@@ -15,6 +15,10 @@ export default defineNuxtConfig({
         '@nuxt/scripts',
         '@nuxt/ui',
         '@nuxt/test-utils',
-        '@nuxt/eslint'
-    ]
+        '@nuxt/eslint',
+        '@pinia/nuxt'
+    ],
+    pinia: {
+        storesDirs: ['./stores/**'],
+    },
 })

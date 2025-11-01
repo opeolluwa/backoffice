@@ -11,7 +11,21 @@ const routes: Route[] = [
     path: "/home",
     icon: "heroicons:home-solid",
   },
-
+  {
+    label:"Users",
+    path:"/users",
+    icon:"heroicons:users-16-solid"
+  },
+  {
+    label:"Account",
+    path:"/account",
+    icon:"heroicons:user-16-solid"
+  },
+  {
+    label:"Settings",
+    path:"/settings",
+    icon:"heroicons:cog-16-solid"
+  }
 ];
 
 
