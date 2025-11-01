@@ -1,6 +1,6 @@
-FROM rust:1.86.0-slim-bullseye
+FROM rust:1.90.0-slim-bullseye
 
-ENV CARGO_TARGET_DIR=/cargo-target 
+ENV CARGO_TARGET_DIR=/cargo-target
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY . .
 
 RUN cargo install cargo-watch
 
-RUN argo build 
+RUN cargo build
 
 VOLUME ["/app", "/cargo-target", "/usr/local/cargo/registry"]
 

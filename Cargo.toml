@@ -15,13 +15,14 @@ chrono = { version = "0.4.41", features = ["serde"] }
 jsonwebtoken = "9.3.1"
 log = "0.4.27"
 serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
+serde_json = { version = "1.0.140", features = ["raw_value"] }
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "postgres", "macros", "uuid", "migrate"] }
 thiserror = "2.0.12"
 tokio = { version = "1.44.2", features = ["full"] }
 tower-http = { version = "0.6.1", features = ["trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+ulid = { version = "1.2.1", features = ["serde"] }
 uuid = { version = "1.16.0", features = ["serde", "v4"] }
 validator = { version = "0.20.0", features = ["derive"] }
 

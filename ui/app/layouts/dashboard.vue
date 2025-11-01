@@ -5,26 +5,32 @@ interface Route {
   path: string
 }
 
-const routes: Route[] = [
+const routes: Route[] | { divider: string } = [
   {
     label: "Home",
     path: "/home",
     icon: "heroicons:home-solid",
   },
+
   {
-    label:"Users",
-    path:"/users",
-    icon:"heroicons:users-16-solid"
+    label: "Users",
+    path: "/users",
+    icon: "heroicons:users-16-solid"
   },
   {
-    label:"Account",
-    path:"/account",
-    icon:"heroicons:user-16-solid"
+    label: "Account",
+    path: "/account",
+    icon: "heroicons:user-16-solid"
   },
   {
-    label:"Settings",
-    path:"/settings",
-    icon:"heroicons:cog-16-solid"
+    label: "Settings",
+    path: "/settings",
+    icon: "heroicons:cog-16-solid"
+  },
+  {
+    label: "Collections",
+    path: "/collections",
+    icon: "heroicons:folder-solid"
   }
 ];
 
@@ -57,13 +63,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
       <div class="flex-1 overflow-y-auto">
         <!-- sidebar content here -->
-<!--        <app-logo class="size-8"/>-->
+        <!--        <app-logo class="size-8"/>-->
         <ul class="space-y-2">
           <li v-for="route in routes" :key="route.path">
             <NuxtLink
                 :to="route.path"
                 class="flex items-center gap-2 px-3 py-4 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                active-class=""
+                active-class="bg-gray-100 border-l-4 rounded-none"
             >
               <UIcon :name="route.icon" class="w-5 h-5"/>
               <span>{{ route.label }}</span>
@@ -83,7 +89,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     <main class="col-span-10 h-screen overflow-y-scroll overflow-x-hidden">
 
       <!-- main content -->
-      <div class=" flex justify-between py-3 px-6  border-b border-gray-200 hidden">
+      <div class=" flex justify-between py-3 px-8 border-b border-gray-200">
         <div>
           <UForm :schema="schema" :state="state">
 
@@ -92,12 +98,14 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         <div class="flex items-center gap-x-2 justify-center">
 
           <UIcon name="heroicons:bell" class="size-5"/>
-          <UAvatar src="https://github.com/benjamincanac.png" class="rounded-full size-8 "/>
+          <UAvatar src="https://github.com/benjamincanac.png" class="size-8 "/>
         </div>
 
       </div>
 
-      <slot/>
+      <div class="px-8">
+        <slot/>
+      </div>
     </main>
   </div>
 </template>
