@@ -38,3 +38,8 @@ build:
 @restart:
     @just kill
     @just watch
+
+
+[working-directory :'ui']
+@run-ui:
+    npm run dev

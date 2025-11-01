@@ -4,14 +4,19 @@ import type {FormSubmitEvent} from '@nuxt/ui'
 
 const schema = v.object({
   email: v.pipe(v.string(), v.email('Please enter a valid email address.')),
-  password: v.pipe(v.string(), v.minLength(8, 'Must be at least 8 characters'))
+  password: v.pipe(v.string(), v.minLength(8, 'Must be at least 8 characters')),
+  firstName: v.pipe(v.string(), v.minLength(1, 'Must be provided')),
+  lastName: v.pipe(v.string(), v.minLength(1, 'Must be provided'))
+
 })
 
 type Schema = v.InferOutput<typeof schema>
 
 const state = reactive({
   email: '',
-  password: ''
+  password: '',
+  firstName: "",
+  lastname: ""
 })
 
 const toast = useToast()
@@ -28,10 +33,22 @@ definePageMeta({
 
 <template>
 
-  <h1 class="capitalize text-center text-5xl font-bold">Welcome</h1>
-  <p class="text-center text-gray-400 leading-6 mt-2">Please enter your email and password</p>
+  <h1 class="capitalize text-center text-5xl font-bold">Create account</h1>
+  <p class="text-center text-gray-400 leading-6 mt-2">The account will be admin account</p>
 
   <UForm :schema="schema" :state="state" class="space-y-4 px-36 w-full mt-6" @submit="onSubmit">
+    <UFormField label="First name" name="firstName" required>
+      <UInput v-model="state.firstName" :ui="{
+ base:'py-4 px-6'
+          }" class="border-2 rounded w-full "/>
+    </UFormField>
+
+    <UFormField label="Last name" name="lastName" required>
+      <UInput v-model="state.lastname" :ui="{
+ base:'py-4 px-6'
+          }" class="border-2 rounded w-full "/>
+    </UFormField>
+
     <UFormField label="Email" name="email" required>
       <UInput v-model="state.email" :ui="{
  base:'py-4 px-6'
@@ -46,7 +63,7 @@ definePageMeta({
 
     <UButton type="submit"
              class="bg-black flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer">
-      Login
+      Continue
     </UButton>
   </UForm>
 </template>
