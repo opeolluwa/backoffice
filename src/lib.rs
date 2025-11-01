@@ -9,3 +9,5 @@ pub mod routes;
 pub mod services;
 pub mod shared;
 pub mod states;
+
+pub mod macros;
