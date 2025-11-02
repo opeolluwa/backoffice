@@ -6,10 +6,10 @@ use ulid::Ulid;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct Collection {
-    pub name: String,
+pub struct Resource {
     pub identifier: Ulid,
+    pub schema: Value,
+    pub icon: String,
     pub created_at: DateTime<Local>,
     pub updated_at: DateTime<Local>,
-    pub schema: Value,
 }
