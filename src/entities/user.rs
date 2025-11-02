@@ -3,7 +3,7 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct UserEntity {
+pub struct User {
     pub email: String,
     pub identifier: Uuid,
     pub first_name: String,

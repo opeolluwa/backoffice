@@ -1,4 +1,4 @@
 
 pub mod user;
-pub mod collection;
+pub mod resource;
 pub mod activity;

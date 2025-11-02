@@ -1,7 +1,7 @@
 use sqlx::{Pool, Postgres};
 
 use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
-use crate::entities::user::UserEntity;
+use crate::entities::user::User;
 use crate::{
     adapters::{
         requests::auth::{
@@ -49,19 +49,24 @@ pub trait AuthenticationServiceTrait {
         &self,
 
         request: &ForgottenPasswordRequest,
-    ) -> impl std::future::Future<Output = Result<ForgottenPasswordResponse, AuthenticationServiceError>> + Send;
+    ) -> impl std::future::Future<
+        Output = Result<ForgottenPasswordResponse, AuthenticationServiceError>,
+    > + Send;
 
     fn set_new_password(
         &self,
         request: &SetNewPasswordRequest,
         claims: &Claims,
-    ) -> impl std::future::Future<Output = Result<SetNewPasswordResponse, AuthenticationServiceError>> + Send;
+    ) -> impl std::future::Future<
+        Output = Result<SetNewPasswordResponse, AuthenticationServiceError>,
+    > + Send;
 
     fn verify_account(
         &self,
         claims: &Claims,
         request: &VerifyAccountRequest,
-    ) -> impl std::future::Future<Output = Result<VerifyAccountResponse, AuthenticationServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<VerifyAccountResponse, AuthenticationServiceError>>
+    + Send;
 
     fn request_refresh_token(
         &self,
@@ -131,7 +136,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
 
         tokio::task::spawn(async move { todo!("send account retrival email") });
 
-        let UserEntity {
+        let User {
             email, identifier, ..
         } = user.unwrap();
 
@@ -145,7 +150,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
         claims: &Claims,
     ) -> Result<SetNewPasswordResponse, AuthenticationServiceError> {
         let new_password = self.user_helper_service.hash_password(&request.password)?;
-    
+
         if self
             .user_repository
             .find_by_identifier(&claims.identifier)

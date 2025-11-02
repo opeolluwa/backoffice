@@ -3,3 +3,4 @@ pub mod auth_service_error;
 pub mod common_service_error;
 pub mod user_service_error;
 pub mod macro_error;
+pub mod repository_error;

@@ -10,7 +10,7 @@ pub fn generate_create_table_sql(
     columns.push("identifier UUID PRIMARY KEY".to_string());
     columns.push("created_at TIMESTAMP NOT NULL DEFAULT NOW()".to_string());
     columns.push("updated_at TIMESTAMP NOT NULL DEFAULT NOW()".to_string());
-
+    columns.push("schema JSONB".to_string());
     for (key, value) in properties {
         columns.push(format!("{key} {kind}", kind = map_field_type(value)))
     }
@@ -75,4 +75,3 @@ mod test {
         }
     }
 }
-

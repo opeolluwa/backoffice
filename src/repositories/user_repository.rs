@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::{
     adapters::{dto::user::UserDto, requests::auth::CreateUserRequest},
-    entities::user::UserEntity,
+    entities::user::User,
     errors::{common_service_error::ServiceError, user_service_error::UserServiceError},
 };
 
@@ -26,12 +26,12 @@ pub trait UserRepositoryTrait {
     fn find_by_identifier(
         &self,
         identifier: &Uuid,
-    ) -> impl std::future::Future<Output = Option<UserEntity>> + Send;
+    ) -> impl std::future::Future<Output = Option<User>> + Send;
 
     fn find_by_email(
         &self,
         email: &str,
-    ) -> impl std::future::Future<Output = Option<UserEntity>> + Send;
+    ) -> impl std::future::Future<Output = Option<User>> + Send;
 
     fn update_account_status(
         &self,
@@ -71,16 +71,16 @@ impl UserRepositoryTrait for UserRepository {
 
         Ok(())
     }
-    async fn find_by_identifier(&self, identifier: &Uuid) -> Option<UserEntity> {
-        sqlx::query_as::<_, UserEntity>("SELECT * FROM users WHERE identifier = $1")
+    async fn find_by_identifier(&self, identifier: &Uuid) -> Option<User> {
+        sqlx::query_as::<_, User>("SELECT * FROM users WHERE identifier = $1")
             .bind(identifier)
             .fetch_one(self.pool.as_ref())
             .await
             .ok()
     }
 
-    async fn find_by_email(&self, email: &str) -> Option<UserEntity> {
-        sqlx::query_as::<_, UserEntity>("SELECT * FROM users WHERE email = $1")
+    async fn find_by_email(&self, email: &str) -> Option<User> {
+        sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
             .bind(email)
             .fetch_one(self.pool.as_ref())
             .await
@@ -88,7 +88,7 @@ impl UserRepositoryTrait for UserRepository {
     }
 
     async fn update_account_status(&self, identifier: &Uuid) -> Result<(), ServiceError> {
-        let _ = sqlx::query_as::<_, UserEntity>(
+        let _ = sqlx::query_as::<_, User>(
             "UPDATE users SET is_active = $1  WHERE identifier = $2",
         )
         .bind(true)
@@ -105,7 +105,7 @@ impl UserRepositoryTrait for UserRepository {
         identifier: &Uuid,
         new_password: &str,
     ) -> Result<(), ServiceError> {
-        let _ = sqlx::query_as::<_, UserEntity>(
+        let _ = sqlx::query_as::<_, User>(
             "UPDATE users SET password = $1  WHERE identifier  = $2",
         )
         .bind(new_password)
