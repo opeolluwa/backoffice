@@ -1,3 +1,9 @@
+import 'scripts/build.just'
+import 'scripts/package.just'
+import 'scripts/server.just'
+import 'scripts/lint.just'
+
+
 alias w:= watch
 alias k:= kill
 alias b:= build

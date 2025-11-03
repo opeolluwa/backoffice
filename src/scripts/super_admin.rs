@@ -4,6 +4,7 @@ use crate::services::auth_service::{AuthenticationService, AuthenticationService
 use crate::shared::extract_env::extract_env;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
+use crate::services::admin_service::{AdminService, AdminServiceExt};
 
 #[derive(Serialize, Deserialize)]
 struct SuperAdminCredentials {
@@ -43,9 +44,9 @@ pub async fn super_admin_from_env(db: &Pool<Postgres>) -> Result<(), AppError> {
         last_name: "".to_string(),
     };
 
-    let auth_service = AuthenticationService::init(db);
-    auth_service
-        .create_account(&admin_user)
+    let admin_service = AdminService::init(db);
+    admin_service
+        .create_super_admin(&admin_user)
         .await
         .map_err(|err| AppError::OperationFailed(err.to_string()))
 }

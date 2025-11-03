@@ -15,7 +15,6 @@ impl UserService {
     pub fn init(pool: &Pool<Postgres>) -> Self {
         Self {
             user_repository: UserRepository::init(pool),
-            // user_helper_service: UserHelperService::init(),
         }
     }
 }
@@ -25,6 +24,13 @@ pub(crate) trait UserServiceTrait {
         &self,
         user_identifier: Uuid,
     ) -> Result<UserDto, UserServiceError>;
+
+    async fn find_user_by_email(
+        &self,
+        user_email: &str,
+    ) -> Result<UserDto, UserServiceError>;
+    
+    
 }
 
 impl UserServiceTrait for UserService {
@@ -35,5 +41,13 @@ impl UserServiceTrait for UserService {
         self.user_repository
             .retrieve_information(&user_identifier)
             .await
+    }
+    async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, UserServiceError> {
+        self.user_repository.find_by_email(user_email).await.ok_or(UserServiceError::OperationFailed("user not found".to_string())).map(|user| UserDto {
+            identifier: user.identifier,
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+        })
     }
 }

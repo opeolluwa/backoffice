@@ -1,7 +1,4 @@
-#![warn(unused_extern_crates)]
-
 use backoffice_lib::{errors, routes, scripts, shared};
-
 use errors::app_error::AppError;
 use routes::router::load_routes;
 use shared::extract_env::extract_env;

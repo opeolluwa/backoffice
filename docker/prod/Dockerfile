@@ -1,5 +1,5 @@
 ARG RUST_VERSION=1.82.0
-ARG APP_NAME=uranium
+ARG APP_NAME=backoffice
 
 FROM rust:${RUST_VERSION} AS build
 ARG APP_NAME
@@ -14,8 +14,8 @@ RUN cargo build --release
 
 FROM ubuntu AS final
 
-COPY --from=build /app/target/release/bookmark ./uranium
+COPY --from=build /app/target/release/bookmark ./backoffice
 
 EXPOSE 50051
 
-CMD ["./uranium"]
+CMD ["./backoffice"]

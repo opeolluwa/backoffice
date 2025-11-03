@@ -23,7 +23,7 @@ pub async fn create_account(
     State(auth_service): State<AuthenticationService>,
     ValidatedRequest(request): ValidatedRequest<CreateUserRequest>,
 ) -> Result<ApiResponse<CreateUserResponse>, AuthenticationServiceError> {
-    auth_service.create_account(&request).await?;
+    auth_service.create_user(&request).await?;
 
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::CREATED)

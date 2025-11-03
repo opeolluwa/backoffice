@@ -11,7 +11,7 @@ pub const _FIVE_MINUTES: Duration = Duration::from_secs(5 * 60 * 60);
 pub const TWENTY_FIVE_MINUTES: Duration = Duration::from_secs(26 * 60 * 60);
 pub const TEN_MINUTES: Duration = Duration::from_secs(10 * 60 * 60);
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JwtCredentials {
     pub email: String,
     pub identifier: Uuid,

@@ -35,11 +35,17 @@ impl AuthenticationService {
     }
 }
 pub trait AuthenticationServiceTrait {
-    fn create_account(
+    fn create_user(
         &self,
         request: &CreateUserRequest,
     ) -> impl std::future::Future<Output = Result<(), AuthenticationServiceError>> + Send;
 
+    fn create_super_admin_user(
+        &self,
+        request: &CreateUserRequest,
+    ) -> impl std::future::Future<Output=Result<(), AuthenticationServiceError>> + Send;
+
+    
     fn login(
         &self,
         request: &LoginRequest,
@@ -75,7 +81,38 @@ pub trait AuthenticationServiceTrait {
 }
 
 impl AuthenticationServiceTrait for AuthenticationService {
-    async fn create_account(
+    async fn create_user(
+        &self,
+        request: &CreateUserRequest,
+    ) -> Result<(), AuthenticationServiceError> {
+        if self
+            .user_repository
+            .find_by_email(&request.email)
+            .await
+            .is_some()
+        {
+            return Err(AuthenticationServiceError::from(
+                UserServiceError::ConflictError("User with the email already exists".to_string()),
+            ));
+        }
+
+        let password_hash = self.user_helper_service.hash_password(&request.password)?;
+        let user = CreateUserRequest {
+            password: password_hash,
+            first_name: request.first_name.to_owned(),
+            email: request.email.to_owned(),
+            last_name: request.last_name.to_owned(),
+        };
+
+        self.user_repository.create_user(user).await.map_err(|err| {
+            log::error!("{}", err.to_string());
+            AuthenticationServiceError::from(err)
+        })
+    }
+
+
+    //TODO: improve 
+    async fn create_super_admin_user(
         &self,
         request: &CreateUserRequest,
     ) -> Result<(), AuthenticationServiceError> {

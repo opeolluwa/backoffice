@@ -21,6 +21,4 @@ pub struct User {
     pub last_name: String,
     pub password: String,
     pub is_active: bool,
-    pub role: Role,
-
 }

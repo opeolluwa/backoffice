@@ -1,5 +1,6 @@
-use crate::errors::macro_error::MacroError;
 use std::collections::HashMap;
+
+use crate::errors::macro_error::MacroError;
 
 pub fn generate_create_table_sql(
     table_name: &str,
