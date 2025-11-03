@@ -1,6 +1,6 @@
 #![warn(unused_extern_crates)]
 
-use uralium_lib::{errors, routes, shared};
+use backoffice_lib::{errors, routes, scripts, shared};
 
 use errors::app_error::AppError;
 use routes::router::load_routes;
@@ -34,6 +34,8 @@ async fn main() -> Result<(), AppError> {
         .await
         .map_err(|err| AppError::StartupError(err.to_string()))?;
 
+    scripts::super_admin_from_env(&pool).await?;
+
     let app = load_routes(pool);
     let port = extract_env::<u16>("PORT")?;
     let ip_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, port));
@@ -48,4 +50,3 @@ async fn main() -> Result<(), AppError> {
 
     Ok(())
 }
-

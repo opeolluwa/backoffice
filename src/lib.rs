@@ -11,3 +11,4 @@ pub mod shared;
 pub mod states;
 
 pub mod macros;
+pub mod scripts;
