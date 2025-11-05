@@ -1,4 +1,4 @@
 - [ ] Create super admin from env
 - [ ] Create dynamic resources 
-- [ ] Use Ulid inplace of UUId for security
-- [ ] Remove unused crates 
+- [x] Use Ulid inplace of UUId for security
+- [x] Remove unused crates 

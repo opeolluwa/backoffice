@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
 use sqlx::{Pool, Postgres};
-use uuid::Uuid;
-
+use ulid::Ulid;
 use crate::{
     adapters::{dto::user::UserDto, requests::auth::CreateUserRequest},
     entities::user::User,
@@ -25,7 +24,7 @@ impl UserRepository {
 pub trait UserRepositoryTrait {
     fn find_by_identifier(
         &self,
-        identifier: &Uuid,
+        identifier: &str,
     ) -> impl std::future::Future<Output = Option<User>> + Send;
 
     fn find_by_email(
@@ -35,12 +34,12 @@ pub trait UserRepositoryTrait {
 
     fn update_account_status(
         &self,
-        identifier: &Uuid,
+        identifier: &str,
     ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
 
     fn update_password(
         &self,
-        identifier: &Uuid,
+        identifier: &str,
         new_password: &str,
     ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
 
@@ -51,34 +50,18 @@ pub trait UserRepositoryTrait {
 
     fn retrieve_information(
         &self,
-        identifier: &Uuid,
+        identifier: &str,
     ) -> impl std::future::Future<Output = Result<UserDto, UserServiceError>> + Send;
 }
 
 impl UserRepositoryTrait for UserRepository {
-    async fn create_user(&self, user: CreateUserRequest) -> Result<(), UserServiceError> {
-        sqlx::query(
-    "INSERT INTO users (identifier, first_name, last_name, email, password) VALUES ($1, $2, $3, $4, $5)"
-)
-.bind(uuid::Uuid::new_v4())
-.bind(user.first_name)
-.bind(user.last_name)
-.bind(user.email)
-.bind(user.password)
-.execute(self.pool.as_ref())
-.await
-.map_err(|err| UserServiceError::OperationFailed(err.to_string()))?;
-
-        Ok(())
-    }
-    async fn find_by_identifier(&self, identifier: &Uuid) -> Option<User> {
+    async fn find_by_identifier(&self, identifier: &str) -> Option<User> {
         sqlx::query_as::<_, User>("SELECT * FROM users WHERE identifier = $1")
             .bind(identifier)
             .fetch_one(self.pool.as_ref())
             .await
             .ok()
     }
-
     async fn find_by_email(&self, email: &str) -> Option<User> {
         sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
             .bind(email)
@@ -87,36 +70,52 @@ impl UserRepositoryTrait for UserRepository {
             .ok()
     }
 
-    async fn update_account_status(&self, identifier: &Uuid) -> Result<(), ServiceError> {
+    async fn update_account_status(&self, identifier: &str) -> Result<(), ServiceError> {
         let _ = sqlx::query_as::<_, User>(
             "UPDATE users SET is_active = $1  WHERE identifier = $2",
         )
-        .bind(true)
-        .bind(identifier.to_string())
-        .fetch_one(self.pool.as_ref())
-        .await
-        .map_err(|err| UserServiceError::OperationFailed(err.to_string()));
+            .bind(true)
+            .bind(identifier.to_string())
+            .fetch_one(self.pool.as_ref())
+            .await
+            .map_err(|err| UserServiceError::OperationFailed(err.to_string()));
 
         Ok(())
     }
 
     async fn update_password(
         &self,
-        identifier: &Uuid,
+        identifier: &str,
         new_password: &str,
     ) -> Result<(), ServiceError> {
         let _ = sqlx::query_as::<_, User>(
             "UPDATE users SET password = $1  WHERE identifier  = $2",
         )
-        .bind(new_password)
-        .bind(identifier)
+            .bind(new_password)
+            .bind(identifier)
         .fetch_one(self.pool.as_ref())
         .await
         .map_err(|err| UserServiceError::OperationFailed(err.to_string()));
 
         Ok(())
     }
-    async fn retrieve_information(&self, identifier: &Uuid) -> Result<UserDto, UserServiceError> {
+
+    async fn create_user(&self, user: CreateUserRequest) -> Result<(), UserServiceError> {
+        sqlx::query(
+            "INSERT INTO users (identifier, first_name, last_name, email, password) VALUES ($1, $2, $3, $4, $5)"
+        )
+            .bind(Ulid::new().to_string())
+            .bind(user.first_name)
+            .bind(user.last_name)
+            .bind(user.email)
+            .bind(user.password)
+            .execute(self.pool.as_ref())
+            .await
+            .map_err(|err| UserServiceError::OperationFailed(err.to_string()))?;
+
+        Ok(())
+    }
+    async fn retrieve_information(&self, identifier: &str) -> Result<UserDto, UserServiceError> {
         sqlx::query_as::<_, UserDto>(r#"SELECT * FROM users  WHERE identifier = $1"#)
             .bind(identifier)
             .fetch_one(self.pool.as_ref())

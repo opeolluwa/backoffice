@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, encode};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+
 
 use crate::errors::auth_service_error::AuthenticationServiceError;
 use crate::shared::extract_env::extract_env;
@@ -14,7 +14,7 @@ pub const TEN_MINUTES: Duration = Duration::from_secs(10 * 60 * 60);
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JwtCredentials {
     pub email: String,
-    pub identifier: Uuid,
+    pub identifier: String,
 }
 
 pub type Claims = JwtCredentials;
@@ -42,7 +42,7 @@ struct Claim {
 }
 
 impl JwtCredentials {
-    pub fn new(email: &str, identifier: &Uuid) -> Self {
+    pub fn new(email: &str, identifier: &str) -> Self {
         Self {
             email: email.to_string(),
             identifier: identifier.to_owned(),

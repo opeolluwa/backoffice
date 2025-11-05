@@ -51,6 +51,7 @@ pub async fn super_admin_from_env(db: &Pool<Postgres>) -> Result<(), AppError> {
         .map_err(|err| AppError::OperationFailed(err.to_string()))
 }
 
+//TODO: use concrete values
 pub async fn check_super_admin() -> Result<bool, AppError> {
     Ok(true)
 }

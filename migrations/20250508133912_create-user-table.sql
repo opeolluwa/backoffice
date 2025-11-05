@@ -1,6 +1,6 @@
 -- Add migration script here
 CREATE TABLE users (
-    identifier UUID PRIMARY KEY,
+    identifier CHAR(26) PRIMARY KEY,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     email VARCHAR(255) NOT NULL UNIQUE,

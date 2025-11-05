@@ -50,6 +50,8 @@ services:
       - POSTGRES_DB=${DATABASE_NAME}
     networks:
       - internal
+    expose:
+      - ${EXTERNAL_DATABASE_PORT}:${DATABASE_PORT}
 
 networks:
   internal:

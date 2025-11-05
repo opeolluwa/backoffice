@@ -1,5 +1,5 @@
 use sqlx::{Pool, Postgres};
-use uuid::Uuid;
+
 
 use crate::adapters::dto::user::UserDto;
 use crate::errors::user_service_error::UserServiceError;
@@ -22,7 +22,7 @@ impl UserService {
 pub(crate) trait UserServiceTrait {
     async fn retrieve_information(
         &self,
-        user_identifier: Uuid,
+        user_identifier: &str,
     ) -> Result<UserDto, UserServiceError>;
 
     async fn find_user_by_email(
@@ -36,7 +36,7 @@ pub(crate) trait UserServiceTrait {
 impl UserServiceTrait for UserService {
     async fn retrieve_information(
         &self,
-        user_identifier: Uuid,
+        user_identifier: &str,
     ) -> Result<UserDto, UserServiceError> {
         self.user_repository
             .retrieve_information(&user_identifier)

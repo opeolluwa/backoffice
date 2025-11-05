@@ -1,15 +1,17 @@
-// use axum::Router;
-// use axum::routing::get;
-// 
-// use axum_test::TestServer;
-// use sqlx::SqlitePool;
-// use sqlx::sqlite::SqlitePoolOptions;
-// 
-// #[tokio::test]
-// async fn test_health_check() {
-//     let pool = SqlitePoolOptions::new()
-//         .connect("sqlite://test.db")
-//         .await
-//         .unwrap();
-//     let app = backoffice_lib::routes::router::load_routes(&pool);
-// }
+
+
+use axum_test::TestServer;
+use sqlx::{PgPool};
+
+#[sqlx::test]
+async fn test_health_check(pool: PgPool) {
+
+    let app = backoffice_lib::routes::router::load_routes(pool);
+    let server = TestServer::new(app).unwrap();
+
+    let response = server
+        .get("/health")
+        .await;
+
+    response.assert_status_ok();
+}
