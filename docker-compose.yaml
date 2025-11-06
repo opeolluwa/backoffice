@@ -4,7 +4,7 @@ services:
     container_name: uranium
     build:
       context: .
-      dockerfile: docker/${ENVIRONMENT}/Dockerfile
+      dockerfile: Dockerfile
       args:
         - CARGO_TARGET_DIR=/cargo-target
     ports:

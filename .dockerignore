@@ -31,3 +31,10 @@
 LICENSE
 README.md
 .env.production
+
+ui/node_modules
+ui/.nuxt
+ui/.output
+ui/dist
+ui/README.md
+ui/.gitignore
