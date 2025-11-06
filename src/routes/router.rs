@@ -1,10 +1,8 @@
-use axum::{Router, http::StatusCode, response::IntoResponse};
-use axum::routing::get_service;
+use axum::Router;
 use sqlx::{Pool, Postgres};
 use tower_http::services::{ServeDir, ServeFile};
 
 use crate::{
-    adapters::response::api_response::ApiResponseBuilder,
     routes::{auth::authentication_routes, public::public_routes, users::user_routes},
     services::{
         auth_service::AuthenticationService, root_service::RootService, user_service::UserService,

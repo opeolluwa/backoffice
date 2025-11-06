@@ -27,6 +27,15 @@ set export :=  true
     npm run dev
 
 
+
+[working-directory :'ui']
+@build-ui:
+    npm run generate
+
+    cp  -r .output/public ../assets
+
+
 run:
+    @just build-ui
     docker compose up -d database
     cargo watch -x run

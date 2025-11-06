@@ -1,6 +1,5 @@
 use crate::adapters::requests::auth::CreateUserRequest;
 use crate::errors::app_error::AppError;
-use crate::services::auth_service::{AuthenticationService, AuthenticationServiceTrait};
 use crate::shared::extract_env::extract_env;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
