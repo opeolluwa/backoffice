@@ -4,7 +4,7 @@ WORKDIR /app
 COPY ./ui/package*.json ./
 RUN npm ci
 COPY ./ui .
-RUN npm run build
+RUN npm run generate
 
 
 ARG RUST_VERSION=1.90.0
@@ -21,7 +21,7 @@ COPY . .
 RUN cargo build --release
 
 FROM ubuntu AS final
-
+WORKDIR /app
 COPY --from=frontend /app/.output/public ./public
 COPY --from=backend /app/target/release/backoffice ./backoffice
 COPY --from=backend /app/migrations ./migrations

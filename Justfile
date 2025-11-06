@@ -25,3 +25,8 @@ set export :=  true
 [working-directory :'ui']
 @run-ui:
     npm run dev
+
+
+run:
+    docker compose up -d database
+    cargo watch -x run
