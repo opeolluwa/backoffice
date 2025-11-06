@@ -27,4 +27,6 @@ Cargo.lock
 .env.local
 zzzsandbox
 
-.evn
+.env
+
+assets
