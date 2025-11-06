@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags:
+      - '*'  # Triggers on all new tags, e.g., v1.0.0, release-2025-11-06, etc.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract tag name
+        id: vars
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag v:${TAG}
