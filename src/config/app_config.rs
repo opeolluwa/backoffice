@@ -1,13 +1,11 @@
 use tower_http::cors::AllowOrigin;
 
-
-
 use crate::errors::app_error::AppError;
 
 extern crate dotenv;
 
-use dotenv::dotenv;
 use crate::shared::extract_env::extract_env;
+use dotenv::dotenv;
 
 #[derive(Debug)]
 pub struct AppConfig {
@@ -26,7 +24,6 @@ impl AppConfig {
         dotenv().ok();
 
         let port = extract_env::<u16>("PORT")?;
-
 
         let max_db_connections = extract_env::<u32>("MAX_DB_CONNECTIONS")?;
 

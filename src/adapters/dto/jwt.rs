@@ -3,7 +3,6 @@ use std::time::Duration;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, encode};
 use serde::{Deserialize, Serialize};
 
-
 use crate::errors::auth_service_error::AuthenticationServiceError;
 use crate::shared::extract_env::extract_env;
 
