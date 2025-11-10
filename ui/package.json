@@ -21,6 +21,7 @@
     "axios": "^1.13.2",
     "eslint": "^9.38.0",
     "nuxt": "^4.2.0",
+    "nuxt-viewport": "^2.3.1",
     "pinia": "^3.0.3",
     "reka-ui": "^2.6.0",
     "tailwindcss": "^4.1.16",

@@ -9,29 +9,35 @@ const routes: Route[] | { divider: string } = [
   {
     label: "Home",
     path: "/home",
-    icon: "heroicons:home-solid",
+    icon: "heroicons:home",
   },
 
   {
     label: "Users",
     path: "/users",
-    icon: "heroicons:users-16-solid"
+    icon: "heroicons:users"
+  },
+  // {
+  //   label: "Account",
+  //   path: "/account",
+  //   icon: "heroicons:user"
+  // },
+
+  {
+    label: "Marketplace",
+    path: "/marketplace",
+    icon: "heroicons:building-storefront"
   },
   {
-    label: "Account",
-    path: "/account",
-    icon: "heroicons:user-16-solid"
+    label: "Collection",
+    path: "/collections",
+    icon: "heroicons:folder"
   },
   {
     label: "Settings",
     path: "/settings",
-    icon: "heroicons:cog-16-solid"
+    icon: "heroicons:cog"
   },
-  {
-    label: "Collections",
-    path: "/collections",
-    icon: "heroicons:folder-solid"
-  }
 ];
 
 
@@ -59,17 +65,15 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <div class="grid grid-cols-12 h-screen">
-    <nav class="col-span-2 border-r border-gray-200  relative px-3 flex flex-col">
+    <nav class="col-span-2 border-r border-gray-200  relative px-3 flex flex-col mt-1">
 
       <div class="flex-1 overflow-y-auto">
-        <!-- sidebar content here -->
-        <!--        <app-logo class="size-8"/>-->
         <ul class="space-y-2">
           <li v-for="route in routes" :key="route.path">
             <NuxtLink
                 :to="route.path"
                 class="flex items-center gap-2 px-3 py-4 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                active-class="bg-gray-100 border-l-4 rounded-none"
+                active-class="bg-gray-200"
             >
               <UIcon :name="route.icon" class="w-5 h-5"/>
               <span>{{ route.label }}</span>

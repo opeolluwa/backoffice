@@ -5,7 +5,7 @@ definePageMeta({
 </script>
 
 <template>
-
+  <under-construction/>
 </template>
 
 <style scoped>

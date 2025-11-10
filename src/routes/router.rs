@@ -20,8 +20,10 @@ pub fn load_routes(pool: Pool<Postgres>) -> Router {
     let serve_dir = ServeDir::new("assets").not_found_service(ServeFile::new("assets/index.html"));
 
     Router::new()
-        .merge(public_routes(state.clone()))
-        .merge(authentication_routes(state.clone()))
-        .nest("/users", user_routes(state.clone()))
-        .fallback_service(serve_dir)
+        .nest("/api", Router::new()
+            .merge(user_routes(state.clone()))
+            .merge(public_routes(state.clone()))
+            .merge(authentication_routes(state.clone())),
+        )
+        // .fallback_service(serve_dir)
 }
