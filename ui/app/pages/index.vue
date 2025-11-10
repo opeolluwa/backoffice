@@ -15,13 +15,23 @@ const state = reactive({
   password: ''
 })
 
+const loading = ref(false)
+const show = ref(false)
 const toast = useToast()
+const router = useRouter()
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
+  loading.value = true;
+  try {
+    const resp = await api.post("/login", {email: event.data.email, password: event.data.password});
 
-  const resp = await api.post("/users/login", {email: event.data.email, passpwrd: event.data.password});
-
+    await router.push('/home')
   console.log(resp)
+  } catch (e) {
+
+  } finally {
+    loading.value = false
+  }
 }
 
 definePageMeta({
@@ -56,21 +66,47 @@ definePageMeta({
 
 
     <!-- Password Field -->
-    <UFormField label="Password" name="password" :error="false" required v-slot="{ error }" :ui="{
-       error:'text-red-500 text-sm mt-1'
-    }">
+    <UFormField
+        label="Password"
+        name="password"
+        :error="false"
+        required
+        v-slot="{ error }"
+        :ui="{ error: 'text-red-500 text-sm mt-1' }"
+    >
       <UInput
           v-model="state.password"
-          type="password"
-          :ui="{ base: 'py-4 px-6' }"
+          :type="show ? 'text' : 'password'"
+          id="password"
+          :ui="{
+      base: 'py-4 px-6',
+      trailing: 'pe-3 mx-auto hidden'
+    }"
           :class="[
-        'border-2 rounded w-full transition-colors',
-        error ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'
-      ]"
-      />
+      'border-2 rounded w-full transition-colors',
+      error ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'
+    ]"
+      >
+        <template #trailing>
+          <UButton
+              color="neutral"
+              variant="ghost"
+              size="lg"
+              class="p-1 absolute"
+              :icon="show ? 'heroicons:eye-slash' : 'heroicons:eye'"
+              :aria-label="show ? 'Hide password' : 'Show password'"
+              :aria-pressed="show"
+              aria-controls="password"
+              @click.prevent="show = !show"
+          />
+        </template>
+      </UInput>
     </UFormField>
 
+
     <UButton
+        :loading="loading"
+        :disabled="loading"
         type="submit"
         class="bg-black flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer"
     >
@@ -81,5 +117,8 @@ definePageMeta({
 </template>
 
 <style scoped>
-
+/* Hide the password reveal button in Edge */
+::-ms-reveal {
+  display: none;
+}
 </style>
