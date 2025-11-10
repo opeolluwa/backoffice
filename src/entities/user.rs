@@ -1,3 +1,4 @@
+use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use sqlx::prelude::FromRow;
@@ -21,4 +22,6 @@ pub struct User {
     pub last_name: String,
     pub password: String,
     pub is_active: bool,
+    // pub created_at: DateTime<Local>,
+    // pub updated_at: Option<DateTime<Local>>
 }

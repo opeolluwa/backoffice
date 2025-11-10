@@ -8,14 +8,25 @@ use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     path::Path,
 };
+use axum::extract::DefaultBodyLimit;
+use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
+use backoffice_lib::config::app::{create_cors_layer, shutdown_signal};
+use backoffice_lib::config::app_config::AppConfig;
+use std::time::Duration;
+use backoffice_lib::config::filesystem::AppFileSystem;
+use backoffice_lib::config::logger::AppLogger;
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .init();
+    AppLogger::init();
+    tracing::info!("Logger initialized");
+
+    let config = AppConfig::from_env()?;
+    AppFileSystem::init(&config)?;
+    tracing::info!("App Config loaded!, {config:#?}");
 
     let database_url = extract_env::<String>("DATABASE_URL")?;
+
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&database_url)
@@ -31,19 +42,28 @@ async fn main() -> Result<(), AppError> {
         .await
         .map_err(|err| AppError::StartupError(err.to_string()))?;
 
-    scripts::super_admin_from_env(&pool).await?;
+    if !scripts::super_admin::super_admin_exists(&pool).await? {
+        scripts::super_admin::create_super_admin_from_env(&pool).await?;
+    }
 
-    let app = load_routes(pool);
-    let port = extract_env::<u16>("PORT")?;
-    let ip_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, port));
-    log::info!("Application listening on http://{}", ip_address);
+    let body_limit_bytes = config.body_limit_mb * 1024 * 1024;
 
-    let listener = tokio::net::TcpListener::bind(ip_address)
-        .await
-        .map_err(|err| AppError::OperationFailed(err.to_string()))?;
+    let app = load_routes(pool)
+        .layer(DefaultBodyLimit::disable())
+        .layer(RequestBodyLimitLayer::new(body_limit_bytes))
+        .layer(TimeoutLayer::new(Duration::from_secs(10)))
+        .layer(tower_http::trace::TraceLayer::new_for_http())
+        .layer(create_cors_layer(&config));
+
+    let ip_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, config.port));
+    tracing::info!("Application listening on http://{ip_address}");
+
+    let listener = tokio::net::TcpListener::bind(ip_address).await?;
+
     axum::serve(listener, app)
-        .await
-        .map_err(|err| AppError::OperationFailed(err.to_string()))?;
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
 
+    tracing::info!("Server shutdown completed");
     Ok(())
 }
