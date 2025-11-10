@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use sqlx::prelude::FromRow;
 
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "role", rename_all = "lowercase")]
 pub enum Role {
@@ -12,7 +11,6 @@ pub enum Role {
     PrivilegedUser,
     User,
 }
-
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct User {

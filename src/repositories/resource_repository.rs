@@ -1,7 +1,6 @@
 use crate::entities::resource::Resource;
 use crate::errors::repository_error::RepositoryError;
 
-
 pub trait ResourceExt {
     async fn create_resource(&self, resource: &Resource) -> Result<Resource, RepositoryError>;
     async fn find_resource_by_identifier(

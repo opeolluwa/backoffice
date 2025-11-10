@@ -43,9 +43,8 @@ pub trait AuthenticationServiceTrait {
     fn create_super_admin_user(
         &self,
         request: &CreateUserRequest,
-    ) -> impl std::future::Future<Output=Result<(), AuthenticationServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<(), AuthenticationServiceError>> + Send;
 
-    
     fn login(
         &self,
         request: &LoginRequest,
@@ -110,8 +109,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
         })
     }
 
-
-    //TODO: improve 
+    //TODO: improve
     async fn create_super_admin_user(
         &self,
         request: &CreateUserRequest,

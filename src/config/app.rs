@@ -1,10 +1,9 @@
 use axum::http::{Method, header};
 use tower_http::cors::{Any, CorsLayer};
 
+use crate::config::app_config::AppConfig;
 use tokio::signal;
 use tracing::info;
-use crate::config::app_config::AppConfig;
-
 
 pub fn create_cors_layer(config: &AppConfig) -> CorsLayer {
     if config.environment == "production" {
@@ -13,7 +12,6 @@ pub fn create_cors_layer(config: &AppConfig) -> CorsLayer {
             .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
             .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
     } else {
-
         CorsLayer::new()
             .allow_origin(Any)
             .allow_methods(Any)

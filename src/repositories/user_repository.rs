@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use sqlx::{Pool, Postgres};
-use ulid::Ulid;
 use crate::{
     adapters::{dto::user::UserDto, requests::auth::CreateUserRequest},
     entities::user::User,
     errors::{common_service_error::ServiceError, user_service_error::UserServiceError},
 };
+use sqlx::{Pool, Postgres};
+use ulid::Ulid;
 
 #[derive(Clone)]
 pub struct UserRepository {
@@ -27,10 +27,7 @@ pub trait UserRepositoryTrait {
         identifier: &str,
     ) -> impl std::future::Future<Output = Option<User>> + Send;
 
-    fn find_by_email(
-        &self,
-        email: &str,
-    ) -> impl std::future::Future<Output = Option<User>> + Send;
+    fn find_by_email(&self, email: &str) -> impl std::future::Future<Output = Option<User>> + Send;
 
     fn update_account_status(
         &self,
@@ -71,9 +68,7 @@ impl UserRepositoryTrait for UserRepository {
     }
 
     async fn update_account_status(&self, identifier: &str) -> Result<(), ServiceError> {
-        let _ = sqlx::query_as::<_, User>(
-            "UPDATE users SET is_active = $1  WHERE identifier = $2",
-        )
+        let _ = sqlx::query_as::<_, User>("UPDATE users SET is_active = $1  WHERE identifier = $2")
             .bind(true)
             .bind(identifier.to_string())
             .fetch_one(self.pool.as_ref())
@@ -88,14 +83,12 @@ impl UserRepositoryTrait for UserRepository {
         identifier: &str,
         new_password: &str,
     ) -> Result<(), ServiceError> {
-        let _ = sqlx::query_as::<_, User>(
-            "UPDATE users SET password = $1  WHERE identifier  = $2",
-        )
+        let _ = sqlx::query_as::<_, User>("UPDATE users SET password = $1  WHERE identifier  = $2")
             .bind(new_password)
             .bind(identifier)
-        .fetch_one(self.pool.as_ref())
-        .await
-        .map_err(|err| UserServiceError::OperationFailed(err.to_string()));
+            .fetch_one(self.pool.as_ref())
+            .await
+            .map_err(|err| UserServiceError::OperationFailed(err.to_string()));
 
         Ok(())
     }

@@ -1,12 +1,12 @@
-use bcrypt::DEFAULT_COST;
 use crate::adapters::requests::auth::CreateUserRequest;
+use crate::entities::privileged_user::PrivilegedUser;
 use crate::errors::app_error::AppError;
+use crate::services::admin_service::{AdminService, AdminServiceExt};
 use crate::shared::extract_env::extract_env;
+use bcrypt::DEFAULT_COST;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 use ulid::Ulid;
-use crate::entities::privileged_user::PrivilegedUser;
-use crate::services::admin_service::{AdminService, AdminServiceExt};
 
 #[derive(Serialize, Deserialize)]
 struct SuperAdminCredentials {
@@ -41,12 +41,18 @@ pub async fn create_super_admin_from_env(db: &Pool<Postgres>) -> Result<(), AppE
     let credentials = SuperAdminCredentials::from_env().unwrap_or_default();
     let role_identifier = create_super_admin_role(&db).await?;
     let identifier = Ulid::new();
-    let hashed_password = bcrypt::hash(&credentials.password, DEFAULT_COST).map_err(|err| AppError::StartupError(err.to_string()))?;
+    let hashed_password = bcrypt::hash(&credentials.password, DEFAULT_COST)
+        .map_err(|err| AppError::StartupError(err.to_string()))?;
 
     let query = r#"INSERT INTO users (identifier, role_identifier, email, password, is_active) VALUES ($1, $2, $3, $4, $5)"#;
 
-
-    sqlx::query(query).bind(identifier.to_string()).bind(&role_identifier).bind(credentials.username).bind(hashed_password).bind(true).execute(db)
+    sqlx::query(query)
+        .bind(identifier.to_string())
+        .bind(&role_identifier)
+        .bind(credentials.username)
+        .bind(hashed_password)
+        .bind(true)
+        .execute(db)
         .await
         .map_err(|err| AppError::OperationFailed(err.to_string()))?;
 
@@ -54,7 +60,9 @@ pub async fn create_super_admin_from_env(db: &Pool<Postgres>) -> Result<(), AppE
 }
 
 pub async fn super_admin_exists(db: &Pool<Postgres>) -> Result<bool, AppError> {
-    let privilege_user = sqlx::query_as!(PrivilegedUser,  r#"
+    let privilege_user = sqlx::query_as!(
+        PrivilegedUser,
+        r#"
      SELECT
             u.email,
             u.identifier,
@@ -68,14 +76,14 @@ pub async fn super_admin_exists(db: &Pool<Postgres>) -> Result<bool, AppError> {
         JOIN user_roles r ON u.role_identifier = r.identifier
         WHERE r.name = 'super_admin'
         LIMIT 1
-    "# ).fetch_optional(db)
-        .await
-        .map_err(|e| AppError::StartupError(format!("DB error: {}", e)))?;
+    "#
+    )
+    .fetch_optional(db)
+    .await
+    .map_err(|e| AppError::StartupError(format!("DB error: {}", e)))?;
 
     Ok(privilege_user.is_some())
-
 }
-
 
 pub async fn create_super_admin_role(db: &Pool<Postgres>) -> Result<String, AppError> {
     let query = r#"
@@ -83,10 +91,15 @@ pub async fn create_super_admin_role(db: &Pool<Postgres>) -> Result<String, AppE
     "#;
 
     let identifier = Ulid::new();
-    sqlx::query(query).bind(&identifier.to_string()).bind("super_admin").bind("Unrestricted access to all resources")
-        .execute(db).await.map_err(|err| {
-        let err_msg = format!("failed to create super_admin role due to {}", err);
-        AppError::StartupError(err_msg)
-    })?;
+    sqlx::query(query)
+        .bind(&identifier.to_string())
+        .bind("super_admin")
+        .bind("Unrestricted access to all resources")
+        .execute(db)
+        .await
+        .map_err(|err| {
+            let err_msg = format!("failed to create super_admin role due to {}", err);
+            AppError::StartupError(err_msg)
+        })?;
     Ok(identifier.to_string())
 }
