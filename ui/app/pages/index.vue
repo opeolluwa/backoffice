@@ -18,8 +18,7 @@ const state = reactive({
 const toast = useToast()
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // toast.add({title: 'Success', description: 'The form has been submitted.', color: 'success'})
-  // import api from "../plugins/api"; // 👈 use your instance
+
   const resp = await api.post("/users/login", {email: event.data.email, passpwrd: event.data.password});
 
   console.log(resp)

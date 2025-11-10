@@ -1,11 +1,9 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard',
-})
+
 </script>
 
 <template>
-  <under-construction/>
+<NuxtImg  />
 </template>
 
 <style scoped>

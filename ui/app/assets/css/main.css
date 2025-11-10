@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+
+@theme {
+    --color-accent: oklch(47.425% 0.08388 183.71);
+    --color-accent-50: oklch(89.583% 0.15351 184.52);
+    --color-accent-100: oklch(89.367% 0.15712 183.7);
+    --color-accent-200: oklch(82.522% 0.14664 183.2);
+    --color-accent-300: oklch(71.406% 0.12702 182.89);
+    --color-accent-400: oklch(59.6% 0.10543 183.96);
+    --color-accent-500: oklch(47.425% 0.08388 183.71);
+    --color-accent-600: oklch(28.9% 0.05058 186.47);
+    --color-accent-700: oklch(0% 0 none);
+    --color-accent-800: oklch(0% 0 none);
+    --color-accent-900: oklch(0% 0 none);
+    --color-accent-950: oklch(0% 0 none);
+}

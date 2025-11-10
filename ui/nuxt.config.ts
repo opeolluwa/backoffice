@@ -11,12 +11,13 @@ export default defineNuxtConfig({
         ],
     },
     modules: [
-        '@nuxt/image',
-        '@nuxt/scripts',
-        '@nuxt/ui',
-        '@nuxt/test-utils',
-        '@nuxt/eslint',
-        '@pinia/nuxt'
+      '@nuxt/image',
+      '@nuxt/scripts',
+      '@nuxt/ui',
+      '@nuxt/test-utils',
+      '@nuxt/eslint',
+      '@pinia/nuxt',
+      'nuxt-viewport',
     ],
     pinia: {
         storesDirs: ['./stores/**'],
