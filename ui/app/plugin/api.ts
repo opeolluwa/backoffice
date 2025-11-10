@@ -1,11 +1,9 @@
 import axios from "axios";
-import {useTokenStore} from "../stores/token";
+// import {useTokenStore} from "../stores/token";
 
 const api = axios.create({
     baseURL:
-        "https://eckko.koyeb.app" ,
-    // "http://192.168.0.170:5006",
-    // "https://mango-jkpc.onrender.com",
+    "http://localhost:5006",
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -15,13 +13,13 @@ const api = axios.create({
 
 api.interceptors.request.use(
     async (config) => {
-        const tokenStore = useTokenStore();
-        if (!tokenStore.isAccessTokenValid()) {
-            await tokenStore.getRefeshToken();
-        }
-
-        const token = tokenStore.accessToken;
-        config.headers.Authorization = `Bearer ${token}`;
+        // const tokenStore = useTokenStore();
+        // if (!tokenStore.isAccessTokenValid()) {
+        //     await tokenStore.getRefeshToken();
+        // }
+        //
+        // const token = tokenStore.accessToken;
+        // config.headers.Authorization = `Bearer ${token}`;
         return config;
     },
     (error) => Promise.reject(error)
@@ -43,5 +41,3 @@ api.interceptors.response.use(
 
 export default api;
 
-// import api from "../plugins/api"; // 👈 use your instance
-// const { data, status } = await api.post("/auth/login", { email, password });

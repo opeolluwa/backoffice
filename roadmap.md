@@ -2,5 +2,5 @@
 - [ ] Create dynamic resources 
 - [x] Use Ulid inplace of UUId for security
 - [x] Remove unused crates 
-- [ ] Add build script 
-- [ ] Add SSR (Axum + Nuxt)
+- [x] Add build script 
+- [x] Add SSR (Axum + Nuxt)

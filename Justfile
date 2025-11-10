@@ -39,3 +39,4 @@ run:
     @just build-ui
     docker compose up -d database
     cargo watch -x run
+
