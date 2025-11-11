@@ -65,17 +65,17 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <div class="grid grid-cols-12 h-screen">
-    <nav class="col-span-2 border-r border-gray-200  relative px-3 flex flex-col mt-1">
+    <nav class="col-span-2 border-r border-gray-200  relative flex flex-col px-4 mt-12">
 
       <div class="flex-1 overflow-y-auto">
         <ul class="space-y-2">
           <li v-for="route in routes" :key="route.path">
             <NuxtLink
                 :to="route.path"
-                class="flex items-center gap-2 px-3 py-4 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                class="flex items-center gap-2 px-4 py-4 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
                 active-class="bg-gray-200"
             >
-              <UIcon :name="route.icon" class="w-5 h-5"/>
+              <UIcon :name="route.icon" class="size-5"/>
               <span>{{ route.label }}</span>
             </NuxtLink>
           </li>
@@ -102,7 +102,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         <div class="flex items-center gap-x-2 justify-center">
 
           <UIcon name="heroicons:bell" class="size-5"/>
-          <UAvatar src="https://github.com/benjamincanac.png" class="size-8 "/>
+          <UAvatar src="https://github.com/benjamincanac.png" />
         </div>
 
       </div>

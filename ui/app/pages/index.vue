@@ -1,48 +1,65 @@
 <script setup lang="ts">
 import * as v from 'valibot'
-import type {FormSubmitEvent} from '@nuxt/ui'
-import api from "~/plugin/api";
+import type { FormSubmitEvent } from '@nuxt/ui'
+import api from '~/plugin/api'
+import { useTokenStore } from '~/stores/token'
+import { useRouter } from 'vue-router'
 
 const schema = v.object({
   email: v.pipe(v.string(), v.email('Please enter a valid email address.')),
-  password: v.pipe(v.string(), v.minLength(8, 'Must be at least 8 characters'))
+  password: v.pipe(v.string(), v.minLength(8, 'Password must be at least 8 characters.')),
 })
 
 type Schema = v.InferOutput<typeof schema>
 
-const state = reactive({
+const state = reactive<Schema>({
   email: '',
-  password: ''
+  password: '',
 })
 
+const formError = ref('')
 const loading = ref(false)
-const show = ref(false)
-const toast = useToast()
+const showPassword = ref(false)
+
 const router = useRouter()
+const tokenStore = useTokenStore()
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  loading.value = true;
+  loading.value = true
+  formError.value = ''
+
   try {
-    const resp = await api.post("/login", {email: event.data.email, password: event.data.password});
+    const resp = await api.post('/login', {
+      email: event.data.email,
+      password: event.data.password,
+    })
 
+    if (resp.status !== 200) {
+      formError.value = resp.data?.message || 'Login failed'
+      return
+    }
+
+    // tokenStore.persistRequestToken(resp.data.data.token)
     await router.push('/home')
-  console.log(resp)
   } catch (e) {
-
+    formError.value = 'An error occurred. Please try again.'
   } finally {
     loading.value = false
   }
 }
 
 definePageMeta({
-  layout: "auth"
+  layout: 'auth',
 })
 </script>
+
 
 <template>
 
   <h1 class="capitalize text-center text-5xl font-bold">Welcome</h1>
   <p class="text-center text-gray-400 leading-6 mt-2">Please enter your email and password</p>
+
+  <span v-if="formError" class="text-red-500 text-sm mt-1">{{ formError }}</span>
   <UForm
       :schema="schema"
       :state="state"

@@ -9,6 +9,7 @@
 
     <div class="col-span-6 sm:flex flex-col justify-center items-center">
       <slot></slot>
+
     </div>
 
 
