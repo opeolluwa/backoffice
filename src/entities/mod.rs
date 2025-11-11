@@ -12,3 +12,4 @@ pub mod privileged_user;
 pub mod user_role;
 
 pub mod resource;
+mod marketplace;
