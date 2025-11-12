@@ -56,10 +56,12 @@ definePageMeta({
 
 <template>
 
-  <h1 class="capitalize text-center text-5xl font-bold">Welcome</h1>
-  <p class="text-center text-gray-400 leading-6 mt-2">Please enter your email and password</p>
+  <h1 class="capitalize text-center text-5xl font-bold" v-show="!formError">Welcome</h1>
+  <h1 class="capitalize text-center text-5xl font-bold" v-show="formError">Oopes!</h1>
 
-  <span v-if="formError" class="text-red-500 text-sm mt-1">{{ formError }}</span>
+  <p class="text-center text-gray-400 leading-6 mt-2" v-show="!formError">Please enter your email and password</p>
+
+  <span v-show="formError" class="text-red-500 text-sm mt-1">{{ formError }}</span>
   <UForm
       :schema="schema"
       :state="state"
@@ -74,7 +76,7 @@ definePageMeta({
           v-model="state.email"
           :ui="{ base: 'py-4 px-6' , }"
           :class="[
-      'border-2 rounded w-full transition-colors',
+      'w-full transition-colors',
       error ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'
     ]"
       />
@@ -93,14 +95,14 @@ definePageMeta({
     >
       <UInput
           v-model="state.password"
-          :type="show ? 'text' : 'password'"
+          :type="showPassword ? 'text' : 'password'"
           id="password"
           :ui="{
       base: 'py-4 px-6',
       trailing: 'pe-3 mx-auto hidden'
     }"
           :class="[
-      'border-2 rounded w-full transition-colors',
+      ' w-full transition-colors',
       error ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'
     ]"
       >
@@ -110,11 +112,11 @@ definePageMeta({
               variant="ghost"
               size="lg"
               class="p-1 absolute"
-              :icon="show ? 'heroicons:eye-slash' : 'heroicons:eye'"
-              :aria-label="show ? 'Hide password' : 'Show password'"
-              :aria-pressed="show"
+              :icon="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              :aria-pressed="showPassword"
               aria-controls="password"
-              @click.prevent="show = !show"
+              @click.prevent="showPassword = !showPassword"
           />
         </template>
       </UInput>
@@ -125,7 +127,7 @@ definePageMeta({
         :loading="loading"
         :disabled="loading"
         type="submit"
-        class="bg-black flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer"
+        class="flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer"
     >
       Login
     </UButton>

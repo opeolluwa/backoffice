@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import * as v from 'valibot'
+import type {FormSubmitEvent} from '@nuxt/ui'
+import useLogout from "~/composibles/useLogout";
+
 interface Route {
   label: string,
   icon: string,
@@ -41,8 +45,6 @@ const routes: Route[] | { divider: string } = [
 ];
 
 
-import * as v from 'valibot'
-import type {FormSubmitEvent} from '@nuxt/ui'
 
 const schema = v.object({
   query: v.pipe(v.string()),
@@ -61,19 +63,20 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   console.log(event.data)
 }
 
+const logout = async () => useLogout();
 </script>
 
 <template>
   <div class="grid grid-cols-12 h-screen">
-    <nav class="col-span-2 border-r border-gray-200  relative flex flex-col px-4 mt-12">
+    <nav class="col-span-2 border-r border-gray-200  relative flex flex-col px-4 pt-12  bg-brand-50/10">
 
       <div class="flex-1 overflow-y-auto">
         <ul class="space-y-2">
           <li v-for="route in routes" :key="route.path">
             <NuxtLink
                 :to="route.path"
-                class="flex items-center gap-2 px-4 py-4 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
-                active-class="bg-gray-200"
+                class="flex items-center   hover:text-brand gap-2 px-4 py-4 rounded text-gray-500 transition-colors"
+                active-class="bg-brand-50/90 text-brand"
             >
               <UIcon :name="route.icon" class="size-5"/>
               <span>{{ route.label }}</span>
@@ -82,7 +85,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         </ul>
       </div>
       <UButton
-          class="bg-black text-white px-3 py-4 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2"
+          @click="logout"
+          class=" text-white px-3 py-4 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2"
       >
 
         <UIcon name="heroicons:arrow-left-end-on-rectangle-20-solid" class="size-5"/>

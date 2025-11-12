@@ -10,6 +10,12 @@ export default defineNuxtConfig({
             tailwindcss(),
         ],
     },
+
+    colorMode: {
+        preference: 'light',
+        fallback: 'light',
+        classSuffix: '',
+    },
     modules: [
       '@nuxt/image',
       '@nuxt/scripts',
@@ -18,6 +24,7 @@ export default defineNuxtConfig({
       '@nuxt/eslint',
       '@pinia/nuxt',
       'nuxt-viewport',
+        '@nuxtjs/color-mode',
     ],
     pinia: {
         storesDirs: ['./stores/**'],
