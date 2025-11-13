@@ -1,7 +1,8 @@
 <template>
- <div class="flex  gap-x-2">
-   <UAvatar src="https://github.com/benjamincanac.png" class="rounded-2xl" /> <div>Alex Brown</div>
- </div>
+  <div class="flex gap-x-2">
+    <UAvatar src="https://github.com/benjamincanac.png" class="rounded-2xl" />
+    <div>Alex Brown</div>
+  </div>
 </template>
 
 <style>
@@ -13,5 +14,4 @@
 }
 </style>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>

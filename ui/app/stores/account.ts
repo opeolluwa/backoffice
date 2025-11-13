@@ -1,11 +1,10 @@
-import {defineStore} from 'pinia'
+import { defineStore } from "pinia";
 
-
-export const useAccountStore = defineStore('account', {
-    state: () => ({
-        firstName: "",
-        lastName: "",
-        email: "",
-    }),
-    persist: true,
-})
+export const useAccountStore = defineStore("account", {
+  state: () => ({
+    firstName: "",
+    lastName: "",
+    email: "",
+  }),
+  persist: true,
+});

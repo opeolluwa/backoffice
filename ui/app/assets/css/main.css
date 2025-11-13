@@ -3,19 +3,19 @@
 
 /* Force light mode rendering */
 @theme {
-    --color-brand: oklch(46.507% 0.18554 314.5);
-    --color-brand-50: oklch(94.011% 0.0321 328.96);
-    --color-brand-100: oklch(88.834% 0.06358 327.76);
-    --color-brand-200: oklch(78.474% 0.12613 325.3);
-    --color-brand-300: oklch(67.936% 0.18068 322.66);
-    --color-brand-400: oklch(57.669% 0.22389 318.72);
-    --color-brand-500: oklch(46.507% 0.18554 314.5);
-    --color-brand-600: oklch(39.581% 0.15594 310.18);
-    --color-brand-700: oklch(32.64% 0.12642 306.18);
-    --color-brand-800: oklch(26.051% 0.09591 301.23);
-    --color-brand-900: oklch(19.522% 0.0654 297.63);
+  --color-brand: oklch(46.507% 0.18554 314.5);
+  --color-brand-50: oklch(94.011% 0.0321 328.96);
+  --color-brand-100: oklch(88.834% 0.06358 327.76);
+  --color-brand-200: oklch(78.474% 0.12613 325.3);
+  --color-brand-300: oklch(67.936% 0.18068 322.66);
+  --color-brand-400: oklch(57.669% 0.22389 318.72);
+  --color-brand-500: oklch(46.507% 0.18554 314.5);
+  --color-brand-600: oklch(39.581% 0.15594 310.18);
+  --color-brand-700: oklch(32.64% 0.12642 306.18);
+  --color-brand-800: oklch(26.051% 0.09591 301.23);
+  --color-brand-900: oklch(19.522% 0.0654 297.63);
 
-    --ui-primary: var(--color-brand);
+  --ui-primary: var(--color-brand);
 }
 
 /* No dark mode overrides — remove this block */

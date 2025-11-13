@@ -1,9 +1,8 @@
-import {defineStore} from 'pinia'
+import { defineStore } from "pinia";
 
-
-export const useAuthStore = defineStore('authStore', {
-    state: () => ({
-        token: ""
-    }),
-    persist: true,
-})
+export const useAuthStore = defineStore("authStore", {
+  state: () => ({
+    token: "",
+  }),
+  persist: true,
+});

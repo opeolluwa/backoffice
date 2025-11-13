@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "prettier": "prettier",
+    "lint": "npm run prettier . --check"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.10.0",
@@ -32,6 +34,7 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
-    "@iconify-json/heroicons": "^1.2.3"
+    "@iconify-json/heroicons": "^1.2.3",
+    "prettier": "3.6.2"
   }
 }
