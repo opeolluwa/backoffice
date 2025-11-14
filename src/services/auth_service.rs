@@ -1,7 +1,7 @@
-use sqlx::{Pool, Postgres};
-
 use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::entities::user::User;
+use crate::errors::repository_error::RepositoryError;
+use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
 use crate::{
     adapters::{
@@ -14,12 +14,11 @@ use crate::{
             VerifyAccountResponse,
         },
     },
-    errors::{
-        auth_service_error::AuthenticationServiceError, user_service_error::UserServiceError,
-    },
+    errors::auth_service_error::AuthenticationServiceError,
     repositories::user_repository::{UserRepository, UserRepositoryTrait},
     services::user_helper_service::{UserHelperService, UserHelperServiceTrait},
 };
+use sqlx::{Pool, Postgres};
 
 #[derive(Clone)]
 pub struct AuthenticationService {
@@ -39,12 +38,12 @@ pub trait AuthenticationServiceTrait {
     fn create_user(
         &self,
         request: &CreateUserRequest,
-    ) -> impl std::future::Future<Output = Result<(), AuthenticationServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
 
     fn create_super_admin_user(
         &self,
         request: &CreateUserRequest,
-    ) -> impl std::future::Future<Output = Result<(), AuthenticationServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
 
     fn login(
         &self,
@@ -81,19 +80,15 @@ pub trait AuthenticationServiceTrait {
 }
 
 impl AuthenticationServiceTrait for AuthenticationService {
-    async fn create_user(
-        &self,
-        request: &CreateUserRequest,
-    ) -> Result<(), AuthenticationServiceError> {
+    async fn create_user(&self, request: &CreateUserRequest) -> Result<(), ServiceError> {
         if self
             .user_repository
             .find_by_email(&request.email)
             .await
             .is_some()
         {
-            return Err(AuthenticationServiceError::from(
-                UserServiceError::ConflictError("User with the email already exists".to_string()),
-            ));
+            todo!("handle duplicate entry error");
+            // return Err(RepositoryError::DuplicateEntry);
         }
 
         let password_hash = self.user_helper_service.hash_password(&request.password)?;
@@ -106,7 +101,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
 
         self.user_repository.create_user(user).await.map_err(|err| {
             log::error!("{}", err.to_string());
-            AuthenticationServiceError::from(err)
+            ServiceError::from(err)
         })
     }
 
@@ -114,16 +109,16 @@ impl AuthenticationServiceTrait for AuthenticationService {
     async fn create_super_admin_user(
         &self,
         request: &CreateUserRequest,
-    ) -> Result<(), AuthenticationServiceError> {
+    ) -> Result<(), ServiceError> {
         if self
             .user_repository
             .find_by_email(&request.email)
             .await
             .is_some()
         {
-            return Err(AuthenticationServiceError::from(
-                UserServiceError::ConflictError("User with the email already exists".to_string()),
-            ));
+            return Err(ServiceError::from(RepositoryError::DuplicateEntry(
+                "user with this email already exists".to_string(),
+            )));
         }
 
         let password_hash = self.user_helper_service.hash_password(&request.password)?;
@@ -134,10 +129,12 @@ impl AuthenticationServiceTrait for AuthenticationService {
             last_name: request.last_name.to_owned(),
         };
 
-        self.user_repository.create_user(user).await.map_err(|err| {
-            log::error!("{}", err.to_string());
-            AuthenticationServiceError::from(err)
-        })
+        // self.user_repository.create_user(user).await.map_err(|err| {
+        //     log::error!("{}", err.to_string());
+        //     AuthenticationServiceError::from(err)
+        // })
+
+        todo!("implement super admin creation logic separate from normal user creation")
     }
 
     async fn login(

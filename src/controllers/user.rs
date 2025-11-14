@@ -5,15 +5,16 @@ use crate::{
         dto::{jwt::Claims, user::UserDto},
         response::api_response::{ApiResponse, ApiResponseBuilder},
     },
-    errors::user_service_error::UserServiceError,
     services::user_service::UserService,
 };
-
+use crate::errors::service_error::ServiceError;
 use crate::services::user_service::UserServiceTrait;
+
+
 pub async fn retrieve_information(
     State(user_service): State<UserService>,
     claim: Claims,
-) -> Result<ApiResponse<UserDto>, UserServiceError> {
+) -> Result<ApiResponse<UserDto>, ServiceError> {
     let user_data = user_service.retrieve_information(&claim.identifier).await?;
 
     Ok(ApiResponseBuilder::new()

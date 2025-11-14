@@ -3,7 +3,8 @@ use std::sync::Arc;
 use crate::{
     adapters::{dto::user::UserDto, requests::auth::CreateUserRequest},
     entities::user::User,
-    errors::{common_service_error::ServiceError, user_service_error::UserServiceError}, repositories::base::Repository,
+    errors::service_error::ServiceError,
+    repositories::base::Repository,
 };
 use sqlx::{Pool, Postgres};
 use ulid::Ulid;
@@ -20,7 +21,6 @@ impl Repository for UserRepository {
         }
     }
 }
-
 
 pub trait UserRepositoryTrait {
     fn find_by_identifier(
@@ -44,12 +44,12 @@ pub trait UserRepositoryTrait {
     fn create_user(
         &self,
         user: CreateUserRequest,
-    ) -> impl std::future::Future<Output = Result<(), UserServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
 
     fn retrieve_information(
         &self,
         identifier: &str,
-    ) -> impl std::future::Future<Output = Result<UserDto, UserServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<UserDto, ServiceError>> + Send;
 }
 
 impl UserRepositoryTrait for UserRepository {
@@ -74,7 +74,7 @@ impl UserRepositoryTrait for UserRepository {
             .bind(identifier.to_string())
             .fetch_one(self.pool.as_ref())
             .await
-            .map_err(|err| UserServiceError::OperationFailed(err.to_string()));
+            .map_err(|err| ServiceError::OperationFailed(err.to_string()));
 
         Ok(())
     }
@@ -89,12 +89,12 @@ impl UserRepositoryTrait for UserRepository {
             .bind(identifier)
             .fetch_one(self.pool.as_ref())
             .await
-            .map_err(|err| UserServiceError::OperationFailed(err.to_string()));
+            .map_err(|err| ServiceError::OperationFailed(err.to_string()));
 
         Ok(())
     }
 
-    async fn create_user(&self, user: CreateUserRequest) -> Result<(), UserServiceError> {
+    async fn create_user(&self, user: CreateUserRequest) -> Result<(), ServiceError> {
         sqlx::query(
             "INSERT INTO users (identifier, first_name, last_name, email, password) VALUES ($1, $2, $3, $4, $5)"
         )
@@ -105,15 +105,15 @@ impl UserRepositoryTrait for UserRepository {
             .bind(user.password)
             .execute(self.pool.as_ref())
             .await
-            .map_err(|err| UserServiceError::OperationFailed(err.to_string()))?;
+            .map_err(|err| ServiceError::OperationFailed(err.to_string()))?;
 
         Ok(())
     }
-    async fn retrieve_information(&self, identifier: &str) -> Result<UserDto, UserServiceError> {
+    async fn retrieve_information(&self, identifier: &str) -> Result<UserDto, ServiceError> {
         sqlx::query_as::<_, UserDto>(r#"SELECT * FROM users  WHERE identifier = $1"#)
             .bind(identifier)
             .fetch_one(self.pool.as_ref())
             .await
-            .map_err(UserServiceError::from)
+            .map_err(|err| ServiceError::OperationFailed(err.to_string()))
     }
 }

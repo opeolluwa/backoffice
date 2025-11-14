@@ -1,6 +1,6 @@
-mod activity;
+pub mod activity;
 pub mod auth;
-mod resource;
+pub mod resource;
 pub mod root;
 pub mod user;
-mod marketplace;
+pub mod marketplace;

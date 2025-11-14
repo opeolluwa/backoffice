@@ -1,9 +1,9 @@
 use sqlx::{Pool, Postgres};
 
 use crate::adapters::dto::user::UserDto;
-use crate::errors::user_service_error::UserServiceError;
-use crate::repositories::user_repository::{UserRepository, UserRepositoryTrait};
+use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
+use crate::repositories::user_repository::{UserRepository, UserRepositoryTrait};
 
 #[derive(Clone)]
 pub struct UserService {
@@ -19,30 +19,22 @@ impl UserService {
 }
 
 pub(crate) trait UserServiceTrait {
-    async fn retrieve_information(
-        &self,
-        user_identifier: &str,
-    ) -> Result<UserDto, UserServiceError>;
+    async fn retrieve_information(&self, user_identifier: &str) -> Result<UserDto, ServiceError>;
 
-    async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, UserServiceError>;
+    async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, ServiceError>;
 }
 
 impl UserServiceTrait for UserService {
-    async fn retrieve_information(
-        &self,
-        user_identifier: &str,
-    ) -> Result<UserDto, UserServiceError> {
+    async fn retrieve_information(&self, user_identifier: &str) -> Result<UserDto, ServiceError> {
         self.user_repository
             .retrieve_information(&user_identifier)
             .await
     }
-    async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, UserServiceError> {
+    async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, ServiceError> {
         self.user_repository
             .find_by_email(user_email)
             .await
-            .ok_or(UserServiceError::OperationFailed(
-                "user not found".to_string(),
-            ))
+            .ok_or(ServiceError::OperationFailed("user not found".to_string()))
             .map(|user| UserDto {
                 identifier: user.identifier,
                 email: user.email,
