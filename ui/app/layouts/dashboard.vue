@@ -104,7 +104,7 @@ const getKey = (item: RouteItem) =>
           <li v-for="item in routes" :key="getKey(item)">
             <!-- Divider -->
             <template v-if="'divider' in item">
-              <div class="border-t border-gray-200 my-4"/>
+              <div class="border-t border-gray-200 my-4" />
             </template>
 
             <!-- Normal route -->
