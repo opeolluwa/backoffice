@@ -40,3 +40,9 @@ run:
     docker compose up -d database
     cargo watch -x run
 
+
+lint:
+    cd ui && npm run lint 
+    cargo sort -w 
+    cargo group-imports --fix
+    cargo fmt 
