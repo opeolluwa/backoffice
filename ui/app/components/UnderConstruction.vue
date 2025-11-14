@@ -5,7 +5,7 @@
     <NuxtImg
       src="/construction-icon.png"
       alt="The page is under construction"
-      class="w-[80px]"
+      class="w-20"
     />
     <h1 class="mt-4 text-xl poppins-thin">
       This page is still under construction!

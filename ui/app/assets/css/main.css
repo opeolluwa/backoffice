@@ -14,8 +14,13 @@
   --color-brand-700: oklch(32.64% 0.12642 306.18);
   --color-brand-800: oklch(26.051% 0.09591 301.23);
   --color-brand-900: oklch(19.522% 0.0654 297.63);
-
+  --color-tint: var(--color-red-50/20);
   --ui-primary: var(--color-brand);
 }
 
 /* No dark mode overrides — remove this block */
+
+
+._icon {
+  @apply size-5 cursor-pointer hover:text-brand;
+}
