@@ -3,6 +3,7 @@ use sqlx::{Pool, Postgres};
 use crate::adapters::dto::user::UserDto;
 use crate::errors::user_service_error::UserServiceError;
 use crate::repositories::user_repository::{UserRepository, UserRepositoryTrait};
+use crate::repositories::base::Repository;
 
 #[derive(Clone)]
 pub struct UserService {

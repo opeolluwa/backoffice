@@ -1,3 +1,4 @@
-mod resource_repository;
+pub mod resource_repository;
 pub mod user_repository;
-mod marketplace;
+pub mod marketplace_repository;
+pub mod base;

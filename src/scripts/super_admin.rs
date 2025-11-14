@@ -1,7 +1,5 @@
-use crate::adapters::requests::auth::CreateUserRequest;
 use crate::entities::privileged_user::PrivilegedUser;
 use crate::errors::app_error::AppError;
-use crate::services::admin_service::{AdminService, AdminServiceExt};
 use crate::shared::extract_env::extract_env;
 use bcrypt::DEFAULT_COST;
 use serde::{Deserialize, Serialize};

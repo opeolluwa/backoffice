@@ -2,6 +2,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::entities::user::User;
+use crate::repositories::base::Repository;
 use crate::{
     adapters::{
         requests::auth::{

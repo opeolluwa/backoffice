@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::{
     adapters::{dto::user::UserDto, requests::auth::CreateUserRequest},
     entities::user::User,
-    errors::{common_service_error::ServiceError, user_service_error::UserServiceError},
+    errors::{common_service_error::ServiceError, user_service_error::UserServiceError}, repositories::base::Repository,
 };
 use sqlx::{Pool, Postgres};
 use ulid::Ulid;
@@ -13,13 +13,14 @@ pub struct UserRepository {
     pool: Arc<Pool<Postgres>>,
 }
 
-impl UserRepository {
-    pub fn init(pool: &Pool<Postgres>) -> Self {
+impl Repository for UserRepository {
+    fn init(pool: &Pool<Postgres>) -> Self {
         Self {
             pool: Arc::new(pool.clone()),
         }
     }
 }
+
 
 pub trait UserRepositoryTrait {
     fn find_by_identifier(

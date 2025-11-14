@@ -1,6 +1,3 @@
-- [ ] Create super admin from env
+- [ ] Create super admin from CLI
 - [ ] Create dynamic resources 
-- [x] Use Ulid inplace of UUId for security
-- [x] Remove unused crates 
-- [x] Add build script 
-- [x] Add SSR (Axum + Nuxt)
+- [ ] Create market place. 

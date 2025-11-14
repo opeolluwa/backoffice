@@ -36,7 +36,7 @@ set export :=  true
 
 
 run:
-    @just build-ui
+    #@just build-ui
     docker compose up -d database
     cargo watch -x run
 
