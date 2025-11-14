@@ -3,6 +3,9 @@ use axum::response::Response;
 use axum::{http::StatusCode, response::IntoResponse};
 
 use crate::adapters::response::api_response::ApiResponseBuilder;
+use crate::errors::app_error::AppError;
+use crate::errors::authentication_error::AuthenticationError;
+use crate::errors::repository_error::RepositoryError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ServiceError {
@@ -14,6 +17,18 @@ pub enum ServiceError {
     AxumFormRejection(#[from] FormRejection),
     #[error(transparent)]
     AxumJsonRejection(#[from] JsonRejection),
+    #[error("an unknown service error has occurred")]
+    Unknown,
+    #[error("operation failed: {0}")]
+    OperationFailed(String),
+    #[error(transparent)]
+    AuthenticationError(#[from] AuthenticationError),
+    #[error("badly formatted request")]
+    BadRequest,
+    #[error("an internal error occurred")]
+    AppError(#[from] AppError),
+    #[error(transparent)]
+    RepositoryError(#[from] RepositoryError),
 }
 
 impl ServiceError {
@@ -23,6 +38,9 @@ impl ServiceError {
             ServiceError::AxumFormRejection(_) => StatusCode::BAD_REQUEST,
             ServiceError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ServiceError::AxumJsonRejection(_) => StatusCode::BAD_REQUEST,
+            ServiceError::AuthenticationError(error) => error.status_code(),
+            ServiceError::RepositoryError(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

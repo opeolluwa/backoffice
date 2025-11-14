@@ -1,17 +1,26 @@
 @import "tailwindcss";
+@import "@nuxt/ui";
 
-
+/* Force light mode rendering */
 @theme {
-    --color-accent: oklch(47.425% 0.08388 183.71);
-    --color-accent-50: oklch(89.583% 0.15351 184.52);
-    --color-accent-100: oklch(89.367% 0.15712 183.7);
-    --color-accent-200: oklch(82.522% 0.14664 183.2);
-    --color-accent-300: oklch(71.406% 0.12702 182.89);
-    --color-accent-400: oklch(59.6% 0.10543 183.96);
-    --color-accent-500: oklch(47.425% 0.08388 183.71);
-    --color-accent-600: oklch(28.9% 0.05058 186.47);
-    --color-accent-700: oklch(0% 0 none);
-    --color-accent-800: oklch(0% 0 none);
-    --color-accent-900: oklch(0% 0 none);
-    --color-accent-950: oklch(0% 0 none);
+  --color-brand: oklch(46.507% 0.18554 314.5);
+  --color-brand-50: oklch(94.011% 0.0321 328.96);
+  --color-brand-100: oklch(88.834% 0.06358 327.76);
+  --color-brand-200: oklch(78.474% 0.12613 325.3);
+  --color-brand-300: oklch(67.936% 0.18068 322.66);
+  --color-brand-400: oklch(57.669% 0.22389 318.72);
+  --color-brand-500: oklch(46.507% 0.18554 314.5);
+  --color-brand-600: oklch(39.581% 0.15594 310.18);
+  --color-brand-700: oklch(32.64% 0.12642 306.18);
+  --color-brand-800: oklch(26.051% 0.09591 301.23);
+  --color-brand-900: oklch(19.522% 0.0654 297.63);
+  --color-tint: var(--color-red-50/20);
+  --ui-primary: var(--color-brand);
+}
+
+/* No dark mode overrides — remove this block */
+
+
+._icon {
+  @apply size-5 cursor-pointer hover:text-brand;
 }

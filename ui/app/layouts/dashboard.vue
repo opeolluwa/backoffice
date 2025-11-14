@@ -1,11 +1,21 @@
 <script setup lang="ts">
+import * as v from "valibot";
+import type { FormSubmitEvent } from "@nuxt/ui";
+import useLogout from "~/composables/useLogout";
+
 interface Route {
-  label: string,
-  icon: string,
-  path: string
+  label: string;
+  icon: string;
+  path: string;
 }
 
-const routes: Route[] | { divider: string } = [
+interface Divider {
+  divider: boolean;
+}
+
+type RouteItem = Route | Divider;
+
+const routes: RouteItem[] = [
   {
     label: "Home",
     path: "/home",
@@ -13,107 +23,161 @@ const routes: Route[] | { divider: string } = [
   },
 
   {
-    label: "Users",
-    path: "/users",
-    icon: "heroicons:users"
+    label: "Tasks",
+    path: "/tasks",
+    icon: "lucide:layout-list",
   },
-  // {
-  //   label: "Account",
-  //   path: "/account",
-  //   icon: "heroicons:user"
-  // },
+
+  {
+    label: "Analytics",
+    path: "/analytics",
+    icon: "heroicons:chart-bar-square",
+  },
+
+  {
+    label: "Calendar",
+    path: "/calendar",
+    icon: "heroicons:calendar-date-range",
+  },
+
+  {
+    label: "Team",
+    path: "/teams",
+    icon: "heroicons:users",
+  },
+
+  {
+    divider: true,
+  },
 
   {
     label: "Marketplace",
     path: "/marketplace",
-    icon: "heroicons:building-storefront"
+    icon: "heroicons:building-storefront",
   },
   {
     label: "Collection",
     path: "/collections",
-    icon: "heroicons:folder"
+    icon: "heroicons:folder",
   },
   {
     label: "Settings",
     path: "/settings",
-    icon: "heroicons:cog"
+    icon: "heroicons:cog",
   },
 ];
 
-
-import * as v from 'valibot'
-import type {FormSubmitEvent} from '@nuxt/ui'
-
 const schema = v.object({
   query: v.pipe(v.string()),
-})
+});
 
-type Schema = v.InferOutput<typeof schema>
+type Schema = v.InferOutput<typeof schema>;
 
 const state = reactive({
-  query: '',
-})
+  query: "",
+});
 
-const toast = useToast()
+const toast = useToast();
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  toast.add({title: 'Success', description: 'The form has been submitted.', color: 'success'})
-  console.log(event.data)
+  toast.add({
+    title: "Success",
+    description: "The form has been submitted.",
+    color: "success",
+  });
+  console.log(event.data);
 }
 
+const logout = async () => useLogout();
+const getKey = (item: RouteItem) =>
+  "divider" in item ? `div-${Math.random()}` : item.path;
 </script>
 
 <template>
   <div class="grid grid-cols-12 h-screen">
-    <nav class="col-span-2 border-r border-gray-200  relative px-3 flex flex-col mt-1">
-
+    <nav
+      class="col-span-2 border-r border-gray-200 relative flex flex-col px-4 pt-12 bg-brand-50/20"
+    >
       <div class="flex-1 overflow-y-auto">
         <ul class="space-y-2">
-          <li v-for="route in routes" :key="route.path">
-            <NuxtLink
-                :to="route.path"
-                class="flex items-center gap-2 px-3 py-4 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                active-class="bg-gray-200"
-            >
-              <UIcon :name="route.icon" class="w-5 h-5"/>
-              <span>{{ route.label }}</span>
-            </NuxtLink>
+          <li v-for="item in routes" :key="getKey(item)">
+            <!-- Divider -->
+            <template v-if="'divider' in item">
+              <div class="border-t border-gray-200 my-4"/>
+            </template>
+
+            <!-- Normal route -->
+            <template v-else>
+              <NuxtLink
+                :href="item.path"
+                class="flex items-center hover:text-brand gap-2 px-4 py-4 rounded text-gray-500 transition-colors"
+                active-class="bg-brand-50/90 text-brand"
+              >
+                <UIcon :name="item.icon" class="size-5" />
+                <span>{{ item.label }}</span>
+              </NuxtLink>
+            </template>
           </li>
         </ul>
       </div>
-      <UButton
-          class="bg-black text-white px-3 py-4 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2"
-      >
 
-        <UIcon name="heroicons:arrow-left-end-on-rectangle-20-solid" class="size-5"/>
+      <UButton
+        class="text-white px-3 py-4 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2"
+        @click="logout"
+      >
+        <UIcon
+          name="heroicons:arrow-left-end-on-rectangle-20-solid"
+          class="size-5"
+        />
         Logout
       </UButton>
     </nav>
 
     <main class="col-span-10 h-screen overflow-y-scroll overflow-x-hidden">
-
       <!-- main content -->
-      <div class=" flex justify-between py-3 px-8 border-b border-gray-200">
+      <header
+        class="flex justify-between items-center px-8 border-b border-gray-200 bg-brand-50/20 min-h-20 py-4"
+      >
         <div>
           <UForm :schema="schema" :state="state">
-
+            <UFormField
+              v-slot="{ error }"
+              name="name"
+              required
+              :ui="{
+                error: 'text-red-500 text-sm mt-1',
+              }"
+            >
+              <UInput
+                placeholder="Search"
+                icon="heroicons:magnifying-glass"
+                :ui="{ base: 'py-2.5 px-6' }"
+                variant="outline"
+                :class="[
+                  'w-full transition-colors rounded-3xl',
+                  error
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-gray-300 focus:border-black',
+                ]"
+              />
+            </UFormField>
           </UForm>
         </div>
-        <div class="flex items-center gap-x-2 justify-center">
-
-          <UIcon name="heroicons:bell" class="size-5"/>
-          <UAvatar src="https://github.com/benjamincanac.png" class="size-8 "/>
+        <div class="flex items-center gap-x-5 justify-center">
+          <UIcon name="heroicons:bell" class="_icon" />
+          <UIcon name="heroicons:envelope" class="_icon" />
+          <NuxtLink to="/account">
+            <UserCard />
+          </NuxtLink>
         </div>
-
-      </div>
+      </header>
 
       <div class="px-8">
-        <slot/>
+        <slot />
       </div>
     </main>
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

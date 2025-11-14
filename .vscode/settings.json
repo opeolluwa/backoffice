@@ -7,10 +7,13 @@
     "dotenv",
     "DQJEZDW",
     "gjolpf",
+    "heroicons",
     "Iden",
     "jsonwebtoken",
     "lettre",
+    "lucide",
     "middlename",
+    "Nuxt",
     "oneshot",
     "ormlite",
     "pkce",
@@ -21,7 +24,9 @@
     "smaple",
     "sqlx",
     "tbody",
+    "thiserror",
     "tinytemplate",
-    "TOTP"
+    "TOTP",
+    "valibot"
   ]
 }

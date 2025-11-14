@@ -2,24 +2,29 @@
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-    compatibilityDate: '2025-07-15',
-    devtools: {enabled: true},
-    css: ['./app/assets/css/main.css'],
-    vite: {
-        plugins: [
-            tailwindcss(),
-        ],
-    },
-    modules: [
-      '@nuxt/image',
-      '@nuxt/scripts',
-      '@nuxt/ui',
-      '@nuxt/test-utils',
-      '@nuxt/eslint',
-      '@pinia/nuxt',
-      'nuxt-viewport',
-    ],
-    pinia: {
-        storesDirs: ['./stores/**'],
-    },
-})
+  compatibilityDate: "2025-07-15",
+  devtools: { enabled: true },
+  css: ["./app/assets/css/main.css"],
+  vite: {
+    plugins: [tailwindcss()],
+  },
+
+  colorMode: {
+    preference: "light",
+    fallback: "light",
+    classSuffix: "",
+  },
+  modules: [
+    "@nuxt/image",
+    "@nuxt/scripts",
+    "@nuxt/ui",
+    "@nuxt/test-utils",
+    "@nuxt/eslint",
+    "@pinia/nuxt",
+    "nuxt-viewport",
+    "@nuxtjs/color-mode",
+  ],
+  pinia: {
+    storesDirs: ["./stores/**"],
+  },
+});

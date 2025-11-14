@@ -3,14 +3,28 @@ use std::fmt::Debug;
 use axum::Json;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use serde::Serialize;
-use serde_json::json;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+use crate::errors::service_error::ServiceError;
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ApiResponse<T: Serialize> {
-    message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    message: Option<String>,
+
     data: Option<T>,
+    #[serde(skip)]
     status_code: StatusCode,
+}
+
+impl From<ServiceError> for ApiResponse<()> {
+    fn from(value: ServiceError) -> Self {
+        ApiResponse {
+            message: None,
+            data: Some(()),
+            status_code: value.into_response().status(),
+        }
+    }
 }
 
 pub type EmptyResponseBody = ();
@@ -60,7 +74,7 @@ where
 
     pub fn build(self) -> ApiResponse<T> {
         ApiResponse {
-            message: self.message.unwrap_or_default(),
+            message: self.message,
             data: self.data,
             status_code: self.status_code,
         }
@@ -72,10 +86,26 @@ where
     T: Serialize,
 {
     fn into_response(self) -> Response {
-        let body = Json(json!({
-          "message":self.message,
-          "data":self.data
-        }));
+        #[derive(Debug, Serialize)]
+        struct BaseResponse<T> {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            message: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            data: Option<T>,
+        }
+        let body = Json(BaseResponse {
+            message: self.message,
+            data: self.data,
+        });
         (self.status_code, body).into_response()
+    }
+}
+
+impl<T> ApiResponse<T>
+where
+    T: Serialize,
+{
+    pub fn builder() -> ApiResponseBuilder<T> {
+        ApiResponseBuilder::new()
     }
 }

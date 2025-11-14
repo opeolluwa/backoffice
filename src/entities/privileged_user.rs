@@ -1,5 +1,3 @@
-use crate::entities::user_role::UserRole;
-use chrono::{DateTime, Local, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
