@@ -29,8 +29,8 @@ const routes: RouteItem[] = [
   },
 
   {
-    label: "Analytics",
-    path: "/analytics",
+    label: "Metrics",
+    path: "/metrics",
     icon: "heroicons:chart-bar-square",
   },
 
@@ -41,15 +41,8 @@ const routes: RouteItem[] = [
   },
 
   {
-    label: "Team",
-    path: "/teams",
-    icon: "heroicons:users",
-  },
-
-  {
     divider: true,
   },
-
   {
     label: "Marketplace",
     path: "/marketplace",
@@ -59,6 +52,14 @@ const routes: RouteItem[] = [
     label: "Collection",
     path: "/collections",
     icon: "heroicons:folder",
+  },
+  {
+    divider: true,
+  },
+  {
+    label: "Team",
+    path: "/teams",
+    icon: "heroicons:users",
   },
   {
     label: "Settings",
@@ -97,22 +98,24 @@ const getKey = (item: RouteItem) =>
 <template>
   <div class="grid grid-cols-12 h-screen">
     <nav
-      class="col-span-2 border-r border-gray-200 relative flex flex-col px-4 pt-12 bg-brand-50/20"
+      class="col-span-2 border-r border-gray-200 dark:border-gray-200/10 relative flex flex-col px-4 pt-12 bg-brand-50/20 dark:bg-brand-dark-400/5"
     >
       <div class="flex-1 overflow-y-auto">
         <ul class="space-y-2">
           <li v-for="item in routes" :key="getKey(item)">
             <!-- Divider -->
             <template v-if="'divider' in item">
-              <div class="border-t border-gray-200 my-4" />
+              <div
+                class="border-t border-gray-200 dark:border-gray-200/10 my-6"
+              />
             </template>
 
             <!-- Normal route -->
             <template v-else>
               <NuxtLink
                 :href="item.path"
-                class="flex items-center hover:text-brand gap-2 px-4 py-4 rounded text-gray-500 transition-colors"
-                active-class="bg-brand-50/90 text-brand"
+                class="flex items-center hover:text-brand dark:hover:text-white/50 gap-2 px-3 my-2 py-2 rounded text-gray-500 transition-colors border-brand-400"
+                active-class="bg-brand-50/90 dark:bg-brand-100/20 text-brand text-white/50"
               >
                 <UIcon :name="item.icon" class="size-5" />
                 <span>{{ item.label }}</span>
@@ -123,7 +126,7 @@ const getKey = (item: RouteItem) =>
       </div>
 
       <UButton
-        class="text-white px-3 py-4 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2"
+        class="text-white px-3 py-3 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2 dark:bg-brand-600"
         @click="logout"
       >
         <UIcon
@@ -137,7 +140,7 @@ const getKey = (item: RouteItem) =>
     <main class="col-span-10 h-screen overflow-y-scroll overflow-x-hidden">
       <!-- main content -->
       <header
-        class="flex justify-between items-center px-8 border-b border-gray-200 bg-brand-50/20 min-h-20 py-4"
+        class="flex justify-between items-center px-8 border-b border-gray-200 bg-brand-50/20 dark:bg-brand-dark dark:border-gray-200/10 min-h-20 py-4"
       >
         <div>
           <UForm :schema="schema" :state="state">
@@ -166,7 +169,7 @@ const getKey = (item: RouteItem) =>
         </div>
         <div class="flex items-center gap-x-5 justify-center">
           <UIcon name="heroicons:bell" class="_icon" />
-          <UIcon name="heroicons:envelope" class="_icon" />
+          <UIcon name="heroicons:moon" class="_icon" />
           <NuxtLink to="/account">
             <UserCard />
           </NuxtLink>

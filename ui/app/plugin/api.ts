@@ -1,5 +1,5 @@
 import axios from "axios";
-// import {useTokenStore} from "../stores/token";
+import { useTokenStore } from "~/stores/token";
 
 const api = axios.create({
   baseURL: "http://localhost:5006/api",
@@ -12,13 +12,13 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    // const tokenStore = useTokenStore();
-    // if (!tokenStore.isAccessTokenValid()) {
-    //     await tokenStore.getRefeshToken();
-    // }
-    //
-    // const token = tokenStore.accessToken;
-    // config.headers.Authorization = `Bearer ${token}`;
+    const tokenStore = useTokenStore();
+    if (!tokenStore.isAccessTokenValid()) {
+      await tokenStore.getRefreshToken();
+    }
+
+    const token = tokenStore.accessToken;
+    config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error),
@@ -29,9 +29,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // example: redirect to login if token expired
-      // const router = useRouter() ❌ can't be used here directly
-      // → Instead, emit event or handle in composable
       console.warn("Unauthorized, maybe redirect to login");
     }
     return Promise.reject(error);

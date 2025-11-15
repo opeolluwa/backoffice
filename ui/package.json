@@ -26,7 +26,7 @@
     "nuxt": "^4.2.0",
     "nuxt-viewport": "^2.3.1",
     "pinia": "^3.0.3",
-    "reka-ui": "^2.6.0",
+    "pinia-plugin-persistedstate": "^4.7.1",
     "tailwindcss": "^4.1.16",
     "typescript": "^5.9.3",
     "valibot": "^1.1.0",
