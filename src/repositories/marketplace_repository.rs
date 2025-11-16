@@ -76,13 +76,14 @@ impl MarketplaceRepositoryExt for MarketplaceRepository {
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
     ) -> Result<MarketPlace, RepositoryError> {
-        let query = "INSERT INTO marketplaces (identifier, name, description, user_identifier) VALUES ($1, $2, $3, $4) RETURNING *";
+        let query = "INSERT INTO marketplaces (identifier, name, description, slug, user_identifier) VALUES ($1, $2, $3, $4, $5) RETURNING *";
 
         let identifier = Ulid::new().to_string();
         let marketplace: MarketPlace = sqlx::query_as(query)
             .bind(identifier)
             .bind(&request.name)
             .bind(&request.description)
+            .bind(&request.slug)
             .bind(user_identifier)
             .fetch_one(self.pool.as_ref())
             .await

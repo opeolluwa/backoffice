@@ -28,6 +28,8 @@ const resetForm = () => {
   state.slug = "";
 };
 
+const marketplaceStore = useMarketplaceStore(); 
+
 const toast = useToast();
 const loading = ref(false);
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
