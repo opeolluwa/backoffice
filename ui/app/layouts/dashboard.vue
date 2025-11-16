@@ -115,7 +115,7 @@ const getKey = (item: RouteItem) =>
               <NuxtLink
                 :href="item.path"
                 class="flex items-center hover:text-brand dark:hover:text-white/50 gap-2 px-3 my-2 py-2 rounded text-gray-500 transition-colors border-brand-400"
-                active-class="bg-brand-50/90 dark:bg-brand-100/20 text-brand text-white/50"
+                active-class="bg-brand-50/90 dark:bg-brand-100/20 t"
               >
                 <UIcon :name="item.icon" class="size-5" />
                 <span>{{ item.label }}</span>
@@ -169,7 +169,7 @@ const getKey = (item: RouteItem) =>
         </div>
         <div class="flex items-center gap-x-5 justify-center">
           <UIcon name="heroicons:bell" class="_icon" />
-          <UIcon name="heroicons:moon" class="_icon" />
+          <UColorModeButton />
           <NuxtLink to="/account">
             <UserCard />
           </NuxtLink>

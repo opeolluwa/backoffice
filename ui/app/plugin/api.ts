@@ -11,10 +11,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-  async (config) => {
+   (config) => {
     const tokenStore = useTokenStore();
     if (!tokenStore.isAccessTokenValid()) {
-      await tokenStore.getRefreshToken();
+      // await tokenStore.getRefreshToken();
     }
 
     const token = tokenStore.accessToken;

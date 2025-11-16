@@ -1,9 +1,61 @@
 <script setup lang="ts">
+import * as v from "valibot";
+import type { FormSubmitEvent } from "@nuxt/ui";
+import api from "~/plugin/api";
 definePageMeta({
   layout: "dashboard",
 });
 
+const schema = v.object({
+  name: v.pipe(v.string(), v.minLength(1, "Name is required ")),
+  description: v.pipe(v.string(), v.minLength(1, "Description is required ")),
+  slug: v.pipe(v.string(), v.minLength(1, "Slug is required ")),
+});
+
+type Schema = v.InferOutput<typeof schema>;
+
 const openForm = ref(false);
+
+const state = reactive<Schema>({
+  name: "",
+  description: "",
+  slug: "",
+});
+
+const resetForm = () => {
+  state.name = "";
+  state.description = "";
+  state.slug = "";
+};
+
+const toast = useToast();
+const loading = ref(false);
+async function onSubmit({ data }: FormSubmitEvent<Schema>) {
+  loading.value = true;
+  try {
+    const { status, data: response } = api.post("/marketplace", data);
+    if (status !== 201) {
+      throw new Error(response?.message || "Failed to create marketplace");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    toast.add({
+      title: "Error",
+      description: "Failed to create marketplace. Please try again.",
+      color: "error",
+    });
+  } finally {
+    loading.value = false;
+  }
+
+  toast.add({
+    title: "Success",
+    description: "Product added successfully.",
+  });
+  openForm.value = false;
+  resetForm();
+}
 </script>
 
 <template>
@@ -28,7 +80,12 @@ const openForm = ref(false);
       close-icon="heroicons:x-mark"
     >
       <template #body>
-        <UForm class="space-y-4">
+        <UForm
+          class="space-y-4"
+          :schema="schema"
+          :state="state"
+          @submit.prevent="onSubmit"
+        >
           <UFormField
             v-slot="{ error }"
             label="Name"
@@ -39,6 +96,7 @@ const openForm = ref(false);
             }"
           >
             <UInput
+              v-model="state.name"
               :ui="{ base: 'py-4 px-6' }"
               :class="[
                 'w-full transition-colors',
@@ -59,6 +117,7 @@ const openForm = ref(false);
             }"
           >
             <UInput
+              v-model="state.description"
               :ui="{ base: 'py-4 px-6' }"
               :class="[
                 'w-full transition-colors',
@@ -80,6 +139,7 @@ const openForm = ref(false);
             }"
           >
             <UInput
+              v-model="state.slug"
               :ui="{ base: 'py-4 px-6' }"
               :class="[
                 'w-full transition-colors',
@@ -89,7 +149,19 @@ const openForm = ref(false);
               ]"
             />
           </UFormField>
-          <UButton type="submit"> Continue </UButton>
+          <div class="flex justify-between items-center">
+            <UButton
+              type="submit"
+              class=""
+              :loading="loading"
+              :disabled="loading"
+            >
+              Continue
+            </UButton>
+            <UButton variant="subtle" color="error" class="" @click="resetForm">
+              Clear form
+            </UButton>
+          </div>
         </UForm>
       </template>
     </UModal>
