@@ -5,4 +5,5 @@ use validator::Validate;
 pub struct CreateMarketplaceRequest {
     pub name: String,
     pub description: String,
+    pub slug: String,
 }

@@ -14,6 +14,20 @@
   --color-brand-700: oklch(32.64% 0.12642 306.18);
   --color-brand-800: oklch(26.051% 0.09591 301.23);
   --color-brand-900: oklch(19.522% 0.0654 297.63);
+
+  --color-brand-dark: oklch(21.951% 0.07514 301.13);
+  --color-brand-dark-50: oklch(50.083% 0.21051 299.34);
+  --color-brand-dark-100: oklch(47.186% 0.19651 299.23);
+  --color-brand-dark-200: oklch(41.254% 0.16903 299.63);
+  --color-brand-dark-300: oklch(34.984% 0.14015 299.54);
+  --color-brand-dark-400: oklch(28.708% 0.10829 299.97);
+  --color-brand-dark-500: oklch(21.951% 0.07514 301.13);
+  --color-brand-dark-600: oklch(11.313% 0.02526 310.01);
+  --color-brand-dark-700: oklch(0% 0 none);
+  --color-brand-dark-800: oklch(0% 0 none);
+  --color-brand-dark-900: oklch(0% 0 none);
+  --color-brand-dark-950: oklch(0% 0 none);
+
   --color-tint: var(--color-red-50/20);
   --ui-primary: var(--color-brand);
 }
@@ -22,4 +36,10 @@
 
 ._icon {
   @apply size-5 cursor-pointer hover:text-brand;
+}
+
+
+.dark {
+  --ui-bg: var(--color-brand-dark);
+  --ui-primary: var(--color-brand);
 }

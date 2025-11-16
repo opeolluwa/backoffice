@@ -29,13 +29,15 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 
   try {
     const { status, data: respData } = await api.post("/login", data);
-
     if (status !== 200) {
       throw new Error(respData?.message || "Login failed");
     }
+    tokenStore.persistAccessToken(respData.data.token);
+    const token = tokenStore.accessToken;
+    console.log("Access Token:", token);
 
-    // tokenStore.persistRequestToken(respData.data.token)
     await router.push("/home");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     formError.value = err.message || "An error occurred. Please try again.";
   } finally {
@@ -47,97 +49,99 @@ definePageMeta({ layout: "auth" });
 </script>
 
 <template>
-  <h1 class="capitalize text-center text-5xl font-bold" v-show="!formError">
-    Welcome
-  </h1>
-  <h1 class="capitalize text-center text-5xl font-bold" v-show="formError">
-    Oops!
-  </h1>
+  <div>
+    <h1 v-show="!formError" class="capitalize text-center text-5xl font-bold">
+      Welcome
+    </h1>
+    <h1 v-show="formError" class="capitalize text-center text-5xl font-bold">
+      Oops!
+    </h1>
 
-  <p class="text-center text-gray-400 leading-6 mt-2" v-show="!formError">
-    Please enter your email and password
-  </p>
+    <p v-show="!formError" class="text-center text-gray-400 leading-6 mt-2">
+      Please enter your email and password
+    </p>
 
-  <span v-show="formError" class="text-red-500 text-sm mt-1">{{
-    formError
-  }}</span>
-  <UForm
-    :schema="schema"
-    :state="state"
-    class="space-y-4 px-36 w-full mt-6"
-    @submit="onSubmit"
-  >
-    <!-- Email Field -->
-    <UFormField
-      label="Email"
-      name="email"
-      required
-      v-slot="{ error }"
-      :ui="{
-        error: 'text-red-500 text-sm mt-1',
-      }"
+    <span v-show="formError" class="text-red-500 text-sm mt-1">{{
+      formError
+    }}</span>
+    <UForm
+      :schema="schema"
+      :state="state"
+      class="space-y-4 w-full mt-6"
+      @submit="onSubmit"
     >
-      <UInput
-        v-model="state.email"
-        :ui="{ base: 'py-4 px-6' }"
-        :class="[
-          'w-full transition-colors',
-          error
-            ? 'border-red-500 focus:border-red-500'
-            : 'border-gray-300 focus:border-black',
-        ]"
-      />
-    </UFormField>
-
-    <!-- Password Field -->
-    <UFormField
-      label="Password"
-      name="password"
-      :error="false"
-      required
-      v-slot="{ error }"
-      :ui="{ error: 'text-red-500 text-sm mt-1' }"
-    >
-      <UInput
-        v-model="state.password"
-        :type="showPassword ? 'text' : 'password'"
-        id="password"
+      <!-- Email Field -->
+      <UFormField
+        v-slot="{ error }"
+        label="Email"
+        name="email"
+        required
         :ui="{
-          base: 'py-4 px-6',
-          trailing: 'pe-3 mx-auto hidden',
+          error: 'text-red-500 text-sm mt-1',
         }"
-        :class="[
-          ' w-full transition-colors',
-          error
-            ? 'border-red-500 focus:border-red-500'
-            : 'border-gray-300 focus:border-black',
-        ]"
       >
-        <template #trailing>
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="lg"
-            class="p-1 absolute"
-            :icon="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
-            :aria-label="showPassword ? 'Hide password' : 'Show password'"
-            :aria-pressed="showPassword"
-            aria-controls="password"
-            @click.prevent="showPassword = !showPassword"
-          />
-        </template>
-      </UInput>
-    </UFormField>
+        <UInput
+          v-model="state.email"
+          :ui="{ base: 'py-4 px-6' }"
+          :class="[
+            'w-full transition-colors',
+            error
+              ? 'border-red-500 focus:border-red-500'
+              : 'border-gray-300 focus:border-black',
+          ]"
+        />
+      </UFormField>
 
-    <UButton
-      :loading="loading"
-      :disabled="loading"
-      type="submit"
-      class="flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer"
-    >
-      Login
-    </UButton>
-  </UForm>
+      <!-- Password Field -->
+      <UFormField
+        v-slot="{ error }"
+        label="Password"
+        name="password"
+        :error="false"
+        required
+        :ui="{ error: 'text-red-500 text-sm mt-1' }"
+      >
+        <UInput
+          id="password"
+          v-model="state.password"
+          :type="showPassword ? 'text' : 'password'"
+          :ui="{
+            base: 'py-4 px-6',
+            trailing: 'pe-3 mx-auto hidden',
+          }"
+          :class="[
+            ' w-full transition-colors',
+            error
+              ? 'border-red-500 focus:border-red-500'
+              : 'border-gray-300 focus:border-black',
+          ]"
+        >
+          <template #trailing>
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="lg"
+              class="p-1 absolute"
+              :icon="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              :aria-pressed="showPassword"
+              aria-controls="password"
+              @click.prevent="showPassword = !showPassword"
+            />
+          </template>
+        </UInput>
+      </UFormField>
+
+      <UButton
+        :loading="loading"
+        :disabled="loading"
+        type="submit"
+        class="flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer"
+      >
+        Login
+      </UButton>
+    </UForm>
+  </div>
 </template>
 
 <style scoped>

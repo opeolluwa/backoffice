@@ -1,5 +1,5 @@
-import axios from "axios";
 import { defineStore } from "pinia";
+import api from "~/plugin/api";
 
 export const useTokenStore = defineStore("token_store", {
   state: () => ({
@@ -11,53 +11,54 @@ export const useTokenStore = defineStore("token_store", {
   }),
 
   actions: {
-    persistRequestToken(requestToken: string) {
-      this.$patch({ requestToken: requestToken });
-    },
     persistRefreshToken(refreshToken: string) {
-      this.$patch({ refreshToken: refreshToken });
+      this.refreshToken = refreshToken;
     },
 
     persistAccessToken(accessToken: string) {
-      this.$patch({ accessToken: accessToken });
+      this.accessToken = accessToken;
     },
+
     clearTokens() {
       this.$reset();
     },
+
     setAccessTokenExpiry(expiry: number) {
-      this.$patch({ accessTokenExpiry: expiry });
+      this.accessTokenExpiry = expiry;
     },
+
     setRefreshTokenExpiry(expiry: number) {
-      this.$patch({ refreshTokenExpiry: expiry });
+      this.refreshTokenExpiry = expiry;
     },
+
     extractAccessToken() {
       return this.accessToken;
     },
-    // async getRefeshToken() {
-    //     const response = await axios.get("/auth/refresh-token", {
-    //         headers: {
-    //             Authorization: `Bearer ${this.refreshToken}`,
-    //             "Content-Type": "application/json",
-    //         },
-    //     });
-    //
-    //     const data = response.data.data;
-    //     if (data?.data?.accessToken) {
-    //         this.persistAccessToken(data.accessToken);
-    //         this.setAccessTokenExpiry(data.exp);
-    //         this.persistRefreshToken(data.refreshToken);
-    //         this.setRefreshTokenExpiry(data.refreshTokenExp);
-    //     }
-    // },
+
+    async getRefreshToken() {
+      const res = await api.get("/refresh-token", {
+        headers: {
+          Authorization: `Bearer ${this.refreshToken}`,
+        },
+      });
+
+      const data = res.data?.data;
+      if (!data) return;
+
+      if (data.accessToken) this.persistAccessToken(data.accessToken);
+      if (data.exp) this.setAccessTokenExpiry(data.exp);
+      if (data.refreshToken) this.persistRefreshToken(data.refreshToken);
+      if (data.refreshTokenExp)
+        this.setRefreshTokenExpiry(data.refreshTokenExp);
+    },
 
     isAccessTokenValid() {
-      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-
-      const validToken =
-        this.accessToken && this.accessTokenExpiry > currentTime + 60;
-      return validToken;
+      const now = Math.floor(Date.now() / 1000);
+      return this.accessToken && this.accessTokenExpiry > now + 60;
     },
   },
+
   getters: {},
+
   persist: true,
 });
