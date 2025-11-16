@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  
  app: {
     pageTransition: { name: 'slide-left', mode: 'out-in' },
   },
@@ -30,4 +31,5 @@ export default defineNuxtConfig({
   pinia: {
     storesDirs: ["./stores/**"],
   },
+  
 });

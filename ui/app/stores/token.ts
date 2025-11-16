@@ -1,4 +1,3 @@
-import axios from "axios";
 import { defineStore } from "pinia";
 import api from "~/plugin/api";
 
@@ -12,8 +11,6 @@ export const useTokenStore = defineStore("token_store", {
   }),
 
   actions: {
-
-
     persistRefreshToken(refreshToken: string) {
       this.refreshToken = refreshToken;
     },

@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import * as v from "valibot";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as v from "valibot";
 import api from "~/plugin/api";
+import { useMarketplaceStore } from "~/stores/marketplace";
+
 definePageMeta({
   layout: "dashboard",
 });
@@ -15,7 +17,7 @@ const schema = v.object({
 type Schema = v.InferOutput<typeof schema>;
 
 const openForm = ref(false);
-
+const toast = useToast();
 const state = reactive<Schema>({
   name: "",
   description: "",
@@ -28,20 +30,24 @@ const resetForm = () => {
   state.slug = "";
 };
 
-const marketplaceStore = useMarketplaceStore(); 
+const marketplaceStore = useMarketplaceStore();
+const fetchingMarketplaces = ref(false);
 
-const toast = useToast();
 const loading = ref(false);
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
-    const { status, data: response } = api.post("/marketplace", data);
-    if (status !== 201) {
-      throw new Error(response?.message || "Failed to create marketplace");
+    const res = await api.post("/marketplace", data);
+    if (res.status !== 201) {
+      throw new Error(res.data?.message || "Failed to create marketplace");
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
+    toast.add({
+      title: "Success",
+      description: "Product added successfully.",
+    });
+    openForm.value = false;
+    resetForm();
+  } catch {
     toast.add({
       title: "Error",
       description: "Failed to create marketplace. Please try again.",
@@ -50,20 +56,65 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   } finally {
     loading.value = false;
   }
-
-  toast.add({
-    title: "Success",
-    description: "Product added successfully.",
-  });
-  openForm.value = false;
-  resetForm();
 }
+
+onMounted(async () => {
+  try {
+    fetchingMarketplaces.value = true;
+    const res = await api.get("/marketplace");
+    if (res.status !== 200) {
+      throw new Error(res.data?.message || "Failed to fetch marketplaces");
+    }
+    marketplaceStore.marketplaces = res.data.data.marketplaces;
+    console.log(
+      "Marketplaces loaded:",
+      JSON.stringify(marketplaceStore.marketplaces, null, 2),
+    );
+  } catch {
+    toast.add({
+      title: "Error",
+      description: "Failed to load marketplaces. Please try again.",
+      color: "error",
+    });
+  } finally {
+    fetchingMarketplaces.value = false;
+  }
+});
 </script>
 
 <template>
   <div>
-    <div class="flex flex-col justify-center items-center h-[70vh]">
+    {{ marketplaceStore.marketplaces }}
+    <PageLoader v-if="fetchingMarketplaces" />
+
+    <div v-else>
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        <div
+          v-for="marketplace in marketplaceStore.marketplaces"
+          :key="marketplace.identifier"
+          class="border border-gray-200 rounded-lg p-4 flex flex-col justify-between"
+        >
+          <div>
+            <h2 class="text-lg font-semibold mb-2">{{ marketplace.name }}</h2>
+            <p class="text-gray-600 mb-4">{{ marketplace.description }}</p>
+          </div>
+          <div>
+            <span class="text-sm text-gray-500"
+              >Slug: {{ marketplace.slug }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="marketplaceStore.marketplaces?.length === 0"
+      class="flex flex-col justify-center items-center h-[70vh]"
+    >
       <h1>You currently don&apos;t have any product</h1>
+
       <UButton
         color="neutral"
         variant="outline"
@@ -93,9 +144,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
             label="Name"
             name="name"
             required
-            :ui="{
-              error: 'text-red-500 text-sm mt-1',
-            }"
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
           >
             <UInput
               v-model="state.name"
@@ -112,11 +161,9 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
           <UFormField
             v-slot="{ error }"
             label="Description"
-            name="email"
+            name="description"
             required
-            :ui="{
-              error: 'text-red-500 text-sm mt-1',
-            }"
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
           >
             <UInput
               v-model="state.description"
@@ -133,12 +180,10 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
           <UFormField
             v-slot="{ error }"
             label="Slug"
-            name="email"
+            name="slug"
             hint="eg: cars, roses"
             required
-            :ui="{
-              error: 'text-red-500 text-sm mt-1',
-            }"
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
           >
             <UInput
               v-model="state.slug"
@@ -151,16 +196,12 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
               ]"
             />
           </UFormField>
+
           <div class="flex justify-between items-center">
-            <UButton
-              type="submit"
-              class=""
-              :loading="loading"
-              :disabled="loading"
-            >
+            <UButton type="submit" :loading="loading" :disabled="loading">
               Continue
             </UButton>
-            <UButton variant="subtle" color="error" class="" @click="resetForm">
+            <UButton variant="subtle" color="error" @click="resetForm">
               Clear form
             </UButton>
           </div>

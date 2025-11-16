@@ -46,3 +46,6 @@ lint:
     cargo sort -w 
     cargo group-imports --fix
     cargo fmt 
+
+test:
+    cargo test

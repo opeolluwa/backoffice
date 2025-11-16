@@ -29,12 +29,14 @@ definePageMeta({
         {{ $viewport.breakpoint }}device Please use a tablet or desktop
       </p>
     </div>
-    <NuxtLayout v-else>
-      <NuxtPage />
-    </NuxtLayout>
+    <div v-else>
+      <NuxtLoadingIndicator />
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </div>
   </div>
 </template>
-
 
 <style>
 .page-enter-active,
@@ -46,7 +48,6 @@ definePageMeta({
   opacity: 0;
   filter: blur(1rem);
 }
-
 
 .slide-left-enter-active,
 .slide-left-leave-active,

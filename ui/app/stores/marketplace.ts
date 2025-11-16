@@ -1,8 +1,9 @@
 import api from "~/plugin/api";
+import type { MarketPlace } from "~/types/Marketplace";
 
 const useMarketplaceStore = defineStore("marketplace", {
   state: () => ({
-    marketplaces: [] as Array<{ id: number; name: string; slug: string }>,
+    marketplaces: [] as Array<MarketPlace>,
   }),
 
   actions: {
@@ -15,6 +16,7 @@ const useMarketplaceStore = defineStore("marketplace", {
       }
     },
   },
+  persist: true,  
 });
 
 export { useMarketplaceStore };

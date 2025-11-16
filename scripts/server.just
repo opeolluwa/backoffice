@@ -1,10 +1,5 @@
 
 
-[working-directory:'.']
-test:
-    DATABASE_URL=postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${EXTERNAL_DATABASE_PORT}/${DATABASE_NAME} cargo test
-
-
 [doc('Install the application dependencies')]
 @install-dependencies:
     @echo "Installing backend dependencies"
