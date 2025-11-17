@@ -1,20 +1,32 @@
-use axum::extract::DefaultBodyLimit;
-use backoffice_lib::config::app::{create_cors_layer, shutdown_signal};
-use backoffice_lib::config::app_config::AppConfig;
-use backoffice_lib::config::filesystem::AppFileSystem;
-use backoffice_lib::config::logger::AppLogger;
-use backoffice_lib::{errors, routes, scripts, shared};
-use errors::app_error::AppError;
-use routes::router::load_routes;
-use shared::extract_env::extract_env;
-use sqlx::migrate::Migrator;
-use sqlx::postgres::PgPoolOptions;
-use std::time::Duration;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     path::Path,
+    time::Duration,
 };
+
+use axum::extract::DefaultBodyLimit;
+
+use backoffice_lib::{
+    config::{
+        app::{create_cors_layer, shutdown_signal},
+        app_config::AppConfig,
+        filesystem::AppFileSystem,
+        logger::AppLogger,
+    },
+    errors,
+    routes,
+    scripts,
+    shared,
+};
+
+use errors::app_error::AppError;
+use routes::router::load_routes;
+use shared::extract_env::extract_env;
+
+use sqlx::{migrate::Migrator, postgres::PgPoolOptions};
+
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
+
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {

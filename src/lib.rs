@@ -11,3 +11,4 @@ pub mod scripts;
 pub mod services;
 pub mod shared;
 pub mod states;
+pub mod cli;
