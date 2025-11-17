@@ -21,7 +21,7 @@ const items = [
     <div
       class="hidden sm:flex items-center justify-end flex-col pb-24 col-span-7 bg-[url('/bg.jpg')] bg-center bg-cover bg-black/50 dark:bg-dark/100 bg-blend-multiply relative rounded"
     >
-    <NuxtImg src="/ijobaa.png"/>https://linear.app/tranqbay/profiles/adeoye
+    <NuxtImg src="/ijobaa.png"/>
       <UCarousel
         dots
         :autoplay="{ delay: 2500 }"
