@@ -47,6 +47,8 @@ impl AppConfig {
             AllowOrigin::list(origins.into_iter().map(|s| s.parse().unwrap()))
         };
 
+    tracing::info!("App Config loaded!");
+
         Ok(Self {
             database_url: extract_env("DATABASE_URL")?,
             max_db_connections,

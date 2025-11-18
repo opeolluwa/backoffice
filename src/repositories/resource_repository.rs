@@ -1,6 +1,7 @@
 use crate::entities::resource::Resource;
 use crate::errors::repository_error::RepositoryError;
 
+#[allow(dead_code)]
 pub(crate) trait ResourceExt {
     async fn create_resource(&self, resource: &Resource) -> Result<Resource, RepositoryError>;
 
@@ -23,7 +24,7 @@ pub(crate) trait ResourceExt {
     async fn resource_exists(&self, identifier: &[u8]) -> Result<bool, RepositoryError>;
 
     async fn count_resources(&self) -> Result<i64, RepositoryError>;
-    
+
     async fn find_resources_by_fields(
         &self,
         filters: &[(String, String)],

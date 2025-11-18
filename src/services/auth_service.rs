@@ -1,6 +1,5 @@
 use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::entities::user::User;
-use crate::errors::repository_error::RepositoryError;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
 use crate::{
@@ -36,11 +35,6 @@ impl AuthenticationService {
 }
 pub trait AuthenticationServiceTrait {
     fn create_user(
-        &self,
-        request: &CreateUserRequest,
-    ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
-
-    fn create_super_admin_user(
         &self,
         request: &CreateUserRequest,
     ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
@@ -103,38 +97,6 @@ impl AuthenticationServiceTrait for AuthenticationService {
             log::error!("{}", err.to_string());
             ServiceError::from(err)
         })
-    }
-
-    //TODO: improve
-    async fn create_super_admin_user(
-        &self,
-        request: &CreateUserRequest,
-    ) -> Result<(), ServiceError> {
-        if self
-            .user_repository
-            .find_by_email(&request.email)
-            .await
-            .is_some()
-        {
-            return Err(ServiceError::from(RepositoryError::DuplicateEntry(
-                "user with this email already exists".to_string(),
-            )));
-        }
-
-        let password_hash = self.user_helper_service.hash_password(&request.password)?;
-        let user = CreateUserRequest {
-            password: password_hash,
-            first_name: request.first_name.to_owned(),
-            email: request.email.to_owned(),
-            last_name: request.last_name.to_owned(),
-        };
-
-        // self.user_repository.create_user(user).await.map_err(|err| {
-        //     log::error!("{}", err.to_string());
-        //     AuthenticationServiceError::from(err)
-        // })
-
-        todo!("implement super admin creation logic separate from normal user creation")
     }
 
     async fn login(

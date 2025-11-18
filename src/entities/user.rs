@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local};
+
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use sqlx::prelude::FromRow;
@@ -6,7 +6,7 @@ use sqlx::prelude::FromRow;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "role", rename_all = "lowercase")]
 pub enum Role {
-    Superadmin,
+    SuperAdmin,
     Admin,
     PrivilegedUser,
     User,
