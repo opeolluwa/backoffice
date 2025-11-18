@@ -31,7 +31,7 @@ set export :=  true
 [working-directory :'ui']
 @build-ui:
     npm run generate
-
+    rm -rf ../assets
     cp  -r .output/public ../assets
 
 

@@ -20,7 +20,8 @@ impl UserService {
 
 pub(crate) trait UserServiceTrait {
     async fn retrieve_information(&self, user_identifier: &str) -> Result<UserDto, ServiceError>;
-
+    
+    #[allow(dead_code)]
     async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, ServiceError>;
 }
 
