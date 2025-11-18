@@ -1,4 +1,3 @@
-
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use sqlx::prelude::FromRow;
@@ -16,10 +15,9 @@ pub enum Role {
 pub struct User {
     pub email: String,
     pub identifier: String,
-    pub first_name: String,
-    pub last_name: String,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
     pub password: String,
     pub is_active: bool,
-    // pub created_at: DateTime<Local>,
-    // pub updated_at: Option<DateTime<Local>>
+    pub role_identifier: String,
 }
