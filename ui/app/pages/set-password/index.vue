@@ -29,11 +29,13 @@ async function onSubmit(values: any) {
 <template>
   <div class="flex flex-col items-center justify-center">
     <AppLeadingText>Set New Password</AppLeadingText>
-    <p class="mb-2 text-gray-400 mt-1">
-      Enter and confirm your new password
-    </p>
+    <p class="mb-2 text-gray-400 mt-1">Enter and confirm your new password</p>
 
-    <UForm :state="{ password: '', confirmPassword: '' }" class="w-full mt-6" @submit="onSubmit">
+    <UForm
+      :state="{ password: '', confirmPassword: '' }"
+      class="w-full mt-6"
+      @submit="onSubmit"
+    >
       <UFormField
         v-slot="{ error }"
         label="New Password"
@@ -47,7 +49,9 @@ async function onSubmit(values: any) {
           :ui="{ base: 'py-4 px-6' }"
           :class="[
             'w-full transition-colors',
-            error ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'
+            error
+              ? 'border-red-500 focus:border-red-500'
+              : 'border-gray-300 focus:border-black',
           ]"
         />
       </UFormField>
@@ -66,7 +70,9 @@ async function onSubmit(values: any) {
           :ui="{ base: 'py-4 px-6' }"
           :class="[
             'w-full transition-colors',
-            error ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'
+            error
+              ? 'border-red-500 focus:border-red-500'
+              : 'border-gray-300 focus:border-black',
           ]"
         />
       </UFormField>

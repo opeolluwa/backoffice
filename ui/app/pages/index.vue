@@ -50,10 +50,7 @@ definePageMeta({ layout: "auth" });
 
 <template>
   <div>
-   <AppLeadingText>
-
-          Welcome
-   </AppLeadingText>
+    <AppLeadingText> Welcome </AppLeadingText>
     <h1 v-show="formError" class="capitalize text-center text-5xl font-bold">
       Oops!
     </h1>

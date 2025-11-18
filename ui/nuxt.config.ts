@@ -8,9 +8,9 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  
- app: {
-    pageTransition: { name: 'slide-left', mode: 'out-in' },
+
+  app: {
+    pageTransition: { name: "slide-left", mode: "out-in" },
   },
   colorMode: {
     preference: "light",
@@ -18,19 +18,18 @@ export default defineNuxtConfig({
     classSuffix: "",
   },
   modules: [
-   "@nuxt/image",
-   "@nuxt/scripts",
-   "@nuxt/ui",
-   "@nuxt/test-utils",
-   "@nuxt/eslint",
-   "@pinia/nuxt",
-   "nuxt-viewport",
-   "@nuxtjs/color-mode",
-   "pinia-plugin-persistedstate/nuxt",
-   "@vueuse/nuxt",
+    "@nuxt/image",
+    "@nuxt/scripts",
+    "@nuxt/ui",
+    "@nuxt/test-utils",
+    "@nuxt/eslint",
+    "@pinia/nuxt",
+    "nuxt-viewport",
+    "@nuxtjs/color-mode",
+    "pinia-plugin-persistedstate/nuxt",
+    "@vueuse/nuxt",
   ],
   pinia: {
     storesDirs: ["./stores/**"],
   },
-  
 });

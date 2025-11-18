@@ -59,7 +59,6 @@ async function onSubmit(values: any) {
       </UButton>
     </UForm>
 
-
     <p v-if="formError" class="text-red-500 text-sm mt-2">
       {{ formError }}
     </p>

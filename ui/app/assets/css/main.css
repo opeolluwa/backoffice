@@ -38,7 +38,6 @@
   @apply size-5 cursor-pointer hover:text-brand;
 }
 
-
 .dark {
   --ui-bg: var(--color-brand-dark);
   --ui-primary: var(--color-brand);
