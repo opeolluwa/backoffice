@@ -30,15 +30,15 @@ backoffice_imagekit = {version = "0.1.0", path = "crates/backoffice_imagekit"}
 backoffice_utils = {version = "0.1.0", path = "crates/backoffice_utils"}
 bcrypt = "0.17.0"
 chrono = {version = "0.4.41", features = ["serde"]}
-clap = "4.5.51"
+clap = { version = "4.5.51", features = ["derive"] }
+console = "0.16.1"
 dialoguer = "0.12.0"
 dotenv = "0.15.0"
 jsonwebtoken = {version = "10.1.0", features = ["rust_crypto"]}
 log = "0.4.27"
-sea-orm = {version = "2.0.0-rc", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "debug-print"]}
 serde = {workspace = true, features = ["derive"]}
 serde_json = {workspace = true, features = ["raw_value"]}
-sqlx = {version = "0.8", features = ["runtime-tokio", "postgres", "macros", "migrate"]}
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "macros", "migrate", "chrono", "time"] }
 thiserror.workspace = true
 tokio = {version = "1.44.2", features = ["full", "macros"]}
 tower = {version = "0.5.2", features = ["limit", "timeout"]}

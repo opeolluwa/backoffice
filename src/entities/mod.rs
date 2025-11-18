@@ -5,3 +5,4 @@ pub mod privileged_user;
 pub mod user_role;
 pub mod marketplace;
 pub mod resource;
+pub mod app;

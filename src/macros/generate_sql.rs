@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::errors::macro_error::MacroError;
 
 pub fn generate_create_table_sql(
-    table_name: &str,
+    _table_name: &str,
     properties: &HashMap<String, String>,
 ) -> Result<String, MacroError> {
     let mut columns = Vec::new();

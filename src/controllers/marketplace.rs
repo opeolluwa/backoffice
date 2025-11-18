@@ -40,8 +40,6 @@ pub async fn find_marketplace_by_identifier(
         .build())
 }
 
-
-
 pub async fn find_all_marketplaces(
     State(marketplace_service): State<MarketplaceService>,
     claims: Claims,
@@ -56,7 +54,6 @@ pub async fn find_all_marketplaces(
         .build())
 }
 
-
 pub async fn count_marketplaces(
     State(marketplace_service): State<MarketplaceService>,
     claims: Claims,
@@ -68,5 +65,34 @@ pub async fn count_marketplaces(
     Ok(ApiResponse::builder()
         .message("Marketplaces counted successfully")
         .data(count)
+        .build())
+}
+
+pub async fn update_marketplace_by_identifier(
+    State(marketplace_service): State<MarketplaceService>,
+    Path(identifier): Path<String>,
+    AuthenticatedRequest { data, claims }: AuthenticatedRequest<CreateMarketplaceRequest>,
+) -> Result<ApiResponse<MarketPlace>, ServiceError> {
+    let updated_marketplace = marketplace_service
+        .update_marketplace_by_identifier(&identifier, &data, &claims.identifier)
+        .await?;
+
+    Ok(ApiResponse::builder()
+        .message("Marketplaces updated successfully")
+        .data(updated_marketplace)
+        .build())
+}
+
+pub async fn delete_marketplace_by_identifier(
+    State(marketplace_service): State<MarketplaceService>,
+    claims: Claims,
+    Path(identifier): Path<String>,
+) -> Result<ApiResponse<()>, ServiceError> {
+    marketplace_service
+        .delete_marketplace_by_identifier(&identifier, &claims.identifier)
+        .await?;
+
+    Ok(ApiResponse::builder()
+        .message("Marketplace deleted successfully")
         .build())
 }

@@ -7,7 +7,6 @@ pub mod macros;
 pub mod middlewares;
 pub mod repositories;
 pub mod routes;
-pub mod scripts;
 pub mod services;
 pub mod shared;
 pub mod states;

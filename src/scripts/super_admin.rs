@@ -58,29 +58,31 @@ pub async fn create_super_admin_from_env(db: &Pool<Postgres>) -> Result<(), AppE
 }
 
 pub async fn super_admin_exists(db: &Pool<Postgres>) -> Result<bool, AppError> {
-    let privilege_user = sqlx::query_as!(
-        PrivilegedUser,
-        r#"
-     SELECT
-            u.email,
-            u.identifier,
-            u.first_name,
-            u.last_name,
-            u.is_active,
-            r.name AS role_name,
-            r.description AS role_description
+    // let privilege_user = sqlx::query_as!(
+    //     PrivilegedUser,
+    //     r#"
+    //  SELECT
+    //         u.email,
+    //         u.identifier,
+    //         u.first_name,
+    //         u.last_name,
+    //         u.is_active,
+    //         r.name AS role_name,
+    //         r.description AS role_description
 
-        FROM users u
-        JOIN user_roles r ON u.role_identifier = r.identifier
-        WHERE r.name = 'super_admin'
-        LIMIT 1
-    "#
-    )
-    .fetch_optional(db)
-    .await
-    .map_err(|e| AppError::StartupError(format!("DB error: {}", e)))?;
+    //     FROM users u
+    //     JOIN user_roles r ON u.role_identifier = r.identifier
+    //     WHERE r.name = 'super_admin'
+    //     LIMIT 1
+    // "#
+    // )
+    // .fetch_optional(db)
+    // .await
+    // .map_err(|e| AppError::StartupError(format!("DB error: {}", e)))?;
 
-    Ok(privilege_user.is_some())
+    // Ok(privilege_user.is_some())
+
+    todo!()
 }
 
 pub async fn create_super_admin_role(db: &Pool<Postgres>) -> Result<String, AppError> {

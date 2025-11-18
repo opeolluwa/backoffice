@@ -7,5 +7,6 @@ impl AppLogger {
             .with_target(false)
             .compact()
             .init();
+        tracing::info!("Logger initialized");
     }
 }

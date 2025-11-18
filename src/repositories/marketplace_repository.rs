@@ -37,6 +37,7 @@ pub(crate) trait MarketplaceRepositoryExt {
         user_identifier: &str,
     ) -> Result<MarketPlace, RepositoryError>;
 
+    #[allow(dead_code)]
     async fn find_marketplace_by_name(
         &self,
         identifier: &str,
@@ -61,6 +62,7 @@ pub(crate) trait MarketplaceRepositoryExt {
         user_identifier: &str,
     ) -> Result<(), RepositoryError>;
 
+    #[allow(dead_code)]
     async fn marketplace_exists(
         &self,
         identifier: &str,
@@ -176,6 +178,7 @@ impl MarketplaceRepositoryExt for MarketplaceRepository {
         Ok(())
     }
 
+    #[allow(dead_code)]
     async fn marketplace_exists(
         &self,
         identifier: &str,

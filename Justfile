@@ -31,12 +31,12 @@ set export :=  true
 [working-directory :'ui']
 @build-ui:
     npm run generate
-
+    rm -rf ../assets
     cp  -r .output/public ../assets
 
 
 run:
-    #@just build-ui
+    @just build-ui
     docker compose up -d database
     cargo watch -x run
 
@@ -49,3 +49,11 @@ lint:
 
 test:
     cargo test
+
+
+db:
+    sqlx migrate run 
+    cargo sqlx prepare -- --bin cli
+
+run-cli:
+    cargo run --bin cli create-user 
