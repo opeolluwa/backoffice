@@ -84,7 +84,25 @@ onMounted(async () => {
 
 <template>
   <div>
-    {{ marketplaceStore.marketplaces }}
+
+     <div
+      v-if="marketplaceStore.marketplaces?.length === 0"
+      class="flex flex-col justify-center items-center h-[70vh]"
+    >
+      <h1>You currently don&apos;t have any product</h1>
+
+      <UButton
+        color="neutral"
+        variant="outline"
+        class="px-5 py-4 rounded mt-3 cursor-pointer flex items-center justify-center gap-x-2"
+        @click="openForm = true"
+      >
+        <UIcon name="heroicons:plus-circle" class="size-5" />
+        Add product
+      </UButton>
+    </div>
+
+    <!-- {{ marketplaceStore.marketplaces }}
     <PageLoader v-if="fetchingMarketplaces" />
 
     <div v-else>
@@ -107,24 +125,9 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div
-      v-if="marketplaceStore.marketplaces?.length === 0"
-      class="flex flex-col justify-center items-center h-[70vh]"
-    >
-      <h1>You currently don&apos;t have any product</h1>
-
-      <UButton
-        color="neutral"
-        variant="outline"
-        class="px-5 py-4 rounded mt-3 cursor-pointer flex items-center justify-center gap-x-2"
-        @click="openForm = true"
-      >
-        <UIcon name="heroicons:plus-circle" class="size-5" />
-        Add product
-      </UButton>
-    </div>
+   
 
     <UModal
       v-model:open="openForm"
