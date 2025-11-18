@@ -4,3 +4,6 @@ pub mod public;
 pub mod router;
 pub mod users;
 pub mod marketplace;
+pub(crate) mod products;
+pub(crate) mod activities;
+

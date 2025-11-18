@@ -5,3 +5,4 @@ pub mod root_service;
 pub mod user_helper_service;
 pub mod user_service;
 pub mod marketplace_service;
+pub(crate) mod product_service;
