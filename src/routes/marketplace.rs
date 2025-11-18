@@ -15,5 +15,5 @@ pub(super) fn marketplace_routes(state: ServicesState) -> Router {
         .route("/{identifier}", put(update_marketplace_by_identifier))
         .route("/{identifier}", delete(delete_marketplace_by_identifier));
 
-    Router::new().nest("/marketplace", routes).with_state(state)
+    Router::new().nest("/marketplaces", routes).with_state(state)
 }

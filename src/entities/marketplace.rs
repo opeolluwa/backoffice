@@ -4,6 +4,7 @@ use ts_rs::TS;
 
 #[derive(sqlx::FromRow, Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "Marketplace.d.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct MarketPlace {
     pub identifier: String,
     pub name: String,
