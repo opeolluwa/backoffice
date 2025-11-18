@@ -8,9 +8,9 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  
- app: {
-    pageTransition: { name: 'slide-left', mode: 'out-in' },
+
+  app: {
+    pageTransition: { name: "slide-left", mode: "out-in" },
   },
   colorMode: {
     preference: "light",
@@ -27,9 +27,9 @@ export default defineNuxtConfig({
     "nuxt-viewport",
     "@nuxtjs/color-mode",
     "pinia-plugin-persistedstate/nuxt",
+    "@vueuse/nuxt",
   ],
   pinia: {
     storesDirs: ["./stores/**"],
   },
-  
 });

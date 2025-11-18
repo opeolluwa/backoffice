@@ -192,7 +192,7 @@ pub async fn create_user(db: &PgPool) -> Result<(), CliError> {
 
     let new_admin_id = Ulid::new().to_string();
     let hashed_password =
-        hash(&admin_password, DEFAULT_COST).map_err(|err| CliError::ParseError(err.to_string()))?;
+        hash(&admin_password.trim(), DEFAULT_COST).map_err(|err| CliError::ParseError(err.to_string()))?;
 
     sqlx::query!(
         r#"

@@ -16,7 +16,7 @@ const useMarketplaceStore = defineStore("marketplace", {
       }
     },
   },
-  persist: true,  
+  persist: true,
 });
 
 export { useMarketplaceStore };

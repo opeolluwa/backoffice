@@ -13,7 +13,6 @@ const items = [
     subtitle: "Permissions, roles & fast publishing",
   },
 ];
-
 </script>
 
 <template>
@@ -21,7 +20,7 @@ const items = [
     <div
       class="hidden sm:flex items-center justify-end flex-col pb-24 col-span-7 bg-[url('/bg.jpg')] bg-center bg-cover bg-black/50 dark:bg-dark/100 bg-blend-multiply relative rounded"
     >
-    <NuxtImg src="/ijobaa.png"/>
+      <NuxtImg src="/ijobaa.png" />
       <UCarousel
         dots
         :autoplay="{ delay: 2500 }"
@@ -35,10 +34,10 @@ const items = [
             <div
               class="absolute bottom-10 left-0 right-0 text-center text-white px-4"
             >
-              <h2 class="text-5xl  text-white/90 font-semibold">
+              <h2 class="text-5xl text-white/90 font-semibold">
                 {{ item.title }}
               </h2>
-              <p class="text-sm opacity-90 text-gray-400  mt-1">
+              <p class="text-sm opacity-90 text-gray-400 mt-1">
                 {{ item.subtitle }}
               </p>
             </div>

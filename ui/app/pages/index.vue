@@ -50,9 +50,7 @@ definePageMeta({ layout: "auth" });
 
 <template>
   <div>
-    <h1 v-show="!formError" class="capitalize text-center text-5xl font-bold">
-      Welcome
-    </h1>
+    <AppLeadingText> Welcome </AppLeadingText>
     <h1 v-show="formError" class="capitalize text-center text-5xl font-bold">
       Oops!
     </h1>
@@ -107,7 +105,6 @@ definePageMeta({ layout: "auth" });
           :type="showPassword ? 'text' : 'password'"
           :ui="{
             base: 'py-4 px-6',
-            trailing: 'pe-3 mx-auto hidden',
           }"
           :class="[
             ' w-full transition-colors',
@@ -121,7 +118,6 @@ definePageMeta({ layout: "auth" });
               color="neutral"
               variant="ghost"
               size="lg"
-              class="p-1 absolute"
               :icon="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
               :aria-label="showPassword ? 'Hide password' : 'Show password'"
               :aria-pressed="showPassword"

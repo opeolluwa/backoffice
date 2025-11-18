@@ -1,13 +1,114 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui";
+import type { FormSubmitEvent, TableColumn } from "@nuxt/ui";
 import * as v from "valibot";
 import api from "~/plugin/api";
 import { useMarketplaceStore } from "~/stores/marketplace";
+import type { MarketPlace } from "~/types/Marketplace";
+import { h, resolveComponent } from "vue";
+import type { Row } from "@tanstack/vue-table";
+import { useClipboard } from "@vueuse/core";
+import { getPaginationRowModel } from "@tanstack/vue-table";
 
 definePageMeta({
   layout: "dashboard",
 });
 
+const UButton = resolveComponent("UButton");
+const UDropdownMenu = resolveComponent("UDropdownMenu");
+
+const toast = useToast();
+const { copy } = useClipboard();
+
+const columns: TableColumn<MarketPlace>[] = [
+  // {
+  //   accessorKey: "identifier",
+  //   header: "#",
+  //   cell: ({ row }) => `#${row.getValue("identifier")}`,
+  // },
+
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => `${row.getValue("name")}`,
+  },
+
+  {
+    accessorKey: "slug",
+    header: "Slug",
+    cell: ({ row }) => `#${row.getValue("slug")}`,
+  },
+
+  {
+    accessorKey: "createdAt",
+    header: "Date created",
+    cell: ({ row }) => {
+      return new Date(row.getValue("createdAt")).toLocaleString("en-US", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      return h(
+        "div",
+        { class: "text-right" },
+        h(
+          UDropdownMenu,
+          {
+            content: {
+              align: "end",
+            },
+            items: getRowItems(row),
+            "aria-label": "Actions dropdown",
+          },
+          () =>
+            h(UButton, {
+              icon: "i-lucide-ellipsis-vertical",
+              color: "neutral",
+              variant: "ghost",
+              class: "ml-auto",
+              "aria-label": "Actions dropdown",
+            }),
+        ),
+      );
+    },
+  },
+];
+
+function getRowItems(row: Row<MarketPlace>) {
+  return [
+    {
+      type: "label",
+      label: "Actions",
+    },
+    {
+      label: "Copy payment ID",
+      onSelect() {
+        copy(row.original.identifier);
+
+        toast.add({
+          title: "Payment ID copied to clipboard!",
+          color: "success",
+          icon: "i-lucide-circle-check",
+        });
+      },
+    },
+    {
+      type: "separator",
+    },
+    {
+      label: "View customer",
+    },
+    {
+      label: "View payment details",
+    },
+  ];
+}
 const schema = v.object({
   name: v.pipe(v.string(), v.minLength(1, "Name is required ")),
   description: v.pipe(v.string(), v.minLength(1, "Description is required ")),
@@ -17,7 +118,6 @@ const schema = v.object({
 type Schema = v.InferOutput<typeof schema>;
 
 const openForm = ref(false);
-const toast = useToast();
 const state = reactive<Schema>({
   name: "",
   description: "",
@@ -33,11 +133,14 @@ const resetForm = () => {
 const marketplaceStore = useMarketplaceStore();
 const fetchingMarketplaces = ref(false);
 
+const marketplaces = ref<MarketPlace[]>();
+const nullMarketplaces = computed(() => !marketplaces.value?.length);
+
 const loading = ref(false);
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
-    const res = await api.post("/marketplace", data);
+    const res = await api.post("/marketplaces", data);
     if (res.status !== 201) {
       throw new Error(res.data?.message || "Failed to create marketplace");
     }
@@ -60,16 +163,8 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 
 onMounted(async () => {
   try {
-    fetchingMarketplaces.value = true;
-    const res = await api.get("/marketplace");
-    if (res.status !== 200) {
-      throw new Error(res.data?.message || "Failed to fetch marketplaces");
-    }
-    marketplaceStore.marketplaces = res.data.data.marketplaces;
-    console.log(
-      "Marketplaces loaded:",
-      JSON.stringify(marketplaceStore.marketplaces, null, 2),
-    );
+    await marketplaceStore.fetchMarketplaces();
+    marketplaces.value = marketplaceStore.marketplaces;
   } catch {
     toast.add({
       title: "Error",
@@ -80,37 +175,19 @@ onMounted(async () => {
     fetchingMarketplaces.value = false;
   }
 });
+
+const globalFilter = ref("");
+const pagination = ref({
+  pageIndex: 0,
+  pageSize: 5,
+});
+const table = useTemplateRef("table");
 </script>
 
 <template>
   <div>
-    {{ marketplaceStore.marketplaces }}
-    <PageLoader v-if="fetchingMarketplaces" />
-
-    <div v-else>
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-      >
-        <div
-          v-for="marketplace in marketplaceStore.marketplaces"
-          :key="marketplace.identifier"
-          class="border border-gray-200 rounded-lg p-4 flex flex-col justify-between"
-        >
-          <div>
-            <h2 class="text-lg font-semibold mb-2">{{ marketplace.name }}</h2>
-            <p class="text-gray-600 mb-4">{{ marketplace.description }}</p>
-          </div>
-          <div>
-            <span class="text-sm text-gray-500"
-              >Slug: {{ marketplace.slug }}</span
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div
-      v-if="marketplaceStore.marketplaces?.length === 0"
+      v-if="nullMarketplaces"
       class="flex flex-col justify-center items-center h-[70vh]"
     >
       <h1>You currently don&apos;t have any product</h1>
@@ -124,6 +201,47 @@ onMounted(async () => {
         <UIcon name="heroicons:plus-circle" class="size-5" />
         Add product
       </UButton>
+    </div>
+
+    <PageLoader v-if="fetchingMarketplaces" />
+
+    <div>
+      <h1 class="justify-start">#Marketplaces</h1>
+      <div class="justify-between items-center hidden">
+        <div class="flex px-4 py-3.5 border-accented">
+          <UInput
+            ref="table"
+            v-model="globalFilter"
+            v-model:global-filter="globalFilter"
+            class="max-w-sm"
+            placeholder="Filter..."
+          />
+        </div>
+      </div>
+      <UTable
+        ref="table"
+        v-model:pagination="pagination"
+        :data="marketplaces"
+        class=""
+        :loading="fetchingMarketplaces"
+        loading-animation="carousel"
+        :columns="columns"
+        sticky="header"
+        :pagination-options="{
+          getPaginationRowModel: getPaginationRowModel(),
+        }"
+      />
+
+      <div class="flex justify-center border-t border-default pt-4 mt-6">
+        <UPagination
+          :default-page="
+            (table?.tableApi?.getState().pagination.pageIndex || 0) + 1
+          "
+          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+          :total="table?.tableApi?.getFilteredRowModel().rows.length"
+          @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)"
+        />
+      </div>
     </div>
 
     <UModal
@@ -208,6 +326,15 @@ onMounted(async () => {
         </UForm>
       </template>
     </UModal>
+
+    <UButton
+      icon="heroicons:plus-20-solid"
+      size="md"
+      color="primary"
+      variant="solid"
+      class="fixed bottom-12 right-20"
+      @click="openForm = true"
+    />
   </div>
 </template>
 

@@ -1,4 +1,7 @@
-use axum::extract::{Path, State};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+};
 
 use crate::{
     adapters::{
@@ -21,6 +24,7 @@ pub async fn create_marketplace(
 
     Ok(ApiResponse::builder()
         .message("Marketplace created successfully")
+        .status_code(StatusCode::CREATED)
         .data(marketplace)
         .build())
 }
