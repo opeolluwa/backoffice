@@ -176,7 +176,7 @@ const getKey = (item: RouteItem) =>
         </div>
       </header>
 
-      <div class="px-8">
+      <div class="px-8 py-12">
         <slot />
       </div>
     </main>
