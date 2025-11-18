@@ -6,3 +6,5 @@ pub mod user_role;
 pub mod marketplace;
 pub mod resource;
 pub mod app;
+pub(crate) mod activities;
+pub(crate) mod products;
