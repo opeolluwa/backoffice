@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                identifier,\n                name,\n                picture,\n                price,\n                description,\n                created_by_identifier,\n                marketplace_identifier,\n                created_at,\n                updated_at\n            FROM products\n            WHERE identifier = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "identifier",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "picture",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_by_identifier",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "marketplace_identifier",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "8dfeec917fcd16892f7d1b017a650591bc659cf8a1c81b312ba2f05050579113"
+}
