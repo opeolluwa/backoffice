@@ -158,6 +158,8 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
     });
   } finally {
     loading.value = false;
+    await marketplaceStore.fetchMarketplaces();
+    marketplaces.value = marketplaceStore.marketplaces;
   }
 }
 
@@ -186,6 +188,8 @@ const table = useTemplateRef("table");
 
 <template>
   <div>
+    <PageLoader v-if="fetchingMarketplaces" />
+
     <div
       v-if="nullMarketplaces"
       class="flex flex-col justify-center items-center h-[70vh]"
@@ -203,9 +207,7 @@ const table = useTemplateRef("table");
       </UButton>
     </div>
 
-    <PageLoader v-if="fetchingMarketplaces" />
-
-    <div>
+    <div v-else>
       <h1 class="justify-start">#Marketplaces</h1>
       <div class="justify-between items-center hidden">
         <div class="flex px-4 py-3.5 border-accented">

@@ -22,21 +22,21 @@ set export :=  true
 
 
 
-[working-directory :'ui']
-@run-ui:
+[working-directory :'frontend']
+@run-frontend:
     npm run dev
 
 
 
-[working-directory :'ui']
-@build-ui:
+[working-directory :'frontend']
+@build-frontend:
     npm run generate
     rm -rf ../assets
     cp  -r .output/public ../assets
 
 
 run:
-    @just build-ui
+    # @just build-ui
     docker compose up -d database
     cargo watch -x run
 
