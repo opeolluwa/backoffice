@@ -20,15 +20,19 @@ pub struct MarketPlace {
     pub updated_at: Option<OffsetDateTime>,
 }
 
-#[derive(Debug, serde::Deserialize, Serialize,  FromRow)]
+#[derive(Debug, serde::Deserialize, Serialize, FromRow, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct MarketplaceWithProducts {
     pub identifier: String,
     pub name: String,
     pub description: String,
+    #[ts(type = "array")]
     pub products: Json<Vec<Product>>,
-    // #[ts(type = "string")]
+    #[ts(type = "string")]
+    #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
-    // #[ts(type = "string")]
+    #[ts(type = "string")]
+    #[serde(with = "time::serde::rfc3339::option")]
     pub updated_at: Option<OffsetDateTime>,
     pub user_identifier: Option<String>,
 }

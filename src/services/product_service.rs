@@ -6,7 +6,7 @@ use sqlx::PgPool;
 use crate::{
     adapters::requests::products::{CreateProductRequest, SaveProductRequest},
     config::app_config::AppConfig,
-    entities::products::Product,
+    entities::{marketplace::MarketplaceWithProducts, products::Product},
     errors::{app_error::AppError, service_error::ServiceError},
     fs::filesystem::AppFileSystem,
     repositories::{
@@ -41,6 +41,12 @@ pub(crate) trait ProductServiceStateExt {
         product_identifier: &str,
         user_identifier: &str,
     ) -> Result<Product, ServiceError>;
+
+    async fn fetch_marketplace_products(
+        &self,
+        marketplace_identifier: &str,
+        user_identifier: &str,
+    ) -> Result<MarketplaceWithProducts, ServiceError>;
 }
 
 impl ProductServiceStateExt for ProductService {
@@ -69,7 +75,7 @@ impl ProductServiceStateExt for ProductService {
         let file = file_system.save_file_to_disk(picture)?;
 
         let upload_response = imagekit_client
-            .upload_file(file.file_path, &file.file_name)
+            .upload_file(file.file_path.clone(), &file.file_name)
             .await?;
 
         let save_product = SaveProductRequest {
@@ -84,8 +90,7 @@ impl ProductServiceStateExt for ProductService {
             .create_product(&save_product, user_identifier, marketplace_identifier)
             .await?;
 
-        // delete file
-        // file_system.delete_file_if_exists(file.file_path.to_str().unwrap());
+        file_system.delete_file_if_exists(file.file_path.to_str().unwrap())?;
         Ok(product)
     }
 
@@ -100,5 +105,18 @@ impl ProductServiceStateExt for ProductService {
             .await?;
 
         Ok(product)
+    }
+
+    async fn fetch_marketplace_products(
+        &self,
+        marketplace_identifier: &str,
+        user_identifier: &str,
+    ) -> Result<MarketplaceWithProducts, ServiceError> {
+        let marketplace_with_products = self
+            .product_repository
+            .fetch_marketplace_products(marketplace_identifier, user_identifier)
+            .await?;
+
+        Ok(marketplace_with_products)
     }
 }
