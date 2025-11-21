@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                identifier,\n                name,\n                picture,\n                price,\n                description,\n                created_by_identifier,\n                marketplace_identifier,\n                created_at,\n                updated_at\n            FROM products\n            WHERE identifier = $1\n            ",
+  "query": "\n            SELECT\n                identifier,\n                name,\n                picture,\n                price,\n                description,\n                created_by_identifier,\n                marketplace_identifier,\n                created_at,\n                updated_at\n            FROM products\n            WHERE identifier = $1\n            AND created_by_identifier = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -51,6 +51,7 @@
     ],
     "parameters": {
       "Left": [
+        "Bpchar",
         "Bpchar"
       ]
     },
@@ -66,5 +67,5 @@
       true
     ]
   },
-  "hash": "8dfeec917fcd16892f7d1b017a650591bc659cf8a1c81b312ba2f05050579113"
+  "hash": "5d299966eef57aa180ad57acdeb64ec97fea64144d7bc7c93c65b98c819df36c"
 }

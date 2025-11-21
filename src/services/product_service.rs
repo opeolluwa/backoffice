@@ -36,7 +36,11 @@ pub(crate) trait ProductServiceStateExt {
         marketplace_identifier: &str,
     ) -> Result<Product, ServiceError>;
 
-    async fn fetch_product(&self, user_identifier: &str) -> Result<Product, ServiceError>;
+    async fn fetch_product(
+        &self,
+        product_identifier: &str,
+        user_identifier: &str,
+    ) -> Result<Product, ServiceError>;
 }
 
 impl ProductServiceStateExt for ProductService {
@@ -85,8 +89,15 @@ impl ProductServiceStateExt for ProductService {
         Ok(product)
     }
 
-    async fn fetch_product(&self, identifier: &str) -> Result<Product, ServiceError> {
-        let product = self.product_repository.retrieve_product(identifier).await?;
+    async fn fetch_product(
+        &self,
+        product_identifier: &str,
+        user_identifier: &str,
+    ) -> Result<Product, ServiceError> {
+        let product = self
+            .product_repository
+            .retrieve_product(user_identifier, product_identifier)
+            .await?;
 
         Ok(product)
     }
