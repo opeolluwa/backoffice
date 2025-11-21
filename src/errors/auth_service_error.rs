@@ -1,7 +1,5 @@
 use crate::adapters::response::api_response::ApiResponseBuilder;
-use crate::errors::{
-    app_error::AppError, service_error::ServiceError, 
-};
+use crate::errors::{app_error::AppError, service_error::ServiceError};
 use axum::{http::StatusCode, response::IntoResponse};
 
 #[derive(Debug, thiserror::Error)]

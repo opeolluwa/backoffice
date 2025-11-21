@@ -1,7 +1,3 @@
-
-
-
-
 //! Utility for colored terminal logging.
 //!
 //! Provides simple, styled output for different message levels.

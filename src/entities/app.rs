@@ -1,4 +1,3 @@
-
 use sqlx::{FromRow, types::time::OffsetDateTime};
 
 #[derive(Debug, FromRow)]

@@ -71,7 +71,7 @@ impl AppFileSystem {
         })
     }
 
-    pub fn delete_file_if_exists(&self,path: &str) -> io::Result<()> {
+    pub fn delete_file_if_exists(&self, path: &str) -> io::Result<()> {
         let file_path = Path::new(path);
         if file_path.exists() {
             std::fs::remove_file(file_path)?;

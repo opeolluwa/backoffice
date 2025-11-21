@@ -1,5 +1,3 @@
-
-
 use sqlx::PgPool;
 
 pub trait Repository {

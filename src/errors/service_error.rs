@@ -47,8 +47,7 @@ impl ServiceError {
             ServiceError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ServiceError::AxumJsonRejection(_) => StatusCode::BAD_REQUEST,
             ServiceError::AuthenticationError(error) => error.status_code(),
-            ServiceError::RepositoryError(_) => 
-            StatusCode::UNPROCESSABLE_ENTITY,
+            ServiceError::RepositoryError(_) => StatusCode::UNPROCESSABLE_ENTITY,
             // ServiceError::ImagekitError(err)=> {}
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }

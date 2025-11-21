@@ -1,4 +1,3 @@
-
 #[derive(thiserror::Error, Debug)]
 pub enum CliError {
     #[error("Parse Error: {0}")]
@@ -11,6 +10,6 @@ pub enum CliError {
     DatabaseError(String),
     #[error(transparent)]
     SqlxError(#[from] sqlx::Error),
-        #[error("Operation failed: {0}")]
+    #[error("Operation failed: {0}")]
     OperationFailed(String),
 }

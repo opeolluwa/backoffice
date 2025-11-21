@@ -1,4 +1,7 @@
-use axum::{http::StatusCode, response::{IntoResponse, Response}};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 
 use crate::adapters::response::api_response::ApiResponseBuilder;
 
@@ -16,7 +19,6 @@ impl AppFileSystemError {
         StatusCode::UNPROCESSABLE_ENTITY
     }
 }
-
 
 impl IntoResponse for AppFileSystemError {
     fn into_response(self) -> Response {
