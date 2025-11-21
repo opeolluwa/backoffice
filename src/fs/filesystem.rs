@@ -1,3 +1,4 @@
+use std::io;
 use std::path::Path;
 
 use axum_typed_multipart::FieldData;
@@ -6,15 +7,25 @@ use tempfile::NamedTempFile;
 
 use crate::config::app_config::AppConfig;
 use crate::errors::app_error::AppError;
-use crate::errors::filesystem_error::FileSystemError;
+use crate::errors::filesystem_error::AppFileSystemError;
 use crate::fs::file::SaveFile;
 use backoffice_utils::generate::generate_file_name;
+
+#[derive(Debug, Clone)]
 pub struct AppFileSystem {
     upload_path: String,
     export_path: String,
 }
 
 impl AppFileSystem {
+    pub fn new(config: &AppConfig) -> Result<Self, AppError> {
+        Self::init(config)?;
+
+        Ok(Self {
+            upload_path: config.upload_path.to_owned(),
+            export_path: config.export_path.to_owned(),
+        })
+    }
     pub fn init(config: &AppConfig) -> Result<(), AppError> {
         let fs = Self {
             upload_path: config.upload_path.to_owned(),
@@ -28,10 +39,10 @@ impl AppFileSystem {
         Ok(())
     }
 
-    fn save_file_to_disk(
+    pub fn save_file_to_disk(
         &self,
         document: FieldData<NamedTempFile>,
-    ) -> Result<SaveFile, FileSystemError> {
+    ) -> Result<SaveFile, AppFileSystemError> {
         // 1. Prepare the file name
         let original_file_name = &document
             .metadata
@@ -51,13 +62,21 @@ impl AppFileSystem {
         let pdf_path = temp_dir.join(format!("{timestamp}_{sanitized_file_name}.jpg")); //TODO: get the extension
         if let Err(err) = document.contents.persist(&pdf_path) {
             log::error!("Failed to persist file: {err}");
-            return Err(FileSystemError::FailedToSaveToDisk);
+            return Err(AppFileSystemError::FailedToSaveToDisk);
         };
 
         Ok(SaveFile {
             file_name: sanitized_file_name,
             file_path: pdf_path,
         })
+    }
+
+    pub fn delete_file_if_exists(&self,path: &str) -> io::Result<()> {
+        let file_path = Path::new(path);
+        if file_path.exists() {
+            std::fs::remove_file(file_path)?;
+        }
+        Ok(())
     }
 }
 

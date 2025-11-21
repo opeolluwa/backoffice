@@ -10,10 +10,11 @@ use backoffice_lib::{
         app::{create_cors_layer, shutdown_signal},
         app_config::AppConfig,
         database::AppDatabase,
-        filesystem::AppFileSystem,
         logger::AppLogger,
     },
-    errors, routes,
+    errors,
+    fs::filesystem::AppFileSystem,
+    routes,
 };
 
 use errors::app_error::AppError;

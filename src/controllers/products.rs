@@ -3,8 +3,7 @@ use axum_typed_multipart::TypedMultipart;
 
 use crate::{
     adapters::{
-        dto::jwt::Claims,
-        requests::{api_request::AuthenticatedRequest, products::CreateProductRequest},
+        dto::jwt::Claims, requests::products::CreateProductRequest,
         response::api_response::ApiResponse,
     },
     entities::products::Product,
