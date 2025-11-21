@@ -4,3 +4,4 @@ pub mod service_error;
 pub mod macro_error;
 pub mod repository_error;
 pub mod authentication_error;
+pub mod filesystem_error;

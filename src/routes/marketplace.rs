@@ -18,10 +18,10 @@ pub(super) fn marketplace_routes(state: ServicesState) -> Router {
 
     let product_routes: Router<ServicesState> = Router::new()
         .route("/", post(add_product_to_marketplace))
-        .route("/", get(retrieve_product_from_marketplace));
+        .route("/{identifier}", get(retrieve_product_from_marketplace));
 
     Router::new()
-        .nest("/marketplaces/products", product_routes)
+        .nest("/marketplaces/{identifier}/products", product_routes)
         .nest("/marketplaces", routes)
         .with_state(state)
 }

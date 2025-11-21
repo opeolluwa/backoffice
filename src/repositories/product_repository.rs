@@ -3,7 +3,7 @@ use std::sync::Arc;
 use sqlx::PgPool;
 
 use crate::{
-    adapters::requests::products::CreateProductRequest, entities::products::Product,
+    adapters::requests::products::SaveProductRequest, entities::products::Product,
     errors::repository_error::RepositoryError, repositories::base::Repository,
 };
 
@@ -23,30 +23,24 @@ impl Repository for ProductRepository {
 pub(crate) trait ProductRepositoryExt {
     async fn create_product(
         &self,
-        request: &CreateProductRequest,
+        request: &SaveProductRequest,
         user_identifier: &str,
         marketplace_identifier: &str,
-        picture: &str,
     ) -> Result<Product, RepositoryError>;
 
-    async fn retrieve_product(
-        &self,
-        identifier: &str,
-
-    ) -> Result<Product, RepositoryError>;
+    async fn retrieve_product(&self, identifier: &str) -> Result<Product, RepositoryError>;
 }
 
 impl ProductRepositoryExt for ProductRepository {
     async fn create_product(
         &self,
-        request: &CreateProductRequest,
+        request: &SaveProductRequest,
         user_identifier: &str,
         marketplace_identifier: &str,
-        picture: &str,
     ) -> Result<Product, RepositoryError> {
         let identifier = ulid::Ulid::new().to_string();
         let name = &request.name;
-        let picture = picture;
+        let picture = &request.picture;
         let price = rust_decimal::Decimal::new(request.price, 2);
         let description = &request.description;
         let created_by_identifier = user_identifier;
@@ -91,11 +85,7 @@ impl ProductRepositoryExt for ProductRepository {
         Ok(product)
     }
 
-    async fn retrieve_product(
-        &self,
-        identifier: &str,
-    ) -> Result<Product, RepositoryError> {
-
+    async fn retrieve_product(&self, identifier: &str) -> Result<Product, RepositoryError> {
         let product = sqlx::query_as!(
             Product,
             r#"
