@@ -126,7 +126,7 @@ const getKey = (item: RouteItem) =>
       </div>
 
       <UButton
-        class="text-white px-3 py-3 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2 dark:bg-brand-600"
+        class="text-white px-3 py-3 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2 dark:bg-transparent dark:border border-gray-400"
         @click="logout"
       >
         <UIcon
