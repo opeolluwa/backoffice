@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            m.identifier,\n            m.user_identifier,\n            m.created_at,\n            m.updated_at,\n            m.name,\n            m.description,\n            COALESCE(\n                json_agg(\n                    jsonb_build_object(\n                        'identifier', p.identifier,\n                        'name', p.name,\n                        'price', p.price::text,\n                        'description', p.description,\n                        'picture', p.picture,\n                        'created_by_identifier', p.created_by_identifier,\n                        'marketplace_identifier', p.marketplace_identifier,\n                'created_at', to_jsonb(p.created_at),\n'updated_at', to_jsonb(p.updated_at)\n\n                    )\n                ) FILTER (WHERE p.identifier IS NOT NULL),\n                '[]'\n            ) AS \"products!: Json<Vec<Product>>\"\n        FROM marketplaces m\n        LEFT JOIN products p ON p.marketplace_identifier = m.identifier\n        WHERE m.identifier = $1\n          AND m.user_identifier = $2\n        GROUP BY m.identifier\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "identifier",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_identifier",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "products!: Json<Vec<Product>>",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar",
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "54ab5cd68c4eb1d5c7a90dae89e24e8cce2f90d3834d8ca64dfc7f0f530dc566"
+}

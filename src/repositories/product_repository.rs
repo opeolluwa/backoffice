@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use rust_decimal::{Decimal, dec};
 use sqlx::PgPool;
 
 use crate::{
@@ -8,7 +9,7 @@ use crate::{
     errors::repository_error::RepositoryError,
     repositories::base::Repository,
 };
- use sqlx::types::Json;
+use sqlx::types::Json;
 
 #[derive(Clone)]
 pub struct ProductRepository {
@@ -54,7 +55,7 @@ impl ProductRepositoryExt for ProductRepository {
         let identifier = ulid::Ulid::new().to_string();
         let name = &request.name;
         let picture = &request.picture;
-        let price = rust_decimal::Decimal::new(request.price, 2);
+        let price: Decimal = Decimal::from(request.price);
         let description = &request.description;
         let created_by_identifier = user_identifier;
         let marketplace_identifier = marketplace_identifier;
@@ -135,9 +136,9 @@ impl ProductRepositoryExt for ProductRepository {
         marketplace_identifier: &str,
         user_identifier: &str,
     ) -> Result<MarketplaceWithProducts, RepositoryError> {
-      let marketplace = sqlx::query_as!(
-    MarketplaceWithProducts,
-    r#"
+        let marketplace = sqlx::query_as!(
+            MarketplaceWithProducts,
+            r#"
         SELECT
             m.identifier,
             m.user_identifier,
@@ -150,13 +151,13 @@ impl ProductRepositoryExt for ProductRepository {
                     jsonb_build_object(
                         'identifier', p.identifier,
                         'name', p.name,
-                        'price', p.price,
+                        'price', p.price::text,
                         'description', p.description,
                         'picture', p.picture,
-                        'created_by_identifier', p.created_by_identifier,
-                        'marketplace_identifier', p.marketplace_identifier,
-                        'created_at', p.created_at,
-                        'updated_at', p.updated_at
+                        'createdByIdentifier', p.created_by_identifier,
+                        'marketplaceIdentifier', p.marketplace_identifier,
+                        'createdAt', p.created_at,
+                        'updatedAt', p.updated_at
                     )
                 ) FILTER (WHERE p.identifier IS NOT NULL),
                 '[]'
@@ -167,13 +168,12 @@ impl ProductRepositoryExt for ProductRepository {
           AND m.user_identifier = $2
         GROUP BY m.identifier
     "#,
-    marketplace_identifier,
-    user_identifier
-)
-.fetch_one(&*self.pool)
-.await?;
+            marketplace_identifier,
+            user_identifier
+        )
+        .fetch_one(&*self.pool)
+        .await?;
 
-
-    Ok(marketplace)
+        Ok(marketplace)
     }
 }
