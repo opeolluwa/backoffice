@@ -1,7 +1,10 @@
+use super::products::Product;
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
+use sqlx::prelude::FromRow;
+use sqlx::types::Json;
+use time::OffsetDateTime;
 use ts_rs::TS;
-
 #[derive(sqlx::FromRow, Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "Marketplace.d.ts")]
 #[serde(rename_all = "camelCase")]
@@ -12,7 +15,27 @@ pub struct MarketPlace {
     pub description: String,
     pub user_identifier: String,
     #[ts(type = "string")]
-    pub created_at: DateTime<Local>,
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
     #[ts(type = "string")]
-    pub updated_at: Option<DateTime<Local>>,
+    #[serde(with = "time::serde::rfc3339::option")]
+    pub updated_at: Option<OffsetDateTime>,
+}
+
+#[derive(Debug, serde::Deserialize, Serialize, FromRow, TS)]
+#[serde(rename_all = "camelCase")]
+pub struct MarketplaceWithProducts {
+    pub identifier: String,
+    pub user_identifier: Option<String>,
+    #[ts(type = "string")]
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
+    #[ts(type = "string")]
+    #[serde(with = "time::serde::rfc3339::option")]
+    pub updated_at: Option<OffsetDateTime>,
+    pub name: String,
+    pub description: String,
+    #[ts(type = "array")]
+    pub products: Json<Vec<Product>>,
+
 }

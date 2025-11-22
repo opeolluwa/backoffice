@@ -17,6 +17,7 @@ set dotenv-load := true
 set dotenv-path := "./.env.local"
 set export :=  true
 
+FRONTEND_DIR:='frontend'
 @default: 
     @just --list --list-heading $'Available commands\n'
 
@@ -42,7 +43,7 @@ run:
 
 
 lint:
-    cd ui && npm run lint 
+    cd {{FRONTEND_DIR}} && npm run lint 
     cargo sort -w 
     cargo group-imports --fix
     cargo fmt 

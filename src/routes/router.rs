@@ -3,8 +3,10 @@ use sqlx::{Pool, Postgres};
 use tower_http::services::{ServeDir, ServeFile};
 
 use crate::{
+    config::app_config::AppConfig,
     routes::{
-        auth::authentication_routes, marketplace::marketplace_routes, products::product_routes, public::public_routes, users::user_routes
+        auth::authentication_routes, marketplace::marketplace_routes, products::product_routes,
+        public::public_routes, users::user_routes,
     },
     services::{
         auth_service::AuthenticationService, marketplace_service::MarketplaceService,

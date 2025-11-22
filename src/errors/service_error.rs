@@ -1,10 +1,12 @@
 use axum::extract::rejection::{FormRejection, JsonRejection};
 use axum::response::Response;
 use axum::{http::StatusCode, response::IntoResponse};
+use backoffice_imagekit::ImagekitError;
 
 use crate::adapters::response::api_response::ApiResponseBuilder;
 use crate::errors::app_error::AppError;
 use crate::errors::authentication_error::AuthenticationError;
+use crate::errors::filesystem_error::AppFileSystemError;
 use crate::errors::repository_error::RepositoryError;
 
 #[derive(thiserror::Error, Debug)]
@@ -29,6 +31,12 @@ pub enum ServiceError {
     AppError(#[from] AppError),
     #[error(transparent)]
     RepositoryError(#[from] RepositoryError),
+    #[error(transparent)]
+    AppFileSystemError(#[from] AppFileSystemError),
+    #[error(transparent)]
+    FileSystemError(#[from] std::io::Error),
+    #[error(transparent)]
+    ImagekitError(#[from] ImagekitError),
 }
 
 impl ServiceError {
@@ -40,6 +48,7 @@ impl ServiceError {
             ServiceError::AxumJsonRejection(_) => StatusCode::BAD_REQUEST,
             ServiceError::AuthenticationError(error) => error.status_code(),
             ServiceError::RepositoryError(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            // ServiceError::ImagekitError(err)=> {}
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }

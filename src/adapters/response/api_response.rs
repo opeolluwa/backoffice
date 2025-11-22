@@ -11,7 +11,7 @@ use crate::errors::service_error::ServiceError;
 pub struct ApiResponse<T: Serialize> {
     #[serde(skip_serializing_if = "Option::is_none")]
     message: Option<String>,
-
+    #[serde(flatten)]
     data: Option<T>,
     #[serde(skip)]
     status_code: StatusCode,

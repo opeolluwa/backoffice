@@ -14,7 +14,7 @@ pub enum AppError {
     #[error(transparent)]
     EnvExtractError(#[from] backoffice_utils::errors::Error),
     #[error(transparent)]
-    FileSystemError(#[from] std::io::Error),
+    AppFileSystemError(#[from] std::io::Error),
 }
 
 impl AppError {
