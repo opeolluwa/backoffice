@@ -1,17 +1,4 @@
-//! Utility for colored terminal logging.
-//!
-//! Provides simple, styled output for different message levels.
-//!
-//! ### Example
-//! ```rust
-//! use lib_toolbox::helpers::console::LogMessage;
-//!
-//! LogMessage::error("The README already exists!");
-//! LogMessage::success("README created successfully.");
-//! LogMessage::warning("Overwriting existing file...");
-//! LogMessage::info("Starting generation process...");
-//! LogMessage::neutral("Nothing to update.");
-//! ```
+
 use console::Style;
 
 /// Prints colored text to stdout or stderr depending on message type.

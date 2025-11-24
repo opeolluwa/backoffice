@@ -11,6 +11,7 @@ export default defineNuxtConfig({
 
   app: {
     pageTransition: { name: "slide-left", mode: "out-in" },
+    
   },
   colorMode: {
     preference: "light",

@@ -34,7 +34,8 @@
     "typescript": "^5.9.3",
     "valibot": "^1.1.0",
     "vue": "^3.5.22",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "vue-shepherd": "^5.0.1"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",

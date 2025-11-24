@@ -5,6 +5,9 @@ use ts_rs::TS;
 
 #[derive(FromRow, Debug, Clone, Serialize, Deserialize,TS )]
 #[serde(rename_all = "camelCase")]
+#[ts(export)]
+
+
 pub struct Product {
     pub identifier: String,
     pub name: String,

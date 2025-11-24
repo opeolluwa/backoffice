@@ -1,12 +1,11 @@
 use super::products::Product;
-use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use sqlx::types::Json;
 use time::OffsetDateTime;
 use ts_rs::TS;
 #[derive(sqlx::FromRow, Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "Marketplace.d.ts")]
+#[ts(export)]
 #[serde(rename_all = "camelCase")]
 pub struct MarketPlace {
     pub identifier: String,
@@ -24,6 +23,8 @@ pub struct MarketPlace {
 
 #[derive(Debug, serde::Deserialize, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
+#[ts(export)]
+
 pub struct MarketplaceWithProducts {
     pub identifier: String,
     pub user_identifier: Option<String>,

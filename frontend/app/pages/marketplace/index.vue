@@ -81,34 +81,91 @@ const columns: TableColumn<MarketPlace>[] = [
 ];
 
 function getRowItems(row: Row<MarketPlace>) {
+  const router = useRouter();
+  const marketplaceStore = useMarketplaceStore();
+  // const { confirm } = useModal(); // Nuxt UI modal composable
+
+  const identifier = row.original.identifier;
+
   return [
     {
       type: "label",
       label: "Actions",
     },
+
     {
       label: "Copy payment ID",
       onSelect() {
-        copy(row.original.identifier);
+        copy(identifier);
 
         toast.add({
-          title: "Payment ID copied to clipboard!",
+          title: "Payment ID copied!",
           color: "success",
           icon: "i-lucide-circle-check",
         });
       },
     },
+
+    { type: "separator" },
+
+    // --- NEW CLEAN ACTIONS ---
     {
-      type: "separator",
+      label: "View entries",
+      icon: "i-lucide-list",
+      onSelect() {
+        router.push(`/marketplace/${identifier}/products`);
+      },
     },
+
     {
-      label: "View customer",
+      label: "Update",
+      icon: "i-lucide-pencil",
+      onSelect() {
+        router.push(`/marketplace/${identifier}/update`);
+      },
     },
+
     {
-      label: "View payment details",
+      label: "Delete",
+      icon: "i-lucide-trash",
+      class: "text-red-500",
+      async onSelect() {
+        // const ok = await confirm({
+        //   title: "Delete marketplace?",
+        //   description: "This action cannot be undone.",
+        //   confirmButton: {
+        //     label: "Delete",
+        //     color: "error",
+        //   },
+        //   cancelButton: {
+        //     label: "Cancel",
+        //   },
+        // });
+
+        // if (!ok) return;
+
+        try {
+          await api.delete(`/marketplaces/${identifier}`);
+
+          toast.add({
+            title: "Deleted",
+            description: "Marketplace deleted successfully.",
+            color: "success",
+          });
+
+          await marketplaceStore.fetchMarketplaces();
+        } catch {
+          toast.add({
+            title: "Error",
+            description: "Failed to delete marketplace.",
+            color: "error",
+          });
+        }
+      },
     },
   ];
 }
+
 const schema = v.object({
   name: v.pipe(v.string(), v.minLength(1, "Name is required ")),
   description: v.pipe(v.string(), v.minLength(1, "Description is required ")),
@@ -184,6 +241,7 @@ const pagination = ref({
   pageSize: 5,
 });
 const table = useTemplateRef("table");
+const colorMode = useColorMode();
 </script>
 
 <template>
@@ -318,10 +376,20 @@ const table = useTemplateRef("table");
           </UFormField>
 
           <div class="flex justify-between items-center">
-            <UButton type="submit" :loading="loading" :disabled="loading">
+            <UButton
+              type="submit"
+              class="dark:text-white/90 py-3 px-4"
+              :loading="loading"
+              :disabled="loading"
+            >
               Continue
             </UButton>
-            <UButton variant="subtle" color="error" @click="resetForm">
+            <UButton
+              variant="subtle"
+              :color="colorMode.toString() === 'dark' ? 'red-500' : 'muted'"
+              class="dark:text-white/90 py-3 px-4"
+              @click="resetForm"
+            >
               Clear form
             </UButton>
           </div>
@@ -330,6 +398,7 @@ const table = useTemplateRef("table");
     </UModal>
 
     <UButton
+      v-if="marketplaces"
       icon="heroicons:plus-20-solid"
       size="md"
       color="primary"
