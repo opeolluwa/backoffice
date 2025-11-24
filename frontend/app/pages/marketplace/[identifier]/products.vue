@@ -1,10 +1,10 @@
 <template>
-  <div class="space-y-4 grid grid-cols-12 grid-rows-12">
+  <div class="space-y-4 grid grid-cols-12">
     <!-- <h1>Products for {{ identifier }} {{ marketplaceWithProducts }}</h1> -->
     <UPageCard
       v-for="value in marketplaceWithProducts?.products"
       :key="value.identifier"
-      class="col-span-3 row-span-3"
+      class="col-span-3"
     >
       <template #default>
         <div>

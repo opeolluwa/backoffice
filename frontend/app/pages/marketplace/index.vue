@@ -241,6 +241,7 @@ const pagination = ref({
   pageSize: 5,
 });
 const table = useTemplateRef("table");
+const colorMode = useColorMode();
 </script>
 
 <template>
@@ -375,10 +376,20 @@ const table = useTemplateRef("table");
           </UFormField>
 
           <div class="flex justify-between items-center">
-            <UButton type="submit" :loading="loading" :disabled="loading">
+            <UButton
+              type="submit"
+              class="dark:text-white/90 py-3 px-4"
+              :loading="loading"
+              :disabled="loading"
+            >
               Continue
             </UButton>
-            <UButton variant="subtle" color="error" @click="resetForm">
+            <UButton
+              variant="subtle"
+              :color="colorMode.toString() === 'dark' ? 'red-500' : 'muted'"
+              class="dark:text-white/90 py-3 px-4"
+              @click="resetForm"
+            >
               Clear form
             </UButton>
           </div>
@@ -387,6 +398,7 @@ const table = useTemplateRef("table");
     </UModal>
 
     <UButton
+      v-if="marketplaces"
       icon="heroicons:plus-20-solid"
       size="md"
       color="primary"
