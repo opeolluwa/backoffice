@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use sqlx::prelude::FromRow;
+use ts_rs::TS;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "role", rename_all = "lowercase")]
@@ -11,7 +12,8 @@ pub enum Role {
     User,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow, TS)]
+#[ts(export)]
 pub struct User {
     pub email: String,
     pub identifier: String,
