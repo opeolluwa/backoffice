@@ -1,32 +1,34 @@
+ARG APP_NAME=backoffice
+ARG UI_DIR=frontend
+ARG RUST_VERSION=1.90.0
+
 FROM node:24 AS frontend
 WORKDIR /app
 
-COPY ./ui/package*.json ./
-RUN npm ci
-COPY ./ui .
+COPY ./frontend/package*.json ./
+RUN npm install
+
+COPY ./frontend .
 RUN npm run generate
 
-
-ARG RUST_VERSION=1.90.0
-ARG APP_NAME=backoffice
-
-FROM rust:1.90.0 AS backend
-ARG APP_NAME
+FROM rust:${RUST_VERSION} AS backend
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y musl-dev
 COPY . .
 
-
 RUN cargo build --release
 
-FROM ubuntu AS final
+FROM debian:bookworm-slim AS final
+ARG APP_NAME
+
 WORKDIR /app
-COPY --from=frontend /app/.output/public ./public
+COPY --from=frontend /app/.output/public ./assets
 COPY --from=backend /app/target/release/backoffice ./backoffice
+COPY --from=backend /app/target/release/cli ./cli
 COPY --from=backend /app/migrations ./migrations
-COPY --from=backend /app/scripts ./scripts
+
+
 
 EXPOSE 50051
-
 CMD ["./backoffice"]
