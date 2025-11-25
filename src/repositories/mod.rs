@@ -1,5 +1,6 @@
 pub(crate) mod activity_repository;
 pub mod base;
+pub mod country_repository;
 pub mod marketplace_repository;
 pub(crate) mod product_repository;
 pub mod resource_repository;

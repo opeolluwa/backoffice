@@ -1,4 +1,4 @@
-use crate::controllers::marketplace::{
+use crate::controllers::marketplaces::{
     count_marketplaces, create_marketplace, delete_marketplace_by_identifier,
     find_all_marketplaces, find_marketplace_by_identifier, update_marketplace_by_identifier,
 };

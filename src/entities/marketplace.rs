@@ -38,5 +38,4 @@ pub struct MarketplaceWithProducts {
     pub description: String,
     #[ts(type = "array")]
     pub products: Json<Vec<Product>>,
-
 }

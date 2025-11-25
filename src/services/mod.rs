@@ -1,5 +1,6 @@
 pub mod admin_service;
 pub mod auth_service;
+pub mod country_service;
 pub mod marketplace_service;
 pub(crate) mod product_service;
 pub mod resource_service;
