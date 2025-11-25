@@ -1,4 +1,3 @@
-
 use console::Style;
 
 /// Prints colored text to stdout or stderr depending on message type.

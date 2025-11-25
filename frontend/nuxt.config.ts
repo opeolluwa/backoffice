@@ -11,7 +11,6 @@ export default defineNuxtConfig({
 
   app: {
     pageTransition: { name: "slide-left", mode: "out-in" },
-    
   },
   colorMode: {
     preference: "light",
@@ -29,6 +28,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "pinia-plugin-persistedstate/nuxt",
     "@vueuse/nuxt",
+    "nuxt-seo-utils",
   ],
   pinia: {
     storesDirs: ["./stores/**"],

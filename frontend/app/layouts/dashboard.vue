@@ -2,6 +2,7 @@
 import * as v from "valibot";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import useLogout from "~/composables/useLogout";
+const items = useBreadcrumbItems();
 
 interface Route {
   label: string;
@@ -114,7 +115,7 @@ const getKey = (item: RouteItem) =>
             <template v-else>
               <NuxtLink
                 :href="item.path"
-                class="flex items-center hover:text-brand dark:hover:text-white/50 gap-2 px-3 my-2 py-2 rounded    transition-colors border-brand-400"
+                class="flex items-center hover:text-brand dark:hover:text-white/50 gap-2 px-3 my-2 py-2 rounded transition-colors border-brand-400"
                 active-class="bg-brand-50/90 dark:bg-brand-100/20 t"
               >
                 <UIcon :name="item.icon" class="size-5" />
@@ -126,7 +127,7 @@ const getKey = (item: RouteItem) =>
       </div>
 
       <UButton
-        class="text-white px-3 py-3 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2 dark:bg-transparent dark:border border-gray-400"
+        class="text-white px-3 py-3 rounded w-full mt-auto mb-3 cursor-pointer flex items-center justify-center gap-x-2 dark:border-none border-gray-400"
         @click="logout"
       >
         <UIcon
@@ -176,7 +177,15 @@ const getKey = (item: RouteItem) =>
         </div>
       </header>
 
+      <div class="px-8 pt-6">
+        <UBreadcrumb :hide-non-existing="true" :hide-root="true" :items="items">
+          <template #separator>
+            <span class="mx-2 text-muted">/</span>
+          </template>
+        </UBreadcrumb>
+      </div>
       <div class="px-8 py-12">
+        <!-- <UPageHeader title="PageHeader" /> -->
         <slot />
       </div>
     </main>

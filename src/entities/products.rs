@@ -3,10 +3,9 @@ use sqlx::FromRow;
 use time::OffsetDateTime;
 use ts_rs::TS;
 
-#[derive(FromRow, Debug, Clone, Serialize, Deserialize,TS )]
+#[derive(FromRow, Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
-
 
 pub struct Product {
     pub identifier: String,
