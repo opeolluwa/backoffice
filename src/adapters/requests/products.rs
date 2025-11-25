@@ -11,6 +11,7 @@ pub struct CreateProductRequest {
     pub name: String,
     pub description: String,
     pub price: i64,
+    pub currency_identifier: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -19,4 +20,5 @@ pub struct SaveProductRequest {
     pub name: String,
     pub description: String,
     pub price: i64,
+    pub currency_identifier: String,
 }

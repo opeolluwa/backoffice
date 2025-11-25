@@ -3,6 +3,8 @@ import api from "~/plugin/api";
 import type { MarketplaceWithProducts } from "../../../../../bindings/MarketplaceWithProducts";
 import { useCountryStore } from "~/stores/country";
 
+import { z } from "zod";
+
 const route = useRoute();
 const identifier = route.params.identifier;
 
@@ -12,7 +14,7 @@ const state = reactive({
   price: 0,
   description: "",
   picture: null,
-  currency: "",
+  currencyIdentifier: "",
 });
 
 const currencyOptions = computed(
@@ -27,22 +29,21 @@ const currencyOptions = computed(
 const countryStore = useCountryStore();
 
 const loading = ref(false);
-const schema = {
-  type: "object",
-  properties: {
-    name: { type: "string", title: "Name" },
-    description: { type: "string", title: "Description" },
-    price: { type: "string", title: "Price" },
-    file: { type: "string", title: "Picture" },
-  },
-};
+
+const schema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  price: z.number().min(1, "Price is required"),
+  picture: z.any().optional(),
+  currencyIdentifier: z.string().min(1, "Currency is required"),
+});
 
 const resetForm = () => {
   state.name = "";
   state.description = "";
   state.price = 0;
   state.picture = null;
-  state.currency = "";
+  state.currencyIdentifier = "";
 };
 
 definePageMeta({
@@ -61,6 +62,7 @@ const onSubmit = async () => {
     formData.append("name", state.name);
     formData.append("description", state.description);
     formData.append("price", state.price.toString());
+    formData.append("currencyIdentifier", state.currencyIdentifier);
     if (state.picture) {
       formData.append("picture", state.picture);
     }
@@ -74,7 +76,6 @@ const onSubmit = async () => {
     }
     resetForm();
     openForm.value = false;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log({ error });
   } finally {
@@ -96,7 +97,6 @@ onMounted(async () => {
     }
     marketplaceWithProducts.value = response.data;
     return;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log({ error });
   }
@@ -111,24 +111,48 @@ const countries = computed(() => countryStore.countries);
     <UPageCard
       v-for="value in marketplaceWithProducts?.products"
       :key="value.identifier"
-      class="col-span-3 border border-gray-200 dark:border-gray-200/10"
+      class="w-64 bg-white rounded-xl shadow-sm p-2 hover:shadow-md transition"
     >
       <template #default>
-        <div class="space-y-2">
-          <img :src="value.picture" class="rounded size-40" />
-
-         <div class="flex justify-between">
-           <div class="flex flex-col">
-            <h1 class="text-black font-medium">{{ value.name }}</h1>
-            <small>
-              {{ value.description }}
-            </small>
+        <div class="flex flex-col gap-3">
+          <!-- Product Image -->
+          <div
+            class="bg-gray-100 rounded-xl flex items-center justify-center p-2"
+          >
+            <img
+              :src="String(value.picture)"
+              class="rounded-xl w-40 h-32 object-cover"
+            />
           </div>
-          <span class="text-black font-medium">
-            {{ value.price }} {{ value.currency }}
-          </span>
-          
-         </div>
+
+          <!-- Name -->
+          <p class="text-gray-900 font-semibold text-base truncate">
+            {{ value.name }}
+          </p>
+
+          <!-- Category (use your description or static category) -->
+          <p class="text-gray-500 text-sm -mt-2">
+            {{ value.description }}
+          </p>
+
+          <!-- Price Row -->
+          <div class="flex justify-between items-center mt-1">
+            <p class="text-gray-900 font-bold text-lg">
+              {{ value.price }}
+            </p>
+
+            <div class="flex items-center gap-1">
+            
+
+              <span class="text-gray-700 text-sm">
+                {{ value.currencyCode }}
+              </span>
+              <img
+                :src="String(value.flag)"
+                class="h-4 w-4 rounded-sm object-cover"
+              />
+            </div>
+          </div>
         </div>
       </template>
     </UPageCard>
@@ -214,7 +238,7 @@ const countries = computed(() => countryStore.countries);
               :ui="{ error: 'text-red-500 text-sm mt-1' }"
             >
               <USelect
-                v-model="state.currency"
+                v-model="state.currencyIdentifier"
                 :items="currencyOptions"
                 :ui="{ base: 'py-4 px-6', viewport: '', content: 'w-60' }"
                 :class="[
@@ -249,8 +273,8 @@ const countries = computed(() => countryStore.countries);
     </UModal>
 
     <AppContentButton
-      @click="openForm = true"
       class="fixed bottom-12 right-20"
+      @click="openForm = true"
     />
   </div>
 </template>

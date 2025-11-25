@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                identifier,\n                name,\n                picture,\n                price,\n                description,\n                created_by_identifier,\n                marketplace_identifier,\n                created_at,\n                updated_at\n            FROM products\n            WHERE identifier = $1\n            AND created_by_identifier = $2\n            ",
+  "query": "\n            INSERT INTO products (\n                identifier,\n                name,\n                picture,\n                price,\n                description,\n                created_by_identifier,\n                marketplace_identifier,\n                currency_identifier\n            )\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n            RETURNING\n                identifier,\n                name,\n                picture,\n                price,\n                description,\n                created_by_identifier,\n                marketplace_identifier,\n                created_at,\n                updated_at,\n                currency_identifier\n            ",
   "describe": {
     "columns": [
       {
@@ -47,10 +47,21 @@
         "ordinal": 8,
         "name": "updated_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "currency_identifier",
+        "type_info": "Bpchar"
       }
     ],
     "parameters": {
       "Left": [
+        "Bpchar",
+        "Varchar",
+        "Varchar",
+        "Numeric",
+        "Text",
+        "Bpchar",
         "Bpchar",
         "Bpchar"
       ]
@@ -64,8 +75,9 @@
       true,
       true,
       false,
+      true,
       true
     ]
   },
-  "hash": "5d299966eef57aa180ad57acdeb64ec97fea64144d7bc7c93c65b98c819df36c"
+  "hash": "7bbf09ebd830089aaf5eccd7daab3a527e69674b65150628fc029fd63ea6636f"
 }

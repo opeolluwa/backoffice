@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            m.identifier,\n            m.user_identifier,\n            m.created_at,\n            m.updated_at,\n            m.name,\n            m.description,\n            COALESCE(\n                json_agg(\n                    jsonb_build_object(\n                        'identifier', p.identifier,\n                        'name', p.name,\n                        'price', p.price::text,\n                        'description', p.description,\n                        'picture', p.picture,\n                        'createdByIdentifier', p.created_by_identifier,\n                        'marketplaceIdentifier', p.marketplace_identifier,\n                        'createdAt', p.created_at,\n                        'updatedAt', p.updated_at,\n\n                        -- 🔥 Add currency info\n                        'currencyCode', c.currency_code,\n                        'currency', c.currency,\n                        'country', c.country,\n                        'flag', c.flag,\n                        'currencyIdentifier', c.identifier\n                    )\n                ) FILTER (WHERE p.identifier IS NOT NULL),\n                '[]'\n            ) AS \"products!: Json<Vec<ProductWithCurrency>>\"\n        FROM marketplaces m\n        LEFT JOIN products p\n            ON p.marketplace_identifier = m.identifier\n        LEFT JOIN countries c\n            ON p.currency_identifier = c.identifier\n        WHERE m.identifier = $1\n          AND m.user_identifier = $2\n        GROUP BY m.identifier\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "identifier",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_identifier",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "products!: Json<Vec<ProductWithCurrency>>",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar",
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "aa67e24b6c2653c465832dc7d81fbb374ad15c1a149568f5914570cdf00e0e51"
+}

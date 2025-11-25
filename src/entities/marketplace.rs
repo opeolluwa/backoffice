@@ -1,4 +1,5 @@
-use super::products::Product;
+use crate::entities::products::ProductWithCurrency;
+
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use sqlx::types::Json;
@@ -37,5 +38,5 @@ pub struct MarketplaceWithProducts {
     pub name: String,
     pub description: String,
     #[ts(type = "array")]
-    pub products: Json<Vec<Product>>,
+    pub products: Json<Vec<ProductWithCurrency>>,
 }
