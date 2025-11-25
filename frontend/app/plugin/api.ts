@@ -4,7 +4,6 @@ import { useTokenStore } from "~/stores/token";
 const api = axios.create({
   baseURL: "http://localhost:5006/api",
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
   },
   timeout: 10000,

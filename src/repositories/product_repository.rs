@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
-use rust_decimal::{Decimal, dec};
+use rust_decimal::Decimal;
 use sqlx::PgPool;
 
+use crate::entities::products::ProductWithCurrency;
 use crate::{
     adapters::requests::products::SaveProductRequest,
     entities::{marketplace::MarketplaceWithProducts, products::Product},
@@ -10,7 +11,6 @@ use crate::{
     repositories::base::Repository,
 };
 use sqlx::types::Json;
-
 #[derive(Clone)]
 pub struct ProductRepository {
     pool: Arc<PgPool>,
@@ -59,6 +59,7 @@ impl ProductRepositoryExt for ProductRepository {
         let description = &request.description;
         let created_by_identifier = user_identifier;
         let marketplace_identifier = marketplace_identifier;
+        let country_identifier = &request.currency_identifier;
 
         let product = sqlx::query_as!(
             Product,
@@ -70,9 +71,10 @@ impl ProductRepositoryExt for ProductRepository {
                 price,
                 description,
                 created_by_identifier,
-                marketplace_identifier
+                marketplace_identifier,
+                currency_identifier
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING
                 identifier,
                 name,
@@ -82,7 +84,8 @@ impl ProductRepositoryExt for ProductRepository {
                 created_by_identifier,
                 marketplace_identifier,
                 created_at,
-                updated_at
+                updated_at,
+                currency_identifier
             "#,
             identifier,
             name,
@@ -90,7 +93,8 @@ impl ProductRepositoryExt for ProductRepository {
             price,
             description,
             created_by_identifier,
-            marketplace_identifier
+            marketplace_identifier,
+            country_identifier,
         )
         .fetch_one(&*self.pool)
         .await
@@ -115,6 +119,7 @@ impl ProductRepositoryExt for ProductRepository {
                 description,
                 created_by_identifier,
                 marketplace_identifier,
+                currency_identifier,
                 created_at,
                 updated_at
             FROM products
@@ -157,13 +162,23 @@ impl ProductRepositoryExt for ProductRepository {
                         'createdByIdentifier', p.created_by_identifier,
                         'marketplaceIdentifier', p.marketplace_identifier,
                         'createdAt', p.created_at,
-                        'updatedAt', p.updated_at
+                        'updatedAt', p.updated_at,
+
+                        -- 🔥 Add currency info
+                        'currencyCode', c.currency_code,
+                        'currency', c.currency,
+                        'country', c.country,
+                        'flag', c.flag,
+                        'currencyIdentifier', c.identifier
                     )
                 ) FILTER (WHERE p.identifier IS NOT NULL),
                 '[]'
-            ) AS "products!: Json<Vec<Product>>"
+            ) AS "products!: Json<Vec<ProductWithCurrency>>"
         FROM marketplaces m
-        LEFT JOIN products p ON p.marketplace_identifier = m.identifier
+        LEFT JOIN products p
+            ON p.marketplace_identifier = m.identifier
+        LEFT JOIN countries c
+            ON p.currency_identifier = c.identifier
         WHERE m.identifier = $1
           AND m.user_identifier = $2
         GROUP BY m.identifier
@@ -173,7 +188,6 @@ impl ProductRepositoryExt for ProductRepository {
         )
         .fetch_one(&*self.pool)
         .await?;
-
         Ok(marketplace)
     }
 }

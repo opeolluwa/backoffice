@@ -58,3 +58,6 @@ db:
 
 run-cli:
     cargo run --bin cli create-user 
+
+run-init:
+    cargo run --bin cli init

@@ -22,4 +22,30 @@ pub struct Product {
     #[ts(type = "string")]
     #[serde(with = "time::serde::rfc3339::option")]
     pub updated_at: Option<OffsetDateTime>,
+    pub currency_identifier: Option<String>,
+}
+
+#[derive(FromRow, Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct ProductWithCurrency {
+    pub identifier: String,
+    pub name: String,
+    #[ts(type = "number")]
+    pub price: rust_decimal::Decimal,
+    pub description: String,
+    pub picture: Option<String>,
+    pub created_by_identifier: Option<String>,
+    pub marketplace_identifier: Option<String>,
+    #[ts(type = "string")]
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
+    #[ts(type = "string")]
+    #[serde(with = "time::serde::rfc3339::option")]
+    pub updated_at: Option<OffsetDateTime>,
+    pub currency_code: String,
+    pub currency: String,
+    pub country: String,
+    pub flag: Option<String>,
+    pub currency_identifier: String,
 }

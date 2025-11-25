@@ -57,6 +57,7 @@ impl ProductServiceStateExt for ProductService {
             price,
             name,
             description,
+            currency_identifier,
         }): TypedMultipart<CreateProductRequest>,
         user_identifier: &str,
         marketplace_identifier: &str,
@@ -83,6 +84,7 @@ impl ProductServiceStateExt for ProductService {
             name,
             description,
             price,
+            currency_identifier,
         };
 
         let product = self
