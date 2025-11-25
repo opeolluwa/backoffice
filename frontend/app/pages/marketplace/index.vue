@@ -3,29 +3,26 @@ import type { FormSubmitEvent, TableColumn } from "@nuxt/ui";
 import * as v from "valibot";
 import api from "~/plugin/api";
 import { useMarketplaceStore } from "~/stores/marketplace";
-import type { MarketPlace } from "~/types/Marketplace";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
-import { useClipboard } from "@vueuse/core";
 import { getPaginationRowModel } from "@tanstack/vue-table";
+import type { MarketPlace } from "../../../../bindings/Marketplace";
 
 definePageMeta({
   layout: "dashboard",
+  breadcrumb: {
+    icon: "heroicons:building-storefront",
+    ariaLabel: "Marketplace",
+    title: "Marketplace",
+  },
 });
 
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 
 const toast = useToast();
-const { copy } = useClipboard();
 
 const columns: TableColumn<MarketPlace>[] = [
-  // {
-  //   accessorKey: "identifier",
-  //   header: "#",
-  //   cell: ({ row }) => `#${row.getValue("identifier")}`,
-  // },
-
   {
     accessorKey: "name",
     header: "Name",
@@ -56,7 +53,7 @@ const columns: TableColumn<MarketPlace>[] = [
     cell: ({ row }) => {
       return h(
         "div",
-        { class: "text-right" },
+        { class: "text-right text-red-500" },
         h(
           UDropdownMenu,
           {
@@ -93,25 +90,13 @@ function getRowItems(row: Row<MarketPlace>) {
       label: "Actions",
     },
 
-    {
-      label: "Copy payment ID",
-      onSelect() {
-        copy(identifier);
-
-        toast.add({
-          title: "Payment ID copied!",
-          color: "success",
-          icon: "i-lucide-circle-check",
-        });
-      },
-    },
-
     { type: "separator" },
 
     // --- NEW CLEAN ACTIONS ---
     {
       label: "View entries",
       icon: "i-lucide-list",
+      class: "text-sm flex gap-x-2 items-center",
       onSelect() {
         router.push(`/marketplace/${identifier}/products`);
       },
@@ -266,7 +251,6 @@ const colorMode = useColorMode();
     </div>
 
     <div v-else>
-      <h1 class="justify-start">#Marketplaces</h1>
       <div class="justify-between items-center hidden">
         <div class="flex px-4 py-3.5 border-accented">
           <UInput
@@ -397,12 +381,8 @@ const colorMode = useColorMode();
       </template>
     </UModal>
 
-    <UButton
-      v-if="marketplaces"
-      icon="heroicons:plus-20-solid"
-      size="md"
-      color="primary"
-      variant="solid"
+    <AppContentButton
+      v-show="nullMarketplaces === false"
       class="fixed bottom-12 right-20"
       @click="openForm = true"
     />

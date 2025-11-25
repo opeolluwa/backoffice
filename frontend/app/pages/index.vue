@@ -5,6 +5,12 @@ import api from "~/plugin/api";
 import { useTokenStore } from "~/stores/token";
 import { useRouter } from "vue-router";
 
+definePageMeta({
+  breadcrumb: {
+    hidden: true,
+  },
+  layout: "auth",
+});
 const schema = v.object({
   email: v.pipe(v.string(), v.email("Please enter a valid email address.")),
   password: v.pipe(
@@ -44,8 +50,6 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
     loading.value = false;
   }
 }
-
-definePageMeta({ layout: "auth" });
 </script>
 
 <template>

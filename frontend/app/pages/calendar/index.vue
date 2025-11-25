@@ -1,11 +1,7 @@
-<script setup lang="ts">
-definePageMeta({
-  layout: "dashboard",
-});
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <under-construction />
+  <UnderConstruction />
 </template>
 
 <style scoped></style>
