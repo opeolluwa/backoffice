@@ -30,3 +30,8 @@ zzzsandbox
 .env
 
 assets
+
+docs/.vitepress/dist
+
+
+node_modules
