@@ -17,19 +17,20 @@ set dotenv-load := true
 set dotenv-path := "./.env.local"
 set export :=  true
 
+FRONTEND_DIR:='frontend'
 @default: 
     @just --list --list-heading $'Available commands\n'
 
 
 
-[working-directory :'ui']
-@run-ui:
+[working-directory :'frontend']
+@run-frontend:
     npm run dev
 
 
 
-[working-directory :'ui']
-@build-ui:
+[working-directory :'frontend']
+@build-frontend:
     npm run generate
     rm -rf ../assets
     cp  -r .output/public ../assets
@@ -42,7 +43,7 @@ run:
 
 
 lint:
-    cd ui && npm run lint 
+    cd {{FRONTEND_DIR}} && npm run lint 
     cargo sort -w 
     cargo group-imports --fix
     cargo fmt 
@@ -57,3 +58,6 @@ db:
 
 run-cli:
     cargo run --bin cli create-user 
+
+run-init:
+    cargo run --bin cli init

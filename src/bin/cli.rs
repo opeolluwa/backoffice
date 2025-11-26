@@ -8,6 +8,7 @@ use clap::{Parser, Subcommand};
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::{Input, Password};
 use sqlx::PgPool;
+
 use ulid::Ulid;
 #[derive(Parser)]
 #[command(
@@ -177,7 +178,8 @@ pub async fn create_user(db: &PgPool) -> Result<(), CliError> {
         .map_err(|e| CliError::ParseError(e.to_string()))?;
 
     let existing_admin: Option<(String,)> =
-        sqlx::query_scalar(r#"SELECT identifier FROM users WHERE email = $1"#).bind(&admin_email)
+        sqlx::query_scalar(r#"SELECT identifier FROM users WHERE email = $1"#)
+            .bind(&admin_email)
             .fetch_optional(db)
             .await
             .map_err(|e| CliError::OperationFailed(e.to_string()))?;
@@ -191,8 +193,8 @@ pub async fn create_user(db: &PgPool) -> Result<(), CliError> {
     }
 
     let new_admin_id = Ulid::new().to_string();
-    let hashed_password =
-        hash(&admin_password.trim(), DEFAULT_COST).map_err(|err| CliError::ParseError(err.to_string()))?;
+    let hashed_password = hash(&admin_password.trim(), DEFAULT_COST)
+        .map_err(|err| CliError::ParseError(err.to_string()))?;
 
     sqlx::query!(
         r#"

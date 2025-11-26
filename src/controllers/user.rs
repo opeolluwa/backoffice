@@ -1,5 +1,7 @@
 use axum::extract::State;
 
+use crate::errors::service_error::ServiceError;
+use crate::services::user_service::UserServiceTrait;
 use crate::{
     adapters::{
         dto::{jwt::Claims, user::UserDto},
@@ -7,9 +9,6 @@ use crate::{
     },
     services::user_service::UserService,
 };
-use crate::errors::service_error::ServiceError;
-use crate::services::user_service::UserServiceTrait;
-
 
 pub async fn retrieve_information(
     State(user_service): State<UserService>,

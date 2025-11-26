@@ -1,10 +1,10 @@
 pub mod app;
-pub mod parser;
 pub mod commands;
 pub mod errors;
-pub mod utils;
 pub mod logging;
+pub mod parser;
+pub mod utils;
 
 pub use app::run;
-pub use parser::parse_commands;
 pub use logging::LogMessage;
+pub use parser::parse_commands;

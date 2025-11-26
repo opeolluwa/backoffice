@@ -4,11 +4,12 @@ use tower_http::services::{ServeDir, ServeFile};
 
 use crate::{
     routes::{
-        auth::authentication_routes, marketplace::marketplace_routes, public::public_routes,
-        users::user_routes,
+        auth::authentication_routes, country::country_routes, marketplace::marketplace_routes,
+        products::product_routes, public::public_routes, users::user_routes,
     },
     services::{
-        auth_service::AuthenticationService, marketplace_service::MarketplaceService,
+        auth_service::AuthenticationService, country_service::CountryService,
+        marketplace_service::MarketplaceService, product_service::ProductService,
         root_service::RootService, user_service::UserService,
     },
     states::services_state::ServicesState,
@@ -20,6 +21,8 @@ pub fn load_routes(pool: Pool<Postgres>) -> Router {
         root_service: RootService::init(),
         auth_service: AuthenticationService::init(&pool),
         marketplace_service: MarketplaceService::init(&pool),
+        product_service: ProductService::init(&pool),
+        country_service: CountryService::init(&pool),
     };
 
     let serve_dir = ServeDir::new("assets").not_found_service(ServeFile::new("assets/index.html"));
@@ -31,7 +34,9 @@ pub fn load_routes(pool: Pool<Postgres>) -> Router {
                 .merge(user_routes(state.clone()))
                 .merge(public_routes(state.clone()))
                 .merge(authentication_routes(state.clone()))
-                .merge(marketplace_routes(state.clone())),
+                .merge(marketplace_routes(state.clone()))
+                .merge(product_routes(state.clone()))
+                .merge(country_routes(state.clone())),
         )
         .fallback_service(serve_dir)
 }

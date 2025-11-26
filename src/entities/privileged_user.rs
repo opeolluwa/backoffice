@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use ts_rs::TS;
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow, TS)]
+#[ts(export)]
+
 pub struct PrivilegedUser {
     pub email: Option<String>,
     pub identifier: String,

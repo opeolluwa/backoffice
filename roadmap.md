@@ -1,3 +1,2 @@
-- [ ] Create super admin from CLI
-- [ ] Create dynamic resources 
-- [ ] Create market place. 
+- [x] Set the user name and password 
+- [x] add shepherd 

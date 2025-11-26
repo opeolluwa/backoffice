@@ -13,7 +13,6 @@ pub enum RepositoryError {
     OperationFailed(String),
     #[error(transparent)]
     SqlxError(#[from] sqlx::Error),
-
 }
 
 impl RepositoryError {
