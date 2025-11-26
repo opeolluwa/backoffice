@@ -4,22 +4,34 @@ layout: home
 
 hero:
   name: "Backoffice"
-  text: "Content management system and administrative platform for web applications "
-  tagline: My great project tagline
+  text: ""
+  tagline: Lightweight content management system and administrative platform for web application
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Get started
+      link: /get-started
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: docs
+      link: /docs
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Centralized Content Management
+    details: Create, edit, schedule, and publish website content from a single intuitive dashboard. Manage pages, media, and dynamic data with version control and instant previews.
+
+  - title: Team Collaboration & Roles
+    details: Work seamlessly with your team using role-based access control, activity logs, and real-time updates. Assign permissions to editors, admins, and reviewers securely.
+
+  - title: Powerful Administration Tools
+    details: Manage users, permissions, configurations, and system settings with fine-grained control. Monitor activity, audit changes, and maintain platform integrity with ease.
+
+  - title: Extensible & API-Driven
+    details: Easily integrate with external services using a robust API. Extend functionality with custom modules, plugins, and automation workflows tailored to your business needs.
+
+  - title: Secure & Reliable
+    details: Built with security at its core—featuring authentication, authorization, encrypted credentials, and protection against common web threats.
+
+  - title: Scalable by Design
+    details: Designed to grow with your application. Whether you’re serving hundreds or millions of users, the platform scales efficiently with your infrastructure.
+
 ---
 

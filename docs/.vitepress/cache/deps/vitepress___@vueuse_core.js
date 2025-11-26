@@ -36,9 +36,9 @@ import {
   unref,
   watch,
   watchEffect
-} from "./chunk-ISA6VLYW.js";
+} from "./chunk-TICTUL3T.js";
 
-// node_modules/vitepress/node_modules/@vueuse/shared/dist/index.js
+// node_modules/@vueuse/shared/dist/index.js
 function computedEager(fn, options) {
   var _options$flush;
   const result = shallowRef();
@@ -1361,7 +1361,7 @@ function whenever(source, cb, options) {
   return stop;
 }
 
-// node_modules/vitepress/node_modules/@vueuse/core/dist/index.js
+// node_modules/@vueuse/core/dist/index.js
 function computedAsync(evaluationCallback, initialState, optionsOrRef) {
   var _globalThis$reportErr;
   let options;
