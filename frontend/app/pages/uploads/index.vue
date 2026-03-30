@@ -145,8 +145,20 @@ function fileIcon(type: string) {
       </div>
     </div>
 
-    <template v-if="true">
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repellendus nobis, culpa perspiciatis dolor consectetur deleniti cum quia doloribus eum, quis dolorum nihil modi rerum! Odio aliquam provident omnis enim et.
+    <!-- Empty state -->
+    <template v-if="!hasFiles">
+      <div class="flex flex-col items-center justify-center py-16 gap-4 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
+          <UIcon name="heroicons:arrow-up-tray" class="size-8 text-gray-300 dark:text-white/20" />
+        </div>
+        <div>
+          <p class="font-medium text-base">No files uploaded yet</p>
+          <p class="text-sm text-muted mt-1">Drag and drop files above or click to browse.</p>
+        </div>
+        <UButton icon="heroicons:arrow-up-tray" variant="outline" color="neutral" @click="fileInputRef?.click()">
+          Browse files
+        </UButton>
+      </div>
     </template>
     <!-- File grid -->
     <template v-else>

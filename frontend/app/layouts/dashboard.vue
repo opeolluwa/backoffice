@@ -4,6 +4,23 @@ import useLogout from "~/composables/useLogout";
 
 const items = useBreadcrumbItems();
 
+const searchInputRef = ref<HTMLInputElement | null>(null);
+
+const isMac =
+  typeof navigator !== "undefined" &&
+  /mac|iphone|ipad|ipod/i.test(navigator.userAgent);
+
+function focusSearch(e: KeyboardEvent) {
+  const isTrigger =
+    e.key === "f" && (isMac ? e.metaKey : e.ctrlKey) && !e.shiftKey;
+  if (!isTrigger) return;
+  e.preventDefault();
+  searchInputRef.value?.focus();
+}
+
+onMounted(() => window.addEventListener("keydown", focusSearch));
+onUnmounted(() => window.removeEventListener("keydown", focusSearch));
+
 interface Route {
   label: string;
   icon: string;
@@ -53,6 +70,11 @@ const routes: RouteItem[] = [
     icon: "heroicons:chart-bar-square",
   },
   {
+    label: "Revenue",
+    path: "/revenue",
+    icon: "heroicons:banknotes",
+  },
+  {
     divider: true,
     label: "Workspace",
   },
@@ -88,34 +110,8 @@ const getKey = (item: RouteItem) =>
       class="w-60 shrink-0 flex flex-col bg-white dark:bg-brand-dark-600 border-r border-gray-100 dark:border-white/5"
     >
       <!-- Brand mark -->
-      <div
-        class="flex items-center gap-3 px-5 py-5 border-b border-gray-100 dark:border-white/5"
-      >
-        <div class="w-8 h-8 shrink-0">
-          <svg
-            viewBox="0 0 120 90"
-            fill="none"
-            class="w-full h-full text-brand"
-            stroke="currentColor"
-            stroke-width="14"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="8,8 38,78 60,32 82,78 112,8" />
-          </svg>
-        </div>
-        <div>
-          <p
-            class="font-bold text-gray-900 dark:text-white text-[15px] leading-tight tracking-tight"
-          >
-            backoffice
-          </p>
-          <p
-            class="text-[9px] text-gray-400 dark:text-white/30 uppercase tracking-widest mt-0.5"
-          >
-            Agro · Veterinary
-          </p>
-        </div>
+      <div class="px-5 py-5 border-b border-gray-100 dark:border-white/5">
+        <AppLogo />
       </div>
 
       <!-- Navigation -->
@@ -168,15 +164,25 @@ const getKey = (item: RouteItem) =>
       <header
         class="flex items-center justify-between px-8 py-3.5 bg-white dark:bg-brand-dark-600 border-b border-gray-100 dark:border-white/5 shrink-0"
       >
-        <UForm :schema="schema" :state="state" class="w-72">
+        <UForm :schema="schema" :state="state" class="w-80">
           <UFormField name="query">
             <UInput
+              :ref="(el: any) => (searchInputRef = el?.$el?.querySelector('input') ?? null)"
               v-model="state.query"
               placeholder="Search..."
               icon="heroicons:magnifying-glass"
               variant="outline"
               class="w-full"
-            />
+              @keydown.escape="state.query = ''; ($event.target as HTMLInputElement).blur()"
+            >
+              <template #trailing>
+                <kbd
+                  class="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-gray-200 dark:border-white/10 text-[10px] font-medium text-gray-400 dark:text-white/30 bg-gray-50 dark:bg-white/5 select-none"
+                >
+                  {{ isMac ? "⌘" : "Ctrl" }}F
+                </kbd>
+              </template>
+            </UInput>
           </UFormField>
         </UForm>
 

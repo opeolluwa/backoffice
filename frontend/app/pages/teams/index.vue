@@ -285,8 +285,8 @@ const columns = getColumns();
 
 <template>
   <div class="space-y-2">
-    <!-- Header -->
-    <div class="flex items-start justify-between mb-8">
+    <!-- Header: only shown when members exist -->
+    <div v-if="hasMembers" class="flex items-start justify-between mb-8">
       <UButton
         icon="i-lucide-user-plus"
         class="px-4 py-2 shrink-0"
@@ -302,14 +302,17 @@ const columns = getColumns();
       class="flex flex-col items-center justify-center h-[60vh] gap-4 text-center"
     >
       <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-          <UIcon name="heroicons:users" class="size-8 text-gray-300 dark:text-white/20" />
-        </div>
+        <UIcon name="heroicons:users" class="size-8 text-gray-300 dark:text-white/20" />
+      </div>
       <div>
         <p class="font-medium text-base">No team members yet</p>
         <p class="text-sm text-muted mt-1">
           Invite your first team member to get started.
         </p>
       </div>
+      <UButton icon="i-lucide-user-plus" @click="openInvite = true">
+        Add team member
+      </UButton>
     </div>
 
     <!-- Role Groups -->

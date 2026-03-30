@@ -133,10 +133,15 @@ function formatFullDate(dateStr: string) {
 
         <div
           v-else-if="filteredEmails.length === 0"
-          class="flex flex-col items-center justify-center h-full gap-2 text-gray-400 dark:text-white/25"
+          class="flex flex-col items-center justify-center h-full gap-4 text-center px-6"
         >
-          <UIcon name="heroicons:envelope-open" class="size-8" />
-          <p class="text-sm">No messages found</p>
+          <div class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
+            <UIcon name="heroicons:envelope-open" class="size-7 text-gray-300 dark:text-white/20" />
+          </div>
+          <div>
+            <p class="font-medium text-sm text-gray-700 dark:text-white/60">No messages found</p>
+            <p class="text-xs text-muted mt-1">Try adjusting your search or filter.</p>
+          </div>
         </div>
 
         <button
@@ -217,10 +222,15 @@ function formatFullDate(dateStr: string) {
       <!-- Empty state -->
       <div
         v-if="!selectedEmail"
-        class="flex-1 flex flex-col items-center justify-center gap-3 text-gray-300 dark:text-white/15"
+        class="flex-1 flex flex-col items-center justify-center gap-4 text-center px-8"
       >
-        <UIcon name="heroicons:envelope" class="size-14" />
-        <p class="text-sm">Select a message to preview</p>
+        <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
+          <UIcon name="heroicons:envelope" class="size-8 text-gray-300 dark:text-white/20" />
+        </div>
+        <div>
+          <p class="font-medium text-base text-gray-700 dark:text-white/50">No message selected</p>
+          <p class="text-sm text-muted mt-1">Select a message from the list to preview it here.</p>
+        </div>
       </div>
 
       <!-- Email preview -->
