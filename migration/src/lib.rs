@@ -23,7 +23,7 @@ pub struct Migrator;
 #[async_trait::async_trait]
 impl MigratorTrait for Migrator {
     fn migration_table_name() -> sea_orm::DynIden {
-        "weangel_server_migrations".into_iden()
+        "backoffice_server_migrations".into_iden()
     }
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {
         vec![

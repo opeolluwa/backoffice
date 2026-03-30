@@ -62,7 +62,7 @@
             <p
               class="font-bold text-gray-900 text-[15px] leading-tight tracking-tight dark:text-white"
             >
-              Weangel
+              Backoffice
             </p>
             <p
               class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5 dark:text-white/30"
@@ -78,7 +78,7 @@
 
       <!-- Footer -->
       <p class="text-center text-[11px] text-gray-400 mt-6 dark:text-white/20">
-        &copy; {{ new Date().getFullYear() }} weangel. All rights reserved.
+        &copy; {{ new Date().getFullYear() }} backoffice. All rights reserved.
       </p>
     </div>
   </div>

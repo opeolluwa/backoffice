@@ -108,7 +108,7 @@ const getKey = (item: RouteItem) =>
           <p
             class="font-bold text-gray-900 dark:text-white text-[15px] leading-tight tracking-tight"
           >
-            weangel
+            backoffice
           </p>
           <p
             class="text-[9px] text-gray-400 dark:text-white/30 uppercase tracking-widest mt-0.5"

@@ -13,7 +13,7 @@ pub mod teams;
 pub mod uploads;
 pub mod user_roles;
 pub mod users;
-pub mod weangel_server_migrations;
+pub mod backoffice_server_migrations;
 
 seaography::register_entity_modules!([
     activities,
@@ -28,5 +28,5 @@ seaography::register_entity_modules!([
     uploads,
     user_roles,
     users,
-    weangel_server_migrations,
+    backoffice_server_migrations,
 ]);

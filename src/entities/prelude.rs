@@ -12,4 +12,4 @@ pub use super::teams::Entity as Teams;
 pub use super::uploads::Entity as Uploads;
 pub use super::user_roles::Entity as UserRoles;
 pub use super::users::Entity as Users;
-pub use super::weangel_server_migrations::Entity as WeangelServerMigrations;
+pub use super::backoffice_server_migrations::Entity as BackofficeServerMigrations;

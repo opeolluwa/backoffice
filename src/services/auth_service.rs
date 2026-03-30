@@ -116,9 +116,9 @@ impl AuthenticationServiceTrait for AuthenticationService {
 
         tokio::task::spawn(async move {
             let email_request = EmailRequestBuilder::new()
-                .from("noreply@mangoverse.app", "Paula")
+                .from("noreply@backoffice.app", "Paula")
                 .to(user_email, user_name)
-                .subject("Welcome to Mangoverse")
+                .subject("Welcome to Backoffice")
                 .html_body(email_body)
                 .build();
 
@@ -176,7 +176,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
 
         tokio::task::spawn(async move {
             let email_request = EmailRequestBuilder::new()
-                .from("noreply@mangoverse.app", "Paula")
+                .from("noreply@backoffice.app", "Paula")
                 .to(user_email, user_name)
                 .subject("Password Reset")
                 .html_body(email_body)
