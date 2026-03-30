@@ -9,7 +9,7 @@ use crate::{
         dto::jwt::Claims, requests::products::CreateProductRequest,
         response::api_response::ApiResponse,
     },
-    entities::{marketplace::MarketplaceWithProducts, products::Product},
+    entities::products::Model as Product,
     errors::service_error::ServiceError,
     services::product_service::{ProductService, ProductServiceStateExt},
 };
@@ -46,17 +46,17 @@ pub async fn retrieve_product_from_marketplace(
         .build())
 }
 
-pub async fn fetch_product_from_marketplace(
-    State(product_service): State<ProductService>,
-    Path(marketplace_identifier): Path<String>,
-    claims: Claims,
-) -> Result<ApiResponse<MarketplaceWithProducts>, ServiceError> {
-    let marketplace_with_products = product_service
-        .fetch_marketplace_products(&marketplace_identifier, &claims.identifier)
-        .await?;
+// pub async fn fetch_product_from_marketplace(
+//     State(product_service): State<ProductService>,
+//     Path(marketplace_identifier): Path<String>,
+//     claims: Claims,
+// ) -> Result<ApiResponse<MarketplaceWithProducts>, ServiceError> {
+//     let marketplace_with_products = product_service
+//         .fetch_marketplace_products(&marketplace_identifier, &claims.identifier)
+//         .await?;
 
-    Ok(ApiResponse::builder()
-        .data(marketplace_with_products)
-        .message("marketplace with products")
-        .build())
-}
+//     Ok(ApiResponse::builder()
+//         .data(marketplace_with_products)
+//         .message("marketplace with products")
+//         .build())
+// }

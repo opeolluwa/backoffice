@@ -1,6 +1,7 @@
-use crate::services::auth_service::AuthenticationService;
+use sea_orm::DatabaseConnection;
+
 use crate::services::user_service::UserService;
-use sqlx::{Pool, Postgres};
+use crate::{config::app_config::AppConfig, services::auth_service::AuthenticationService};
 
 #[allow(dead_code)]
 pub struct AdminService {
@@ -9,10 +10,10 @@ pub struct AdminService {
 }
 
 impl AdminService {
-    pub fn init(pool: &Pool<Postgres>) -> Self {
+    pub fn init(db: &DatabaseConnection, app_config: &AppConfig) -> Self {
         AdminService {
-            user_service: UserService::init(pool),
-            authentication_service: AuthenticationService::init(pool),
+            user_service: UserService::init(db, app_config),
+            authentication_service: AuthenticationService::init(db, app_config),
         }
     }
 }

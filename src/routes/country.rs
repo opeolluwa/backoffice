@@ -1,8 +1,9 @@
+use axum::{Router, routing::get};
+
 use crate::{
     controllers::countries::{fetch_all_countries, fetch_country_by_identifier},
-    states::services_state::ServicesState,
+    states::ServicesState,
 };
-use axum::{Router, routing::get};
 
 pub(super) fn country_routes(state: ServicesState) -> Router {
     Router::new()

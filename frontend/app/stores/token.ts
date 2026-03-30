@@ -19,6 +19,10 @@ export const useTokenStore = defineStore("token_store", {
       this.accessToken = accessToken;
     },
 
+    persistRequestToken(requestToken: string) {
+      this.requestToken = requestToken;
+    },
+
     clearTokens() {
       this.$reset();
     },

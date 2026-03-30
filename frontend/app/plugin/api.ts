@@ -27,10 +27,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      console.warn("Unauthorized, maybe redirect to login");
-    }
-    return Promise.reject(error);
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "Unknown error";
+
+    return Promise.reject(new Error(message));
   },
 );
 

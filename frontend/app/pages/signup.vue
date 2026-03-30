@@ -36,7 +36,7 @@ definePageMeta({
 
 <template>
   <h1 class="capitalize text-center text-5xl font-bold">Create account</h1>
-  <p class="text-center text-gray-400 leading-6 mt-2">
+  <p class="text-center text-gray-500 leading-6 mt-2">
     The account will be admin account
   </p>
 

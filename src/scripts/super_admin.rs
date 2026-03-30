@@ -1,10 +1,11 @@
-use crate::entities::privileged_user::PrivilegedUser;
-use crate::errors::app_error::AppError;
-use crate::shared::extract_env::extract_env;
 use bcrypt::DEFAULT_COST;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 use ulid::Ulid;
+
+use crate::entities::privileged_user::PrivilegedUser;
+use crate::errors::app_error::AppError;
+use crate::shared::extract_env::extract_env;
 
 #[derive(Serialize, Deserialize)]
 struct SuperAdminCredentials {

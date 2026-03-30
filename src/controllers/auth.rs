@@ -1,3 +1,6 @@
+use axum::extract::State;
+use axum::http::StatusCode;
+
 use crate::adapters::dto::jwt::Claims;
 use crate::adapters::requests::auth::VerifyAccountRequest;
 use crate::adapters::response::api_response::ApiResponseBuilder;
@@ -16,8 +19,6 @@ use crate::{
     errors::auth_service_error::AuthenticationServiceError,
     services::auth_service::{AuthenticationService, AuthenticationServiceTrait},
 };
-use axum::extract::State;
-use axum::http::StatusCode;
 
 pub async fn create_account(
     State(auth_service): State<AuthenticationService>,

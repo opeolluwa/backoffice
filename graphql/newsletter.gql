@@ -1,0 +1,18 @@
+# Write your query or mutation here
+query newsletterSubscriber {
+  newsletter {
+    nodes {
+      identifier
+      email
+      subscribed
+    }
+  }
+}
+
+mutation joinNewsletter {
+  subscribe_to_newsletter(input: { email: "test@mailer.com" }) {
+    identifier
+    subscribed
+    email
+  }
+}

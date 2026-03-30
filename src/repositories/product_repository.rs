@@ -1,26 +1,26 @@
-use std::sync::Arc;
-
 use rust_decimal::Decimal;
-use sqlx::PgPool;
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
+use ulid::Ulid;
 
-use crate::entities::products::ProductWithCurrency;
 use crate::{
     adapters::requests::products::SaveProductRequest,
-    entities::{marketplace::MarketplaceWithProducts, products::Product},
-    errors::repository_error::RepositoryError,
+    entities::{
+        countries,
+        marketplaces::{self, Entity as MarketplaceEntity},
+        products::{self, Entity as ProductEntity},
+    },
+    errors::database_error::DatabaseError,
     repositories::base::Repository,
 };
-use sqlx::types::Json;
-#[derive(Clone)]
+
+#[derive(Debug, Clone)]
 pub struct ProductRepository {
-    pool: Arc<PgPool>,
+    db: DatabaseConnection,
 }
 
 impl Repository for ProductRepository {
-    fn init(pool: &PgPool) -> Self {
-        Self {
-            pool: Arc::new(pool.clone()),
-        }
+    fn init(db: &DatabaseConnection) -> Self {
+        Self { db: db.clone() }
     }
 }
 
@@ -30,19 +30,19 @@ pub(crate) trait ProductRepositoryExt {
         request: &SaveProductRequest,
         user_identifier: &str,
         marketplace_identifier: &str,
-    ) -> Result<Product, RepositoryError>;
+    ) -> Result<products::Model, DatabaseError>;
 
     async fn retrieve_product(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<Product, RepositoryError>;
+    ) -> Result<products::Model, DatabaseError>;
 
-    async fn fetch_marketplace_products(
-        &self,
-        marketplace_identifier: &str,
-        user_identifier: &str,
-    ) -> Result<MarketplaceWithProducts, RepositoryError>;
+    // async fn fetch_marketplace_products(
+    //     &self,
+    //     marketplace_identifier: &str,
+    //     user_identifier: &str,
+    // ) -> Result<MarketplaceWithProducts, DatabaseError>;
 }
 
 impl ProductRepositoryExt for ProductRepository {
@@ -51,143 +51,64 @@ impl ProductRepositoryExt for ProductRepository {
         request: &SaveProductRequest,
         user_identifier: &str,
         marketplace_identifier: &str,
-    ) -> Result<Product, RepositoryError> {
-        let identifier = ulid::Ulid::new().to_string();
-        let name = &request.name;
-        let picture = &request.picture;
-        let price: Decimal = Decimal::from(request.price);
-        let description = &request.description;
-        let created_by_identifier = user_identifier;
-        let marketplace_identifier = marketplace_identifier;
-        let country_identifier = &request.currency_identifier;
-
-        let product = sqlx::query_as!(
-            Product,
-            r#"
-            INSERT INTO products (
-                identifier,
-                name,
-                picture,
-                price,
-                description,
-                created_by_identifier,
-                marketplace_identifier,
-                currency_identifier
-            )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING
-                identifier,
-                name,
-                picture,
-                price,
-                description,
-                created_by_identifier,
-                marketplace_identifier,
-                created_at,
-                updated_at,
-                currency_identifier
-            "#,
-            identifier,
-            name,
-            picture,
-            price,
-            description,
-            created_by_identifier,
-            marketplace_identifier,
-            country_identifier,
-        )
-        .fetch_one(&*self.pool)
-        .await
-        .map_err(RepositoryError::from)?;
-
-        Ok(product)
+    ) -> Result<products::Model, DatabaseError> {
+        let model = products::ActiveModel {
+            identifier: Set(Ulid::new().to_string()),
+            name: Set(request.name.clone()),
+            picture: Set(Some(request.picture.clone())),
+            price: Set(Decimal::from(request.price)),
+            description: Set(request.description.clone()),
+            created_by_identifier: Set(Some(user_identifier.to_string())),
+            marketplace_identifier: Set(Some(marketplace_identifier.to_string())),
+            currency_identifier: Set(Some(request.currency_identifier.clone())),
+            ..Default::default()
+        };
+        model.insert(&self.db).await.map_err(DatabaseError::from)
     }
 
     async fn retrieve_product(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<Product, RepositoryError> {
-        let product = sqlx::query_as!(
-            Product,
-            r#"
-            SELECT
-                identifier,
-                name,
-                picture,
-                price,
-                description,
-                created_by_identifier,
-                marketplace_identifier,
-                currency_identifier,
-                created_at,
-                updated_at
-            FROM products
-            WHERE identifier = $1
-            AND created_by_identifier = $2
-            "#,
-            identifier,
-            user_identifier
-        )
-        .fetch_one(&*self.pool)
-        .await
-        .map_err(RepositoryError::from)?;
-
-        Ok(product)
+    ) -> Result<products::Model, DatabaseError> {
+        ProductEntity::find()
+            .filter(products::Column::Identifier.eq(identifier))
+            .filter(products::Column::CreatedByIdentifier.eq(user_identifier))
+            .one(&self.db)
+            .await
+            .map_err(DatabaseError::from)?
+            .ok_or_else(|| DatabaseError::NotFound("product not found".to_string()))
     }
 
-    async fn fetch_marketplace_products(
-        &self,
-        marketplace_identifier: &str,
-        user_identifier: &str,
-    ) -> Result<MarketplaceWithProducts, RepositoryError> {
-        let marketplace = sqlx::query_as!(
-            MarketplaceWithProducts,
-            r#"
-        SELECT
-            m.identifier,
-            m.user_identifier,
-            m.created_at,
-            m.updated_at,
-            m.name,
-            m.description,
-            COALESCE(
-                json_agg(
-                    jsonb_build_object(
-                        'identifier', p.identifier,
-                        'name', p.name,
-                        'price', p.price::text,
-                        'description', p.description,
-                        'picture', p.picture,
-                        'createdByIdentifier', p.created_by_identifier,
-                        'marketplaceIdentifier', p.marketplace_identifier,
-                        'createdAt', p.created_at,
-                        'updatedAt', p.updated_at,
+    // async fn fetch_marketplace_products(
+    //     &self,
+    //     marketplace_identifier: &str,
+    //     user_identifier: &str,
+    // ) -> Result<MarketplaceWithProducts, DatabaseError> {
+    //     let marketplace = MarketplaceEntity::find()
+    //         .filter(marketplaces::Column::Identifier.eq(marketplace_identifier))
+    //         .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+    //         .one(&self.db)
+    //         .await
+    //         .map_err(DatabaseError::from)?
+    //         .ok_or_else(|| DatabaseError::NotFound("marketplace not found".to_string()))?;
 
-                        -- 🔥 Add currency info
-                        'currencyCode', c.currency_code,
-                        'currency', c.currency,
-                        'country', c.country,
-                        'flag', c.flag,
-                        'currencyIdentifier', c.identifier
-                    )
-                ) FILTER (WHERE p.identifier IS NOT NULL),
-                '[]'
-            ) AS "products!: Json<Vec<ProductWithCurrency>>"
-        FROM marketplaces m
-        LEFT JOIN products p
-            ON p.marketplace_identifier = m.identifier
-        LEFT JOIN countries c
-            ON p.currency_identifier = c.identifier
-        WHERE m.identifier = $1
-          AND m.user_identifier = $2
-        GROUP BY m.identifier
-    "#,
-            marketplace_identifier,
-            user_identifier
-        )
-        .fetch_one(&*self.pool)
-        .await?;
-        Ok(marketplace)
-    }
+    //     let products_with_currencies: Vec<(products::Model, Option<countries::Model>)> =
+    //         ProductEntity::find()
+    //             .filter(products::Column::MarketplaceIdentifier.eq(marketplace_identifier))
+    //             .find_also_related(countries::Entity)
+    //             .all(&self.db)
+    //             .await
+    //             .map_err(DatabaseError::from)?;
+
+    //     let products = products_with_currencies
+    //         .into_iter()
+    //         .map(|(product, country)| ProductWithCurrency::from_models(product, country))
+    //         .collect();
+
+    //     Ok(MarketplaceWithProducts::from_marketplace(
+    //         marketplace,
+    //         products,
+    //     ))
+    // }
 }

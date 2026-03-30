@@ -35,6 +35,11 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 
   try {
     const { status, data: respData } = await api.post("/login", data);
+
+    console.log({
+      respData,
+    });
+
     if (status !== 200) {
       throw new Error(respData?.message || "Login failed");
     }
@@ -55,17 +60,21 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 <template>
   <div>
     <AppLeadingText> Welcome </AppLeadingText>
-    <h1 v-show="formError" class="capitalize text-center text-5xl font-bold">
-      Oops!
-    </h1>
 
-    <p v-show="!formError" class="text-center text-gray-400 leading-6 mt-2">
+    <p class="text-center text-gray-500 leading-6 mt-2">
       Please enter your email and password
     </p>
 
-    <span v-show="formError" class="text-red-500 text-sm mt-1">{{
-      formError
-    }}</span>
+     <UAlert
+        v-if="formError"
+        color="error"
+        variant="subtle"
+        title="Request failed"
+        :description="formError"
+        class="mt-4"
+        icon="heroicons:information-circle"
+      />
+      
     <UForm
       :schema="schema"
       :state="state"
@@ -132,6 +141,15 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
         </UInput>
       </UFormField>
 
+      <div class="flex justify-end">
+        <NuxtLink
+          to="/forgotten-password"
+          class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+        >
+          Forgot password?
+        </NuxtLink>
+      </div>
+
       <UButton
         :loading="loading"
         :disabled="loading"
@@ -140,6 +158,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       >
         Login
       </UButton>
+     
     </UForm>
   </div>
 </template>

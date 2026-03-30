@@ -1,5 +1,13 @@
+use askama::Template;
+use sea_orm::DatabaseConnection;
+
+use backoffice_email_client::auto_respond::AutoRespondTemplate;
+use backoffice_email_client::password_reset::PasswordResetTemplate;
+use backoffice_email_client::zepto_mailer::{EmailRequestBuilder, ZeptoMail};
+
 use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
-use crate::entities::user::User;
+use crate::config::app_config::AppConfig;
+use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
 use crate::{
@@ -17,19 +25,20 @@ use crate::{
     repositories::user_repository::{UserRepository, UserRepositoryTrait},
     services::user_helper_service::{UserHelperService, UserHelperServiceTrait},
 };
-use sqlx::{Pool, Postgres};
 
 #[derive(Clone)]
 pub struct AuthenticationService {
     user_repository: UserRepository,
     user_helper_service: UserHelperService,
+    email_client: ZeptoMail,
 }
 
 impl AuthenticationService {
-    pub fn init(pool: &Pool<Postgres>) -> Self {
+    pub fn init(db: &DatabaseConnection, app_config: &AppConfig) -> Self {
         Self {
-            user_repository: UserRepository::init(pool),
+            user_repository: UserRepository::init(db),
             user_helper_service: UserHelperService::init(),
+            email_client: ZeptoMail::new(&app_config.email_api_key),
         }
     }
 }
@@ -81,8 +90,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
             .await
             .is_some()
         {
-            todo!("handle duplicate entry error");
-            // return Err(RepositoryError::DuplicateEntry);
+            return Err(DatabaseError::DuplicateEmailForUser.into());
         }
 
         let password_hash = self.user_helper_service.hash_password(&request.password)?;
@@ -93,10 +101,33 @@ impl AuthenticationServiceTrait for AuthenticationService {
             last_name: request.last_name.to_owned(),
         };
 
-        self.user_repository.create_user(user).await.map_err(|err| {
-            log::error!("{}", err.to_string());
-            ServiceError::from(err)
-        })
+        self.user_repository
+            .create_user(user)
+            .await
+            .map_err(|err| {
+                log::error!("{}", err);
+                err
+            })?;
+
+        let email_client = self.email_client.clone();
+        let user_email = request.email.clone();
+        let user_name = request.first_name.clone();
+        let email_body = AutoRespondTemplate { name: &user_name }.render().unwrap();
+
+        tokio::task::spawn(async move {
+            let email_request = EmailRequestBuilder::new()
+                .from("noreply@mangoverse.app", "Paula")
+                .to(user_email, user_name)
+                .subject("Welcome to Mangoverse")
+                .html_body(email_body)
+                .build();
+
+            if let Err(err) = email_client.send_email(email_request).await {
+                log::error!("Failed to send welcome email: {}", err);
+            }
+        });
+
+        Ok(())
     }
 
     async fn login(
@@ -124,18 +155,38 @@ impl AuthenticationServiceTrait for AuthenticationService {
         &self,
         request: &ForgottenPasswordRequest,
     ) -> Result<ForgottenPasswordResponse, AuthenticationServiceError> {
-        let user = self.user_repository.find_by_email(&request.email).await;
-        if user.is_none() {
+        let Some(user) = self.user_repository.find_by_email(&request.email).await else {
             return Err(AuthenticationServiceError::WrongCredentials);
         };
 
-        tokio::task::spawn(async move { todo!("send account retrival email") });
+        let token =
+            JwtCredentials::new(&user.email, &user.identifier).generate_token(TEN_MINUTES)?;
 
-        let User {
-            email, identifier, ..
-        } = user.unwrap();
+        let email_body = PasswordResetTemplate {
+            reset_link: &format!("https://yourapp.com/reset-password?token={token}"),
+            name: user.first_name.as_deref().unwrap_or("there"),
+        }
+        .render()
+        .unwrap();
 
-        let token = JwtCredentials::new(&email, &identifier).generate_token(TEN_MINUTES)?;
+        let email_client = self.email_client.clone();
+        let user_email = user.email.clone();
+        let user_name = user.first_name.clone().unwrap_or_else(|| "there".into());
+        let email_body = email_body.clone();
+
+        tokio::task::spawn(async move {
+            let email_request = EmailRequestBuilder::new()
+                .from("noreply@mangoverse.app", "Paula")
+                .to(user_email, user_name)
+                .subject("Password Reset")
+                .html_body(email_body)
+                .build();
+
+            if let Err(err) = email_client.send_email(email_request).await {
+                log::error!("Failed to send password reset email: {}", err);
+            }
+        });
+
         Ok(ForgottenPasswordResponse { token })
     }
 

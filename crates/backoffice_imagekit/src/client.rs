@@ -5,7 +5,6 @@ use reqwest::{
     header::{HeaderMap, HeaderValue},
     multipart,
 };
-
 use serde::{Deserialize, Serialize};
 
 use crate::ImagekitError;

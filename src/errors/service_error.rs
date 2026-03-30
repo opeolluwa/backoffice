@@ -1,18 +1,19 @@
 use axum::extract::rejection::{FormRejection, JsonRejection};
 use axum::response::Response;
 use axum::{http::StatusCode, response::IntoResponse};
+
 use backoffice_imagekit::ImagekitError;
 
 use crate::adapters::response::api_response::ApiResponseBuilder;
 use crate::errors::app_error::AppError;
 use crate::errors::authentication_error::AuthenticationError;
+use crate::errors::database_error::DatabaseError;
 use crate::errors::filesystem_error::AppFileSystemError;
-use crate::errors::repository_error::RepositoryError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ServiceError {
     #[error("an internal database error has occurred")]
-    DatabaseError(#[from] sqlx::error::Error),
+    SqlxError(#[from] sqlx::error::Error),
     #[error(transparent)]
     ValidationError(#[from] validator::ValidationErrors),
     #[error(transparent)]
@@ -30,7 +31,7 @@ pub enum ServiceError {
     #[error("an internal error occurred")]
     AppError(#[from] AppError),
     #[error(transparent)]
-    RepositoryError(#[from] RepositoryError),
+    DatabaseError(#[from] DatabaseError),
     #[error(transparent)]
     AppFileSystemError(#[from] AppFileSystemError),
     #[error(transparent)]
@@ -44,10 +45,10 @@ impl ServiceError {
         match self {
             ServiceError::ValidationError(_) => StatusCode::BAD_REQUEST,
             ServiceError::AxumFormRejection(_) => StatusCode::BAD_REQUEST,
-            ServiceError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ServiceError::SqlxError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ServiceError::AxumJsonRejection(_) => StatusCode::BAD_REQUEST,
             ServiceError::AuthenticationError(error) => error.status_code(),
-            ServiceError::RepositoryError(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            ServiceError::DatabaseError(_) => StatusCode::UNPROCESSABLE_ENTITY,
             // ServiceError::ImagekitError(err)=> {}
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }

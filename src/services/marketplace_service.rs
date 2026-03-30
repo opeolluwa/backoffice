@@ -1,9 +1,9 @@
+use sea_orm::DatabaseConnection;
+
 use crate::adapters::requests::marketplace::CreateMarketplaceRequest;
-use crate::entities::marketplace::MarketPlace;
+use crate::entities::marketplaces;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
-use sqlx::PgPool;
-
 use crate::repositories::marketplace_repository::MarketplaceRepository;
 use crate::repositories::marketplace_repository::MarketplaceRepositoryExt;
 
@@ -13,9 +13,9 @@ pub struct MarketplaceService {
 }
 
 impl MarketplaceService {
-    pub fn init(pool: &PgPool) -> Self {
+    pub fn init(db: &DatabaseConnection) -> Self {
         Self {
-            marketplace_repository: MarketplaceRepository::init(pool),
+            marketplace_repository: MarketplaceRepository::init(db),
         }
     }
 }
@@ -25,25 +25,25 @@ pub(crate) trait MarketplaceServiceExt {
         &self,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, ServiceError>;
+    ) -> Result<marketplaces::Model, ServiceError>;
 
     async fn find_marketplace_by_identifier(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<MarketPlace, ServiceError>;
+    ) -> Result<marketplaces::Model, ServiceError>;
 
     async fn find_all_marketplaces(
         &self,
         user_identifier: &str,
-    ) -> Result<Vec<MarketPlace>, ServiceError>;
+    ) -> Result<Vec<marketplaces::Model>, ServiceError>;
 
     async fn update_marketplace_by_identifier(
         &self,
         identifier: &str,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, ServiceError>;
+    ) -> Result<marketplaces::Model, ServiceError>;
 
     async fn delete_marketplace_by_identifier(
         &self,
@@ -59,7 +59,7 @@ impl MarketplaceServiceExt for MarketplaceService {
         &self,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, ServiceError> {
+    ) -> Result<marketplaces::Model, ServiceError> {
         self.marketplace_repository
             .create_marketplace(request, user_identifier)
             .await
@@ -70,7 +70,7 @@ impl MarketplaceServiceExt for MarketplaceService {
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<MarketPlace, ServiceError> {
+    ) -> Result<marketplaces::Model, ServiceError> {
         self.marketplace_repository
             .find_marketplace_by_identifier(identifier, user_identifier)
             .await
@@ -80,7 +80,7 @@ impl MarketplaceServiceExt for MarketplaceService {
     async fn find_all_marketplaces(
         &self,
         user_identifier: &str,
-    ) -> Result<Vec<MarketPlace>, ServiceError> {
+    ) -> Result<Vec<marketplaces::Model>, ServiceError> {
         self.marketplace_repository
             .find_all_marketplaces(user_identifier)
             .await
@@ -92,7 +92,7 @@ impl MarketplaceServiceExt for MarketplaceService {
         identifier: &str,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, ServiceError> {
+    ) -> Result<marketplaces::Model, ServiceError> {
         self.marketplace_repository
             .update_marketplace_by_identifier(identifier, request, user_identifier)
             .await

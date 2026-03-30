@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import api from "~/plugin/api";
+import { useRouter, useRoute } from "vue-router";
+
 definePageMeta({
   layout: "security",
 });
@@ -7,9 +10,11 @@ const password = ref("");
 const confirmPassword = ref("");
 const formError = ref<string>();
 const loading = ref<boolean>(false);
+const router = useRouter();
+const route = useRoute();
+const token = computed(() => route.query.token as string | undefined);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-async function onSubmit(values: any) {
+async function onSubmit() {
   try {
     loading.value = true;
     formError.value = "";
@@ -17,9 +22,20 @@ async function onSubmit(values: any) {
       formError.value = "Passwords do not match";
       return;
     }
-  } catch (error) {
-    console.log(error);
-    formError.value = "Something went wrong";
+    await api.post(
+      "/reset-password",
+      { password: password.value, confirmPassword: confirmPassword.value },
+      {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      },
+    );
+    await router.push("/");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    formError.value =
+      error.response?.data?.message || "Something went wrong";
   } finally {
     loading.value = false;
   }
@@ -28,8 +44,14 @@ async function onSubmit(values: any) {
 
 <template>
   <div class="flex flex-col items-center justify-center">
+    <template v-if="!token">
+      <AppLeadingText>Unauthorized</AppLeadingText>
+      <p class="mb-2 text-gray-500 mt-1">This link is invalid or has expired.</p>
+    </template>
+
+    <template v-else>
     <AppLeadingText>Set New Password</AppLeadingText>
-    <p class="mb-2 text-gray-400 mt-1">Enter and confirm your new password</p>
+    <p class="mb-2 text-gray-500 mt-1">Enter and confirm your new password</p>
 
     <UForm
       :state="{ password: '', confirmPassword: '' }"
@@ -89,6 +111,7 @@ async function onSubmit(values: any) {
     <p v-if="formError" class="text-red-500 text-sm mt-2">
       {{ formError }}
     </p>
+    </template>
   </div>
 </template>
 

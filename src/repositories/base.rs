@@ -1,5 +1,5 @@
-use sqlx::PgPool;
+use sea_orm::DatabaseConnection;
 
 pub trait Repository {
-    fn init(pool: &PgPool) -> Self;
+    fn init(db: &DatabaseConnection) -> Self;
 }

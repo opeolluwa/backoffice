@@ -31,7 +31,7 @@ async function onSubmit() {
 <template>
   <div class="flex flex-col items-center justify-center">
     <AppLeadingText> Check you email </AppLeadingText>
-    <p class="mb-4 text-gray-400 mt-1">
+    <p class="mb-4 text-gray-500 mt-1">
       Please enter the six digit pin we sent to you
     </p>
 
@@ -44,7 +44,7 @@ async function onSubmit() {
       size="xl"
       type="number"
       class="mt-6"
-      :ui="{ base: 'bg-brand-50/5 p-7' }"
+      :ui="{ base: 'bg-brand-50 p-7 dark:bg-brand-50/5' }"
       @complete="onSubmit"
     />
 
@@ -53,7 +53,7 @@ async function onSubmit() {
     >
       Confirm</UButton
     >
-    <small class="mt-4 text-gray-400"
+    <small class="mt-4 text-gray-500"
       >Did&apos;t get the email? Resent in {{ remaining }}</small
     >
   </div>

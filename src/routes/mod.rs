@@ -6,4 +6,5 @@ pub mod marketplace;
 pub mod products;
 pub mod public;
 pub mod router;
+pub mod teams;
 pub mod users;

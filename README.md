@@ -1,89 +1,116 @@
-
 # Backoffice
 
-Content management system and administrative platform for web applications 
+A content management system and administrative platform for web applications. Built with a Rust backend and a Nuxt frontend.
 
+## Technologies
 
-## Installation
+### Backend
+- **Rust** 1.93.1 — core application language
+- **Axum** 0.8 — HTTP framework
+- **SQLx** 0.8 — async PostgreSQL driver with compile-time query checking
+- **Tokio** 1 — async runtime
+- **JWT** (jsonwebtoken) — authentication
+- **bcrypt** — password hashing
+- **Clap** — CLI tooling for admin commands
 
-Install my-project with npm
+### Frontend
+- **Node.js** v24.7.0
+- **Nuxt** 4 (Vue 3) — full-stack framework
+- **Nuxt UI** 4 — component library
+- **Pinia** — state management
+- **TailwindCSS** 4 — styling
+- **TypeScript** — type safety
+- **Zod / Valibot** — schema validation
+- **TanStack Table** — data tables
 
-```bash
-  npm install my-project
-  cd my-project
-```
-    
-## Run Locally
+### Infrastructure
+- **PostgreSQL** 15 — primary database
+- **Docker / Docker Compose** — containerized services
+- **just** — task runner
 
-Clone the project
+## Prerequisites
 
-```bash
-  git clone https://link-to-project
-```
+- [Rust](https://rustup.rs/) 1.93.1+
+- [Node.js](https://nodejs.org/) v24.7.0+
+- [Docker](https://www.docker.com/) with Docker Compose
+- [just](https://just.systems/) task runner
+- [sqlx-cli](https://github.com/launchbadge/sqlx) (`cargo install sqlx-cli`)
+- [cargo-watch](https://crates.io/crates/cargo-watch) (`cargo install cargo-watch`)
 
-Go to the project directory
+## Setup
 
-```bash
-  cd my-project
-```
+### 1. Clone the repository
 
-Install dependencies
-
-```bash
-  npm install
-```
-
-Start the server
-
-```bash
-  npm run start
-```
-
-
-## API Reference
-
-#### Get all items
-
-```http
-  GET /api/items
-```
-
-| Parameter | Type     | Description                |
-| :-------- | :------- | :------------------------- |
-| `api_key` | `string` | **Required**. Your API key |
-
-#### Get item
-
-```http
-  GET /api/items/${id}
+```sh
+git clone <repo-url>
+cd backoffice
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `id`      | `string` | **Required**. Id of item to fetch |
+### 2. Configure environment
 
-#### add(num1, num2)
+```sh
+cp .env.example .env.local
+```
 
-Takes two numbers and returns the sum.
+Edit `.env.local` and fill in the required values (at minimum `JWT_SIGNING_KEY`, and any external service keys you need).
 
+### 3. Install dependencies
 
-## Contributing
+```sh
+just install
+```
 
-Contributions are always welcome!
+This installs both Cargo and frontend npm dependencies.
 
-See `contributing.md` for ways to get started.
+### 4. Start the database
 
-Please adhere to this project's `code of conduct`.
+```sh
+docker compose up -d database
+```
 
+### 5. Run migrations and prepare SQLx
 
-## Roadmap
+```sh
+just db
+```
 
-- Additional browser support
+### 6. Seed initial data (first run only)
 
-- Add more integrations
+```sh
+just run-init
+```
 
+This creates the super-admin user defined in your `.env.local`.
 
-## License
+### 7. Start the development server
 
-[MIT](https://choosealicense.com/licenses/mit/)
+**Backend + database:**
+```sh
+just run
+```
 
+**Frontend (separate terminal):**
+```sh
+just run-frontend
+```
+
+The API listens on the port set by `PORT` (default `5006`) and the frontend on `http://localhost:7000`.
+
+## Common Commands
+
+| Command | Description |
+|---|---|
+| `just run` | Start backend with hot-reload |
+| `just run-frontend` | Start Nuxt dev server |
+| `just watch` | Start full stack via Docker Compose |
+| `just build-frontend` | Build and export frontend static assets |
+| `just db` | Run migrations + prepare SQLx |
+| `just test` | Run backend test suite |
+| `just lint` | Lint frontend and format Rust code |
+| `just logs` | Tail Docker Compose app logs |
+| `just kill` | Stop and remove Docker containers |
+| `just restart` | Kill then watch |
+| `just run-cli` | Run CLI — create user |
+| `just run-init` | Run CLI — initialize super admin |
+
+Run `just` with no arguments to see all available commands.

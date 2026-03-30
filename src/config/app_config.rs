@@ -1,11 +1,12 @@
+use std::env;
+
+use dotenv::dotenv;
 use tower_http::cors::AllowOrigin;
 
 use crate::errors::app_error::AppError;
+use crate::shared::extract_env::extract_env;
 
 extern crate dotenv;
-
-use crate::shared::extract_env::extract_env;
-use dotenv::dotenv;
 
 #[derive(Debug)]
 pub struct AppConfig {
@@ -17,6 +18,13 @@ pub struct AppConfig {
     pub port: u16,
     pub environment: String,
     pub allowed_origins: AllowOrigin,
+    pub email_api_key: String,
+    pub email_api_user: String,
+
+    // GraphQL / API settings
+    pub endpoint: String,
+    pub depth_limit: Option<usize>,
+    pub complexity_limit: Option<usize>,
 }
 
 impl AppConfig {
@@ -49,8 +57,23 @@ impl AppConfig {
 
         tracing::info!("App Config loaded!");
 
+        let email_api_user = extract_env("ZEPTO_EMAIL_API_USER")?;
+        let email_api_key = extract_env("ZEPTO_EMAIL_API_KEY")?;
+
+        let database_url = extract_env("DATABASE_URL")?;
+
+        let endpoint = env::var("ENDPOINT").unwrap_or_else(|_| "/graphql".into());
+
+        let depth_limit = env::var("DEPTH_LIMIT")
+            .ok()
+            .map(|v| v.parse().unwrap_or_else(|_| 100));
+
+        let complexity_limit = env::var("COMPLEXITY_LIMIT")
+            .ok()
+            .map(|v| v.parse().unwrap_or_else(|_| 1000));
+
         Ok(Self {
-            database_url: extract_env("DATABASE_URL")?,
+            database_url,
             max_db_connections,
             body_limit_mb,
             upload_path,
@@ -58,6 +81,11 @@ impl AppConfig {
             port,
             environment,
             allowed_origins,
+            email_api_key,
+            email_api_user,
+            endpoint,
+            depth_limit,
+            complexity_limit,
         })
     }
 }

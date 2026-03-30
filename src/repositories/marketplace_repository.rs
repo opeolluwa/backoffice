@@ -1,26 +1,27 @@
 //! Marketplace repository module
 //! The Marketplace contains different products, see it as a catalogue of items.
 //!
-use std::sync::Arc;
-
-use sqlx::PgPool;
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
+    Set,
+};
 use ulid::Ulid;
 
 use crate::{
-    adapters::requests::marketplace::CreateMarketplaceRequest, entities::marketplace::MarketPlace,
-    errors::repository_error::RepositoryError, repositories::base::Repository,
+    adapters::requests::marketplace::CreateMarketplaceRequest,
+    entities::marketplaces::{self, Entity as MarketplaceEntity},
+    errors::database_error::DatabaseError,
+    repositories::base::Repository,
 };
 
 #[derive(Debug, Clone)]
 pub struct MarketplaceRepository {
-    pool: Arc<PgPool>,
+    db: DatabaseConnection,
 }
 
 impl Repository for MarketplaceRepository {
-    fn init(pool: &PgPool) -> Self {
-        Self {
-            pool: Arc::new(pool.clone()),
-        }
+    fn init(db: &DatabaseConnection) -> Self {
+        Self { db: db.clone() }
     }
 }
 
@@ -29,47 +30,47 @@ pub(crate) trait MarketplaceRepositoryExt {
         &self,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError>;
+    ) -> Result<marketplaces::Model, DatabaseError>;
 
     async fn find_marketplace_by_identifier(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError>;
+    ) -> Result<marketplaces::Model, DatabaseError>;
 
     #[allow(dead_code)]
     async fn find_marketplace_by_name(
         &self,
-        identifier: &str,
+        name: &str,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError>;
+    ) -> Result<marketplaces::Model, DatabaseError>;
 
     async fn find_all_marketplaces(
         &self,
         user_identifier: &str,
-    ) -> Result<Vec<MarketPlace>, RepositoryError>;
+    ) -> Result<Vec<marketplaces::Model>, DatabaseError>;
 
     async fn update_marketplace_by_identifier(
         &self,
         identifier: &str,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError>;
+    ) -> Result<marketplaces::Model, DatabaseError>;
 
     async fn delete_marketplace_by_identifier(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<(), RepositoryError>;
+    ) -> Result<(), DatabaseError>;
 
     #[allow(dead_code)]
     async fn marketplace_exists(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<bool, RepositoryError>;
+    ) -> Result<bool, DatabaseError>;
 
-    async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, RepositoryError>;
+    async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, DatabaseError>;
 }
 
 impl MarketplaceRepositoryExt for MarketplaceRepository {
@@ -77,20 +78,16 @@ impl MarketplaceRepositoryExt for MarketplaceRepository {
         &self,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError> {
-        let query = "INSERT INTO marketplaces (identifier, name, description, slug, user_identifier) VALUES ($1, $2, $3, $4, $5) RETURNING *";
-
-        let identifier = Ulid::new().to_string();
-        let marketplace: MarketPlace = sqlx::query_as(query)
-            .bind(identifier)
-            .bind(&request.name)
-            .bind(&request.description)
-            .bind(&request.slug)
-            .bind(user_identifier)
-            .fetch_one(self.pool.as_ref())
-            .await
-            .map_err(|err| RepositoryError::from(err))?;
-
+    ) -> Result<marketplaces::Model, DatabaseError> {
+        let model = marketplaces::ActiveModel {
+            identifier: Set(Ulid::new().to_string()),
+            name: Set(request.name.clone()),
+            description: Set(request.description.clone()),
+            slug: Set(request.slug.clone()),
+            user_identifier: Set(Some(user_identifier.to_string())),
+            ..Default::default()
+        };
+        let marketplace = model.insert(&self.db).await.map_err(DatabaseError::from)?;
         Ok(marketplace)
     }
 
@@ -98,49 +95,39 @@ impl MarketplaceRepositoryExt for MarketplaceRepository {
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError> {
-        let query = "SELECT * FROM marketplaces WHERE identifier = $1 AND user_identifier = $2";
-
-        let marketplace: MarketPlace = sqlx::query_as(query)
-            .bind(identifier)
-            .bind(user_identifier)
-            .fetch_one(self.pool.as_ref())
+    ) -> Result<marketplaces::Model, DatabaseError> {
+        MarketplaceEntity::find()
+            .filter(marketplaces::Column::Identifier.eq(identifier))
+            .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+            .one(&self.db)
             .await
-            .map_err(|err| RepositoryError::from(err))?;
-        Ok(marketplace)
+            .map_err(DatabaseError::from)?
+            .ok_or_else(|| DatabaseError::NotFound("marketplace not found".to_string()))
     }
 
     async fn find_marketplace_by_name(
         &self,
-        identifier: &str,
+        name: &str,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError> {
-        let query = "SELECT * FROM marketplaces WHERE name = $1 AND user_identifier = $2";
-
-        let marketplace: MarketPlace = sqlx::query_as(query)
-            .bind(identifier)
-            .bind(user_identifier)
-            .fetch_one(self.pool.as_ref())
+    ) -> Result<marketplaces::Model, DatabaseError> {
+        MarketplaceEntity::find()
+            .filter(marketplaces::Column::Name.eq(name))
+            .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+            .one(&self.db)
             .await
-            .map_err(|err| RepositoryError::from(err))?;
-
-        Ok(marketplace)
+            .map_err(DatabaseError::from)?
+            .ok_or_else(|| DatabaseError::NotFound("marketplace not found".to_string()))
     }
 
-    //TODO: paginate
     async fn find_all_marketplaces(
         &self,
         user_identifier: &str,
-    ) -> Result<Vec<MarketPlace>, RepositoryError> {
-        let query = "SELECT * FROM marketplaces WHERE user_identifier = $1";
-
-        let marketplaces: Vec<MarketPlace> = sqlx::query_as(query)
-            .bind(user_identifier)
-            .fetch_all(self.pool.as_ref())
+    ) -> Result<Vec<marketplaces::Model>, DatabaseError> {
+        MarketplaceEntity::find()
+            .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+            .all(&self.db)
             .await
-            .map_err(|err| RepositoryError::from(err))?;
-
-        Ok(marketplaces)
+            .map_err(DatabaseError::from)
     }
 
     async fn update_marketplace_by_identifier(
@@ -148,63 +135,57 @@ impl MarketplaceRepositoryExt for MarketplaceRepository {
         identifier: &str,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
-    ) -> Result<MarketPlace, RepositoryError> {
-        let query = "UPDATE marketplaces SET name = $1, description = $2, updated_at = NOW() WHERE identifier = $3 AND user_identifier = $4 RETURNING *";
-
-        let marketplace: MarketPlace = sqlx::query_as(query)
-            .bind(&request.name)
-            .bind(&request.description)
-            .bind(identifier)
-            .bind(user_identifier)
-            .fetch_one(self.pool.as_ref())
+    ) -> Result<marketplaces::Model, DatabaseError> {
+        let marketplace = MarketplaceEntity::find()
+            .filter(marketplaces::Column::Identifier.eq(identifier))
+            .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+            .one(&self.db)
             .await
-            .map_err(|err| RepositoryError::from(err))?;
+            .map_err(DatabaseError::from)?
+            .ok_or_else(|| DatabaseError::NotFound("marketplace not found".to_string()))?;
 
-        Ok(marketplace)
+        let mut active: marketplaces::ActiveModel = marketplace.into();
+        active.name = Set(request.name.clone());
+        active.description = Set(request.description.clone());
+        active.updated_at = Set(Some(chrono::Utc::now().fixed_offset()));
+
+        active.update(&self.db).await.map_err(DatabaseError::from)
     }
 
     async fn delete_marketplace_by_identifier(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<(), RepositoryError> {
-        let query = "DELETE FROM marketplaces WHERE identifier = $1 AND user_identifier = $2";
-        sqlx::query(query)
-            .bind(identifier)
-            .bind(user_identifier)
-            .execute(self.pool.as_ref())
+    ) -> Result<(), DatabaseError> {
+        MarketplaceEntity::delete_many()
+            .filter(marketplaces::Column::Identifier.eq(identifier))
+            .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+            .exec(&self.db)
             .await
-            .map_err(|err| RepositoryError::from(err))?;
+            .map_err(DatabaseError::from)?;
         Ok(())
     }
 
-    #[allow(dead_code)]
     async fn marketplace_exists(
         &self,
         identifier: &str,
         user_identifier: &str,
-    ) -> Result<bool, RepositoryError> {
-        let query = "SELECT EXISTS(SELECT 1 FROM marketplaces WHERE identifier = $1 AND user_identifier = $2)";
-
-        let exists: bool = sqlx::query_scalar(query)
-            .bind(identifier)
-            .bind(user_identifier)
-            .fetch_one(self.pool.as_ref())
+    ) -> Result<bool, DatabaseError> {
+        let count = MarketplaceEntity::find()
+            .filter(marketplaces::Column::Identifier.eq(identifier))
+            .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+            .count(&self.db)
             .await
-            .map_err(|err| RepositoryError::from(err))?;
-
-        Ok(exists)
+            .map_err(DatabaseError::from)?;
+        Ok(count > 0)
     }
 
-    async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, RepositoryError> {
-        let query = "SELECT COUNT(*) FROM marketplaces WHERE user_identifier = $1";
-
-        let count: i64 = sqlx::query_scalar(query)
-            .bind(user_identifier)
-            .fetch_one(self.pool.as_ref())
+    async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, DatabaseError> {
+        let count = MarketplaceEntity::find()
+            .filter(marketplaces::Column::UserIdentifier.eq(user_identifier))
+            .count(&self.db)
             .await
-            .map_err(|err| RepositoryError::from(err))?;
-
-        Ok(count)
+            .map_err(DatabaseError::from)?;
+        Ok(count as i64)
     }
 }

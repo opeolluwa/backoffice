@@ -1,0 +1,3 @@
+mutation sayHello {
+  health_check(name: "Adeoye")
+}

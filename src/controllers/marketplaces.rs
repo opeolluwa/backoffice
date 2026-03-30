@@ -9,7 +9,7 @@ use crate::{
         requests::{api_request::AuthenticatedRequest, marketplace::CreateMarketplaceRequest},
         response::api_response::ApiResponse,
     },
-    entities::marketplace::MarketPlace,
+    entities::marketplaces,
     errors::service_error::ServiceError,
     services::marketplace_service::{MarketplaceService, MarketplaceServiceExt},
 };
@@ -17,7 +17,7 @@ use crate::{
 pub async fn create_marketplace(
     State(marketplace_service): State<MarketplaceService>,
     request: AuthenticatedRequest<CreateMarketplaceRequest>,
-) -> Result<ApiResponse<MarketPlace>, ServiceError> {
+) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
     let marketplace = marketplace_service
         .create_marketplace(&request.data, &request.claims.identifier)
         .await?;
@@ -33,7 +33,7 @@ pub async fn find_marketplace_by_identifier(
     State(marketplace_service): State<MarketplaceService>,
     claims: Claims,
     Path(marketplace_identifier): axum::extract::Path<String>,
-) -> Result<ApiResponse<MarketPlace>, ServiceError> {
+) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
     let marketplace = marketplace_service
         .find_marketplace_by_identifier(&marketplace_identifier, &claims.identifier)
         .await?;
@@ -47,7 +47,7 @@ pub async fn find_marketplace_by_identifier(
 pub async fn find_all_marketplaces(
     State(marketplace_service): State<MarketplaceService>,
     claims: Claims,
-) -> Result<ApiResponse<Vec<MarketPlace>>, ServiceError> {
+) -> Result<ApiResponse<Vec<marketplaces::Model>>, ServiceError> {
     let marketplaces = marketplace_service
         .find_all_marketplaces(&claims.identifier)
         .await?;
@@ -76,7 +76,7 @@ pub async fn update_marketplace_by_identifier(
     State(marketplace_service): State<MarketplaceService>,
     Path(identifier): Path<String>,
     AuthenticatedRequest { data, claims }: AuthenticatedRequest<CreateMarketplaceRequest>,
-) -> Result<ApiResponse<MarketPlace>, ServiceError> {
+) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
     let updated_marketplace = marketplace_service
         .update_marketplace_by_identifier(&identifier, &data, &claims.identifier)
         .await?;

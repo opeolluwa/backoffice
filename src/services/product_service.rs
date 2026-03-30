@@ -1,12 +1,13 @@
 use axum_typed_multipart::TypedMultipart;
+use sea_orm::DatabaseConnection;
+
 use backoffice_imagekit::ImagekitClient;
 use backoffice_utils::extract_env;
-use sqlx::PgPool;
 
 use crate::{
     adapters::requests::products::{CreateProductRequest, SaveProductRequest},
     config::app_config::AppConfig,
-    entities::{marketplace::MarketplaceWithProducts, products::Product},
+    entities::products::Model as Product,
     errors::{app_error::AppError, service_error::ServiceError},
     fs::filesystem::AppFileSystem,
     repositories::{
@@ -21,9 +22,9 @@ pub struct ProductService {
 }
 
 impl ProductService {
-    pub fn init(pool: &PgPool) -> Self {
+    pub fn init(db: &DatabaseConnection) -> Self {
         Self {
-            product_repository: ProductRepository::init(pool),
+            product_repository: ProductRepository::init(db),
         }
     }
 }
@@ -42,11 +43,11 @@ pub(crate) trait ProductServiceStateExt {
         user_identifier: &str,
     ) -> Result<Product, ServiceError>;
 
-    async fn fetch_marketplace_products(
-        &self,
-        marketplace_identifier: &str,
-        user_identifier: &str,
-    ) -> Result<MarketplaceWithProducts, ServiceError>;
+    // async fn fetch_marketplace_products(
+    //     &self,
+    //     marketplace_identifier: &str,
+    //     user_identifier: &str,
+    // ) -> Result<MarketplaceWithProducts, ServiceError>;
 }
 
 impl ProductServiceStateExt for ProductService {
@@ -109,16 +110,17 @@ impl ProductServiceStateExt for ProductService {
         Ok(product)
     }
 
-    async fn fetch_marketplace_products(
-        &self,
-        marketplace_identifier: &str,
-        user_identifier: &str,
-    ) -> Result<MarketplaceWithProducts, ServiceError> {
-        let marketplace_with_products = self
-            .product_repository
-            .fetch_marketplace_products(marketplace_identifier, user_identifier)
-            .await?;
+    // async fn fetch_marketplace_products(
+    //     &self,
+    //     marketplace_identifier: &str,
+    //     user_identifier: &str,
+    // ) -> Result<MarketplaceWithProducts, ServiceError> {
 
-        Ok(marketplace_with_products)
-    }
+    // let marketplace_with_products = self
+    //     .product_repository
+    //     .fetch_marketplace_products(marketplace_identifier, user_identifier)
+    //     .await?;
+
+    // Ok(marketplace_with_products)
+    // }
 }

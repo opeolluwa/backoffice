@@ -1,2 +1,0 @@
-- [x] Set the user name and password 
-- [x] add shepherd 

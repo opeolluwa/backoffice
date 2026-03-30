@@ -142,8 +142,6 @@ const countries = computed(() => countryStore.countries);
             </p>
 
             <div class="flex items-center gap-1">
-            
-
               <span class="text-gray-700 text-sm">
                 {{ value.currencyCode }}
               </span>

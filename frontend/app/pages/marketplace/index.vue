@@ -220,13 +220,66 @@ onMounted(async () => {
   }
 });
 
+const pagination = ref({ pageIndex: 0, pageSize: 10 });
+
 const globalFilter = ref("");
-const pagination = ref({
-  pageIndex: 0,
-  pageSize: 5,
+const search = ref("");
+const domainFilter = ref("");
+const minPrice = ref<number | null>(null);
+const maxPrice = ref<number | null>(null);
+const fromDate = ref("");
+const toDate = ref("");
+
+const filteredMarketplaces = computed(() => {
+  const query = search.value.trim().toLowerCase();
+  const domain = domainFilter.value.trim().toLowerCase();
+  const min = minPrice.value;
+  const max = maxPrice.value;
+  const from = fromDate.value ? new Date(fromDate.value) : null;
+  const to = toDate.value ? new Date(toDate.value) : null;
+
+  return (marketplaces.value || []).filter((item) => {
+    const name = item.name?.toLowerCase() || "";
+    const slug = item.slug?.toLowerCase() || "";
+    const description = item.description?.toLowerCase() || "";
+
+    const matchSearch =
+      !query ||
+      name.includes(query) ||
+      slug.includes(query) ||
+      description.includes(query);
+    const matchDomain =
+      !domain || slug.includes(domain) || name.includes(domain);
+
+    const createdAt = item.createdAt ? new Date(item.createdAt) : null;
+    const matchDate =
+      (!from || (createdAt && createdAt >= from)) &&
+      (!to || (createdAt && createdAt <= to));
+
+    const price = (item as any).price;
+    const hasPriceFilter = min != null || max != null;
+    const matchPrice =
+      !hasPriceFilter ||
+      (typeof price === "number" &&
+        (min == null || price >= min) &&
+        (max == null || price <= max));
+
+    return matchSearch && matchDomain && matchDate && matchPrice;
+  });
 });
+
 const table = useTemplateRef("table");
 const colorMode = useColorMode();
+
+function clearFilters() {
+  search.value = "";
+  domainFilter.value = "";
+  minPrice.value = null;
+  maxPrice.value = null;
+  fromDate.value = "";
+  toDate.value = "";
+  globalFilter.value = "";
+}
 </script>
 
 <template>
@@ -237,6 +290,15 @@ const colorMode = useColorMode();
       v-if="nullMarketplaces"
       class="flex flex-col justify-center items-center h-[70vh]"
     >
+      <div
+        class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-6"
+      >
+        <UIcon
+          name="heroicons:users"
+          class="size-8 text-gray-300 dark:text-white/20"
+        />
+      </div>
+
       <h1>You currently don&apos;t have any product</h1>
 
       <UButton
@@ -251,21 +313,57 @@ const colorMode = useColorMode();
     </div>
 
     <div v-else>
-      <div class="justify-between items-center hidden">
-        <div class="flex px-4 py-3.5 border-accented">
-          <UInput
-            ref="table"
-            v-model="globalFilter"
-            v-model:global-filter="globalFilter"
-            class="max-w-sm"
-            placeholder="Filter..."
-          />
-        </div>
+      <div
+        class="flex flex-col lg:flex-row gap-3 mb-5 px-4 py-3 border rounded border-accented items-end"
+      >
+        <UInput
+          v-model="search"
+          class="max-w-sm"
+          placeholder="Search by name / slug / description"
+        />
+
+        <UInput
+          v-model="domainFilter"
+          class="max-w-sm"
+          placeholder="Domain (slug)"
+        />
+
+        <UInput
+          type="date"
+          v-model="fromDate"
+          class="max-w-sm"
+          placeholder="From date"
+        />
+
+        <UInput
+          type="date"
+          v-model="toDate"
+          class="max-w-sm"
+          placeholder="To date"
+        />
+
+        <UInput
+          type="number"
+          v-model.number="minPrice"
+          class="max-w-[10rem]"
+          placeholder="Min price"
+        />
+
+        <UInput
+          type="number"
+          v-model.number="maxPrice"
+          class="max-w-[10rem]"
+          placeholder="Max price"
+        />
+
+        <UButton color="neutral" variant="outline" @click="clearFilters">
+          Clear filters
+        </UButton>
       </div>
       <UTable
         ref="table"
         v-model:pagination="pagination"
-        :data="marketplaces"
+        :data="filteredMarketplaces"
         class=""
         :loading="fetchingMarketplaces"
         loading-animation="carousel"

@@ -15,6 +15,10 @@ pub enum AppError {
     EnvExtractError(#[from] backoffice_utils::errors::Error),
     #[error(transparent)]
     AppFileSystemError(#[from] std::io::Error),
+    #[error("Internal server error")]
+    InternalServerError,
+    #[error("GraphQL error: {0}")]
+    GraphQLError(String),
 }
 
 impl AppError {

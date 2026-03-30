@@ -14,10 +14,13 @@ alias r:= restart
 
 set dotenv-required
 set dotenv-load := true
-set dotenv-path := "./.env.local"
+set dotenv-path := "./.env"
 set export :=  true
 
 FRONTEND_DIR:='frontend'
+DOCKER_CMD := "docker compose -f docker-compose.yaml"
+DEV_DB_URL:="postgres://backoffice:backoffice@localhost:5400/backoffice"
+
 @default: 
     @just --list --list-heading $'Available commands\n'
 
@@ -28,7 +31,6 @@ FRONTEND_DIR:='frontend'
     npm run dev
 
 
-
 [working-directory :'frontend']
 @build-frontend:
     npm run generate
@@ -37,9 +39,9 @@ FRONTEND_DIR:='frontend'
 
 
 run:
-    # @just build-ui
-    docker compose up -d database
-    cargo watch -x run
+    {{ DOCKER_CMD }} up -d 
+    {{ DOCKER_CMD }} logs -f --tail='30' app
+
 
 
 lint:
@@ -61,3 +63,19 @@ run-cli:
 
 run-init:
     cargo run --bin cli init
+
+
+migrate-add target:
+    sea-orm-cli migrate generate {{target}}
+
+@generate-entities:
+	sea-orm-cli generate entity \
+		--database-url {{DEV_DB_URL}} \
+		--with-serde both \
+		--model-extra-attributes 'serde(rename_all="camelCase")' \
+		-o src/entities --seaography
+
+
+
+db-pull:
+    just generate-entities

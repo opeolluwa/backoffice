@@ -1,8 +1,10 @@
 
 
-[doc('Install the application dependencies')]
+[doc('Install all application dependencies (backend + frontend)')]
 @install-dependencies:
-    @echo "Installing backend dependencies"
+    @echo "Installing frontend dependencies..."
+    cd frontend && npm install
+    @echo "Done. Copy .env.example to .env.local if you haven't already."
 
 
 @fmt:
