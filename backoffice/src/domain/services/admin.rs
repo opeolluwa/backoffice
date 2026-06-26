@@ -1,19 +1,21 @@
-use sea_orm::DatabaseConnection;
-
-use crate::services::user_service::UserService;
-use crate::{config::app_config::AppConfig, services::auth_service::AuthenticationService};
+use crate::domain::ports::user_repository::UserRepositoryTrait;
+use crate::domain::services::auth::AuthenticationService;
+use crate::domain::services::user::UserService;
 
 #[allow(dead_code)]
-pub struct AdminService {
-    user_service: UserService,
-    authentication_service: AuthenticationService,
+pub struct AdminService<R: UserRepositoryTrait + Clone> {
+    user_service: UserService<R>,
+    authentication_service: AuthenticationService<R>,
 }
 
-impl AdminService {
-    pub fn init(db: &DatabaseConnection, app_config: &AppConfig) -> Self {
+impl<R: UserRepositoryTrait + Clone> AdminService<R> {
+    pub fn new(
+        user_service: UserService<R>,
+        authentication_service: AuthenticationService<R>,
+    ) -> Self {
         AdminService {
-            user_service: UserService::init(db, app_config),
-            authentication_service: AuthenticationService::init(db, app_config),
+            user_service,
+            authentication_service,
         }
     }
 }
@@ -22,7 +24,7 @@ pub trait AdminServiceExt {
     fn invite_user();
 }
 
-impl AdminServiceExt for AdminService {
+impl<R: UserRepositoryTrait + Clone> AdminServiceExt for AdminService<R> {
     fn invite_user() {
         unimplemented!()
     }

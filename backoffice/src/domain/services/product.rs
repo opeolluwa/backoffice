@@ -1,5 +1,4 @@
 use axum_typed_multipart::TypedMultipart;
-use sea_orm::DatabaseConnection;
 
 use backoffice_imagekit::ImagekitClient;
 use backoffice_utils::extract_env;
@@ -7,25 +6,20 @@ use backoffice_utils::extract_env;
 use crate::{
     adapters::requests::products::{CreateProductRequest, SaveProductRequest},
     config::app_config::AppConfig,
+    domain::ports::product_repository::ProductRepositoryExt,
     entities::products::Model as Product,
     errors::{app_error::AppError, service_error::ServiceError},
     fs::filesystem::AppFileSystem,
-    repositories::{
-        base::Repository,
-        product_repository::{ProductRepository, ProductRepositoryExt},
-    },
 };
 
 #[derive(Clone)]
-pub struct ProductService {
-    product_repository: ProductRepository,
+pub struct ProductService<R: ProductRepositoryExt> {
+    repo: R,
 }
 
-impl ProductService {
-    pub fn init(db: &DatabaseConnection) -> Self {
-        Self {
-            product_repository: ProductRepository::init(db),
-        }
+impl<R: ProductRepositoryExt + Clone> ProductService<R> {
+    pub fn new(repo: R) -> Self {
+        Self { repo }
     }
 }
 
@@ -42,15 +36,9 @@ pub(crate) trait ProductServiceStateExt {
         product_identifier: &str,
         user_identifier: &str,
     ) -> Result<Product, ServiceError>;
-
-    // async fn fetch_marketplace_products(
-    //     &self,
-    //     marketplace_identifier: &str,
-    //     user_identifier: &str,
-    // ) -> Result<MarketplaceWithProducts, ServiceError>;
 }
 
-impl ProductServiceStateExt for ProductService {
+impl<R: ProductRepositoryExt + Clone + Send + Sync> ProductServiceStateExt for ProductService<R> {
     async fn add_product(
         &self,
         TypedMultipart(CreateProductRequest {
@@ -89,7 +77,7 @@ impl ProductServiceStateExt for ProductService {
         };
 
         let product = self
-            .product_repository
+            .repo
             .create_product(&save_product, user_identifier, marketplace_identifier)
             .await?;
 
@@ -103,24 +91,10 @@ impl ProductServiceStateExt for ProductService {
         user_identifier: &str,
     ) -> Result<Product, ServiceError> {
         let product = self
-            .product_repository
+            .repo
             .retrieve_product(user_identifier, product_identifier)
             .await?;
 
         Ok(product)
     }
-
-    // async fn fetch_marketplace_products(
-    //     &self,
-    //     marketplace_identifier: &str,
-    //     user_identifier: &str,
-    // ) -> Result<MarketplaceWithProducts, ServiceError> {
-
-    // let marketplace_with_products = self
-    //     .product_repository
-    //     .fetch_marketplace_products(marketplace_identifier, user_identifier)
-    //     .await?;
-
-    // Ok(marketplace_with_products)
-    // }
 }

@@ -1,15 +1,12 @@
 use askama::Template;
-use sea_orm::DatabaseConnection;
 
 use backoffice_email_client::auto_respond::AutoRespondTemplate;
 use backoffice_email_client::password_reset::PasswordResetTemplate;
 use backoffice_email_client::zepto_mailer::{EmailRequestBuilder, ZeptoMail};
 
 use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
-use crate::config::app_config::AppConfig;
 use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
-use crate::repositories::base::Repository;
 use crate::{
     adapters::{
         requests::auth::{
@@ -21,27 +18,30 @@ use crate::{
             VerifyAccountResponse,
         },
     },
+    domain::{
+        ports::user_repository::UserRepositoryTrait,
+        services::user_helper::{UserHelperService, UserHelperServiceTrait},
+    },
     errors::auth_service_error::AuthenticationServiceError,
-    repositories::user_repository::{UserRepository, UserRepositoryTrait},
-    services::user_helper_service::{UserHelperService, UserHelperServiceTrait},
 };
 
 #[derive(Clone)]
-pub struct AuthenticationService {
-    user_repository: UserRepository,
+pub struct AuthenticationService<R: UserRepositoryTrait> {
+    repo: R,
     user_helper_service: UserHelperService,
     email_client: ZeptoMail,
 }
 
-impl AuthenticationService {
-    pub fn init(db: &DatabaseConnection, app_config: &AppConfig) -> Self {
+impl<R: UserRepositoryTrait + Clone> AuthenticationService<R> {
+    pub fn new(repo: R, email_client: ZeptoMail) -> Self {
         Self {
-            user_repository: UserRepository::init(db),
+            repo,
             user_helper_service: UserHelperService::init(),
-            email_client: ZeptoMail::new(&app_config.email_api_key),
+            email_client,
         }
     }
 }
+
 pub trait AuthenticationServiceTrait {
     fn create_user(
         &self,
@@ -55,7 +55,6 @@ pub trait AuthenticationServiceTrait {
 
     fn forgotten_password(
         &self,
-
         request: &ForgottenPasswordRequest,
     ) -> impl std::future::Future<
         Output = Result<ForgottenPasswordResponse, AuthenticationServiceError>,
@@ -79,17 +78,15 @@ pub trait AuthenticationServiceTrait {
     fn request_refresh_token(
         &self,
         request: &RefreshTokenRequest,
-    ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>>
+    + Send;
 }
 
-impl AuthenticationServiceTrait for AuthenticationService {
+impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
+    for AuthenticationService<R>
+{
     async fn create_user(&self, request: &CreateUserRequest) -> Result<(), ServiceError> {
-        if self
-            .user_repository
-            .find_by_email(&request.email)
-            .await
-            .is_some()
-        {
+        if self.repo.find_by_email(&request.email).await.is_some() {
             return Err(DatabaseError::DuplicateEmailForUser.into());
         }
 
@@ -101,13 +98,10 @@ impl AuthenticationServiceTrait for AuthenticationService {
             last_name: request.last_name.to_owned(),
         };
 
-        self.user_repository
-            .create_user(user)
-            .await
-            .map_err(|err| {
-                log::error!("{}", err);
-                err
-            })?;
+        self.repo.create_user(user).await.map_err(|err| {
+            log::error!("{}", err);
+            err
+        })?;
 
         let email_client = self.email_client.clone();
         let user_email = request.email.clone();
@@ -134,7 +128,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
         &self,
         request: &LoginRequest,
     ) -> Result<LoginResponse, AuthenticationServiceError> {
-        let Some(user) = self.user_repository.find_by_email(&request.email).await else {
+        let Some(user) = self.repo.find_by_email(&request.email).await else {
             return Err(AuthenticationServiceError::WrongCredentials);
         };
 
@@ -155,7 +149,7 @@ impl AuthenticationServiceTrait for AuthenticationService {
         &self,
         request: &ForgottenPasswordRequest,
     ) -> Result<ForgottenPasswordResponse, AuthenticationServiceError> {
-        let Some(user) = self.user_repository.find_by_email(&request.email).await else {
+        let Some(user) = self.repo.find_by_email(&request.email).await else {
             return Err(AuthenticationServiceError::WrongCredentials);
         };
 
@@ -197,16 +191,11 @@ impl AuthenticationServiceTrait for AuthenticationService {
     ) -> Result<SetNewPasswordResponse, AuthenticationServiceError> {
         let new_password = self.user_helper_service.hash_password(&request.password)?;
 
-        if self
-            .user_repository
-            .find_by_identifier(&claims.identifier)
-            .await
-            .is_none()
-        {
+        if self.repo.find_by_identifier(&claims.identifier).await.is_none() {
             return Err(AuthenticationServiceError::InvalidToken);
         };
 
-        self.user_repository
+        self.repo
             .update_password(&claims.identifier, &new_password)
             .await?;
 
@@ -218,19 +207,12 @@ impl AuthenticationServiceTrait for AuthenticationService {
         claims: &Claims,
         _request: &VerifyAccountRequest,
     ) -> Result<VerifyAccountResponse, AuthenticationServiceError> {
-        if self
-            .user_repository
-            .find_by_identifier(&claims.identifier)
-            .await
-            .is_none()
-        {
+        if self.repo.find_by_identifier(&claims.identifier).await.is_none() {
             return Err(AuthenticationServiceError::InvalidToken);
         };
 
         //todo: validate account credentials
-        self.user_repository
-            .update_account_status(&claims.identifier)
-            .await?;
+        self.repo.update_account_status(&claims.identifier).await?;
         Ok(VerifyAccountResponse {})
     }
 

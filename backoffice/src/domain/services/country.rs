@@ -1,21 +1,17 @@
-use sea_orm::DatabaseConnection;
-
 use crate::{
-    entities::countries, errors::service_error::ServiceError, repositories::base::Repository,
-    repositories::country_repository::CountryRepository,
-    repositories::country_repository::CountryRepositoryExt,
+    domain::ports::country_repository::CountryRepositoryExt,
+    entities::countries,
+    errors::service_error::ServiceError,
 };
 
 #[derive(Clone)]
-pub struct CountryService {
-    country_repository: CountryRepository,
+pub struct CountryService<R: CountryRepositoryExt> {
+    repo: R,
 }
 
-impl CountryService {
-    pub fn init(db: &DatabaseConnection) -> Self {
-        Self {
-            country_repository: CountryRepository::init(db),
-        }
+impl<R: CountryRepositoryExt + Clone> CountryService<R> {
+    pub fn new(repo: R) -> Self {
+        Self { repo }
     }
 }
 
@@ -28,27 +24,21 @@ pub(crate) trait CountryServiceExt {
     ) -> Result<Option<countries::Model>, ServiceError>;
 }
 
-impl CountryServiceExt for CountryService {
+impl<R: CountryRepositoryExt + Clone + Send + Sync> CountryServiceExt for CountryService<R> {
     async fn get_all_countries(&self) -> Result<Vec<countries::Model>, ServiceError> {
-        let countries = self
-            .country_repository
+        self.repo
             .fetch_all_countries()
             .await
-            .map_err(ServiceError::from)?;
-
-        Ok(countries)
+            .map_err(ServiceError::from)
     }
 
     async fn get_country_by_identifier(
         &self,
         identifier: &str,
     ) -> Result<Option<countries::Model>, ServiceError> {
-        let country = self
-            .country_repository
+        self.repo
             .fetch_country_by_identifier(identifier)
             .await
-            .map_err(ServiceError::from)?;
-
-        Ok(country)
+            .map_err(ServiceError::from)
     }
 }

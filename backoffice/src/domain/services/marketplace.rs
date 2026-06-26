@@ -1,22 +1,16 @@
-use sea_orm::DatabaseConnection;
-
 use crate::adapters::requests::marketplace::CreateMarketplaceRequest;
+use crate::domain::ports::marketplace_repository::MarketplaceRepositoryExt;
 use crate::entities::marketplaces;
 use crate::errors::service_error::ServiceError;
-use crate::repositories::base::Repository;
-use crate::repositories::marketplace_repository::MarketplaceRepository;
-use crate::repositories::marketplace_repository::MarketplaceRepositoryExt;
 
 #[derive(Clone)]
-pub struct MarketplaceService {
-    marketplace_repository: MarketplaceRepository,
+pub struct MarketplaceService<R: MarketplaceRepositoryExt> {
+    repo: R,
 }
 
-impl MarketplaceService {
-    pub fn init(db: &DatabaseConnection) -> Self {
-        Self {
-            marketplace_repository: MarketplaceRepository::init(db),
-        }
+impl<R: MarketplaceRepositoryExt + Clone> MarketplaceService<R> {
+    pub fn new(repo: R) -> Self {
+        Self { repo }
     }
 }
 
@@ -54,13 +48,15 @@ pub(crate) trait MarketplaceServiceExt {
     async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, ServiceError>;
 }
 
-impl MarketplaceServiceExt for MarketplaceService {
+impl<R: MarketplaceRepositoryExt + Clone + Send + Sync> MarketplaceServiceExt
+    for MarketplaceService<R>
+{
     async fn create_marketplace(
         &self,
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, ServiceError> {
-        self.marketplace_repository
+        self.repo
             .create_marketplace(request, user_identifier)
             .await
             .map_err(|e| ServiceError::OperationFailed(e.to_string()))
@@ -71,7 +67,7 @@ impl MarketplaceServiceExt for MarketplaceService {
         identifier: &str,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, ServiceError> {
-        self.marketplace_repository
+        self.repo
             .find_marketplace_by_identifier(identifier, user_identifier)
             .await
             .map_err(|e| ServiceError::OperationFailed(e.to_string()))
@@ -81,7 +77,7 @@ impl MarketplaceServiceExt for MarketplaceService {
         &self,
         user_identifier: &str,
     ) -> Result<Vec<marketplaces::Model>, ServiceError> {
-        self.marketplace_repository
+        self.repo
             .find_all_marketplaces(user_identifier)
             .await
             .map_err(|e| ServiceError::OperationFailed(e.to_string()))
@@ -93,7 +89,7 @@ impl MarketplaceServiceExt for MarketplaceService {
         request: &CreateMarketplaceRequest,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, ServiceError> {
-        self.marketplace_repository
+        self.repo
             .update_marketplace_by_identifier(identifier, request, user_identifier)
             .await
             .map_err(|e| ServiceError::OperationFailed(e.to_string()))
@@ -104,14 +100,14 @@ impl MarketplaceServiceExt for MarketplaceService {
         identifier: &str,
         user_identifier: &str,
     ) -> Result<(), ServiceError> {
-        self.marketplace_repository
+        self.repo
             .delete_marketplace_by_identifier(identifier, user_identifier)
             .await
             .map_err(|e| ServiceError::OperationFailed(e.to_string()))
     }
 
     async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, ServiceError> {
-        self.marketplace_repository
+        self.repo
             .count_marketplaces(user_identifier)
             .await
             .map_err(|e| ServiceError::OperationFailed(e.to_string()))
