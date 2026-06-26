@@ -20,7 +20,7 @@ services:
     networks:
       - internal
     volumes:
-      - .:/app:cached
+      - ./backoffice:/app:cached
       - cargo-target:/cargo-target:delegated
       - rust-cache:/usr/local/cargo/registry:delegated
     # command: cargo watch -qcx run
