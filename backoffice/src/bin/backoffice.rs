@@ -18,9 +18,9 @@ use backoffice_lib::{
         database::AppDatabase,
         logger::AppLogger,
     },
+    api::load_http_routes,
     errors,
     fs::filesystem::AppFileSystem,
-    routes::router::load_routes,
     states::GraphQlState,
 };
 use errors::app_error::AppError;
@@ -60,7 +60,7 @@ async fn main() -> Result<(), AppError> {
         endpoint: app_config.endpoint.clone(),
     };
 
-    let http_routes = load_routes(db_conn, &app_config);
+    let http_routes = load_http_routes(db_conn, &app_config);
 
     let graphql_router = Router::new()
         .route(

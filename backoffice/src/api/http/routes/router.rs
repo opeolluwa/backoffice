@@ -3,7 +3,7 @@ use sea_orm::DatabaseConnection;
 use tower_http::services::{ServeDir, ServeFile};
 
 use crate::{
-    api::http::routers::{
+    api::http::routes::{
         auth::authentication_routes, country::country_routes, marketplace::marketplace_routes,
         products::product_routes, public::public_routes, teams::team_routes, users::user_routes,
     },

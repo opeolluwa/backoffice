@@ -23,6 +23,7 @@
     "proto",
     "pswd",
     "reqwest",
+    "seaography",
     "singlepart",
     "smaple",
     "sqlx",
