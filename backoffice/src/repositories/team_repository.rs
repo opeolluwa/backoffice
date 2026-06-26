@@ -2,7 +2,8 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait,
 use ulid::Ulid;
 
 use crate::{
-    adapters::requests::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
+    api::http::extractors::requests::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
+    domain::ports::team_repository::TeamRepositoryExt,
     entities::teams::{self, Entity as TeamEntity},
     errors::database_error::DatabaseError,
     repositories::base::Repository,
@@ -17,36 +18,6 @@ impl Repository for TeamRepository {
     fn init(db: &DatabaseConnection) -> Self {
         Self { db: db.clone() }
     }
-}
-
-pub(crate) trait TeamRepositoryExt {
-    async fn create_team_member(
-        &self,
-        request: &CreateTeamMemberRequest,
-    ) -> Result<teams::Model, DatabaseError>;
-
-    async fn find_team_member_by_identifier(
-        &self,
-        identifier: &str,
-    ) -> Result<teams::Model, DatabaseError>;
-
-    async fn find_all_team_members(&self) -> Result<Vec<teams::Model>, DatabaseError>;
-
-    async fn update_team_member(
-        &self,
-        identifier: &str,
-        request: &UpdateTeamMemberRequest,
-    ) -> Result<teams::Model, DatabaseError>;
-
-    async fn delete_team_member(&self, identifier: &str) -> Result<(), DatabaseError>;
-
-    async fn block_team_member(
-        &self,
-        identifier: &str,
-        blocked: bool,
-    ) -> Result<teams::Model, DatabaseError>;
-
-    async fn count_team_members(&self) -> Result<i64, DatabaseError>;
 }
 
 impl TeamRepositoryExt for TeamRepository {

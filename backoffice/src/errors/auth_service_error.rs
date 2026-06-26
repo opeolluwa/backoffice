@@ -1,6 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse};
 
-use crate::adapters::response::api_response::ApiResponseBuilder;
+use crate::api::http::extractors::responses::api_response::ApiResponseBuilder;
 use crate::errors::{app_error::AppError, service_error::ServiceError};
 
 #[derive(Debug, thiserror::Error)]

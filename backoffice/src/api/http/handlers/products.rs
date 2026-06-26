@@ -5,9 +5,9 @@ use axum::{
 use axum_typed_multipart::TypedMultipart;
 
 use crate::{
-    adapters::{
+    api::http::extractors::{
         dto::jwt::Claims, requests::products::CreateProductRequest,
-        response::api_response::ApiResponse,
+        responses::api_response::ApiResponse,
     },
     entities::products::Model as Product,
     errors::service_error::ServiceError,

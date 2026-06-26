@@ -1,12 +1,11 @@
 use axum::extract::State;
 
+use crate::api::http::extractors::dto::user::UserDto;
 use crate::errors::service_error::ServiceError;
 use crate::services::user_service::UserServiceTrait;
 use crate::{
-    adapters::{
-        dto::{jwt::Claims, user::UserDto},
-        response::api_response::{ApiResponse, ApiResponseBuilder},
-    },
+    api::http::extractors::dto::jwt::Claims,
+    api::http::extractors::responses::api_response::{ApiResponse, ApiResponseBuilder},
     services::user_service::UserService,
 };
 

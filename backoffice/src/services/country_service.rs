@@ -1,9 +1,11 @@
 use sea_orm::DatabaseConnection;
 
 use crate::{
-    entities::countries, errors::service_error::ServiceError, repositories::base::Repository,
+    domain::ports::country_repository::CountryRepositoryExt,
+    entities::countries,
+    errors::service_error::ServiceError,
+    repositories::base::Repository,
     repositories::country_repository::CountryRepository,
-    repositories::country_repository::CountryRepositoryExt,
 };
 
 #[derive(Clone)]

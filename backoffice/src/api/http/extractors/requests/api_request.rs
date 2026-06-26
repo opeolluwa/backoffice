@@ -8,7 +8,7 @@ use serde::{Serialize, de::DeserializeOwned};
 use validator::Validate;
 
 use crate::{
-    adapters::dto::jwt::Claims,
+    api::http::extractors::dto::jwt::Claims,
     errors::{authentication_error::AuthenticationError, service_error::ServiceError},
 };
 

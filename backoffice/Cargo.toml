@@ -39,9 +39,11 @@ clap = { version = "4.5.51", features = ["derive"] }
 console = "0.16.1"
 dialoguer = "0.12.0"
 dotenv = "0.15.0"
+eyre = "0.6.12"
 jsonwebtoken = { version = "10.1.0", features = ["rust_crypto"] }
 log = "0.4.27"
 migration = { version = "0.1.0", path = "migration" }
+redis = { version = "1.2.4", features = ["tls-rustls"] }
 regex = "1.12.2"
 reqwest.workspace = true
 rust_decimal = { version = "1.39.0", features = ["macros", "serde"] }

@@ -3,7 +3,8 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Qu
 use ulid::Ulid;
 
 use crate::{
-    adapters::requests::products::SaveProductRequest,
+    api::http::extractors::requests::products::SaveProductRequest,
+    domain::ports::product_repository::ProductRepositoryExt,
     entities::{
         countries,
         marketplaces::{self, Entity as MarketplaceEntity},
@@ -22,27 +23,6 @@ impl Repository for ProductRepository {
     fn init(db: &DatabaseConnection) -> Self {
         Self { db: db.clone() }
     }
-}
-
-pub(crate) trait ProductRepositoryExt {
-    async fn create_product(
-        &self,
-        request: &SaveProductRequest,
-        user_identifier: &str,
-        marketplace_identifier: &str,
-    ) -> Result<products::Model, DatabaseError>;
-
-    async fn retrieve_product(
-        &self,
-        identifier: &str,
-        user_identifier: &str,
-    ) -> Result<products::Model, DatabaseError>;
-
-    // async fn fetch_marketplace_products(
-    //     &self,
-    //     marketplace_identifier: &str,
-    //     user_identifier: &str,
-    // ) -> Result<MarketplaceWithProducts, DatabaseError>;
 }
 
 impl ProductRepositoryExt for ProductRepository {

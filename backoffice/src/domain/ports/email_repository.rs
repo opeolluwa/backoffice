@@ -1,5 +1,5 @@
 use crate::{
-    adapters::requests::email::{CreateEmailRequest, UpdateEmailRequest},
+    api::http::extractors::requests::email::{CreateEmailRequest, UpdateEmailRequest},
     entities::emails,
     errors::database_error::DatabaseError,
 };

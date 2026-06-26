@@ -3,7 +3,7 @@ use sea_orm::DatabaseConnection;
 use seaography::{Builder, BuilderContext, async_graphql, lazy_static::lazy_static};
 
 use crate::entities::*;
-use crate::mutations;
+use super::mutations;
 
 lazy_static! {
     static ref CONTEXT: BuilderContext = BuilderContext::default();
@@ -28,7 +28,7 @@ pub fn schema_builder(
 
     seaography::register_custom_inputs!(
         builder,
-        [crate::types::newsletter::SubscribeToNewsletterInput]
+        [super::types::newsletter::SubscribeToNewsletterInput]
     );
     seaography::register_custom_mutations!(
         builder,

@@ -1,4 +1,4 @@
-use crate::adapters::requests::marketplace::CreateMarketplaceRequest;
+use crate::api::http::extractors::requests::marketplace::CreateMarketplaceRequest;
 use crate::domain::ports::marketplace_repository::MarketplaceRepositoryExt;
 use crate::entities::marketplaces;
 use crate::errors::service_error::ServiceError;

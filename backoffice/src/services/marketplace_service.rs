@@ -1,11 +1,11 @@
 use sea_orm::DatabaseConnection;
 
-use crate::adapters::requests::marketplace::CreateMarketplaceRequest;
+use crate::api::http::extractors::requests::marketplace::CreateMarketplaceRequest;
 use crate::entities::marketplaces;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
 use crate::repositories::marketplace_repository::MarketplaceRepository;
-use crate::repositories::marketplace_repository::MarketplaceRepositoryExt;
+use crate::domain::ports::marketplace_repository::MarketplaceRepositoryExt;
 
 #[derive(Clone)]
 pub struct MarketplaceService {

@@ -1,7 +1,7 @@
 use axum::extract::{Path, State};
 
 use crate::{
-    adapters::response::api_response::ApiResponse, entities::countries,
+    api::http::extractors::responses::api_response::ApiResponse, entities::countries,
     errors::service_error::ServiceError, services::country_service::CountryService,
     services::country_service::CountryServiceExt,
 };

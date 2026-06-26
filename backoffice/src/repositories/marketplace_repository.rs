@@ -8,7 +8,8 @@ use sea_orm::{
 use ulid::Ulid;
 
 use crate::{
-    adapters::requests::marketplace::CreateMarketplaceRequest,
+    api::http::extractors::requests::marketplace::CreateMarketplaceRequest,
+    domain::ports::marketplace_repository::MarketplaceRepositoryExt,
     entities::marketplaces::{self, Entity as MarketplaceEntity},
     errors::database_error::DatabaseError,
     repositories::base::Repository,
@@ -23,54 +24,6 @@ impl Repository for MarketplaceRepository {
     fn init(db: &DatabaseConnection) -> Self {
         Self { db: db.clone() }
     }
-}
-
-pub(crate) trait MarketplaceRepositoryExt {
-    async fn create_marketplace(
-        &self,
-        request: &CreateMarketplaceRequest,
-        user_identifier: &str,
-    ) -> Result<marketplaces::Model, DatabaseError>;
-
-    async fn find_marketplace_by_identifier(
-        &self,
-        identifier: &str,
-        user_identifier: &str,
-    ) -> Result<marketplaces::Model, DatabaseError>;
-
-    #[allow(dead_code)]
-    async fn find_marketplace_by_name(
-        &self,
-        name: &str,
-        user_identifier: &str,
-    ) -> Result<marketplaces::Model, DatabaseError>;
-
-    async fn find_all_marketplaces(
-        &self,
-        user_identifier: &str,
-    ) -> Result<Vec<marketplaces::Model>, DatabaseError>;
-
-    async fn update_marketplace_by_identifier(
-        &self,
-        identifier: &str,
-        request: &CreateMarketplaceRequest,
-        user_identifier: &str,
-    ) -> Result<marketplaces::Model, DatabaseError>;
-
-    async fn delete_marketplace_by_identifier(
-        &self,
-        identifier: &str,
-        user_identifier: &str,
-    ) -> Result<(), DatabaseError>;
-
-    #[allow(dead_code)]
-    async fn marketplace_exists(
-        &self,
-        identifier: &str,
-        user_identifier: &str,
-    ) -> Result<bool, DatabaseError>;
-
-    async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, DatabaseError>;
 }
 
 impl MarketplaceRepositoryExt for MarketplaceRepository {

@@ -1,6 +1,6 @@
 use axum::extract::State;
 
-use crate::adapters::response::api_response::{ApiResponse, ApiResponseBuilder};
+use crate::api::http::extractors::responses::api_response::{ApiResponse, ApiResponseBuilder};
 use crate::services::root_service::RootServiceTrait;
 use crate::{errors::app_error::AppError, services::root_service::RootService};
 
