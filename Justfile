@@ -73,6 +73,7 @@ migrate-add target:
 		--database-url {{DEV_DB_URL}} \
 		--with-serde both \
 		--model-extra-attributes 'serde(rename_all="camelCase")' \
+		--ignore-tables backoffice_server_migrations \
 		-o backoffice/src/domain/models --seaography
 
 
