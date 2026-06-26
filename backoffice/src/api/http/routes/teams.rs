@@ -3,14 +3,11 @@ use axum::{
     routing::{delete, get, post, put},
 };
 
-use crate::{
-    controllers::teams::{
-        block_team_member, count_team_members, create_team_member, delete_team_member,
-        find_all_team_members, find_team_member_by_identifier, unblock_team_member,
-        update_team_member,
-    },
-    states::ServicesState,
+use crate::api::http::handlers::teams::{
+    block_team_member, count_team_members, create_team_member, delete_team_member,
+    find_all_team_members, find_team_member_by_identifier, unblock_team_member, update_team_member,
 };
+use crate::states::ServicesState;
 
 pub(super) fn team_routes(state: ServicesState) -> Router {
     let routes = Router::new()

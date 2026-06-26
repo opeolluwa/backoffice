@@ -3,13 +3,12 @@ use axum::{
     routing::{get, post},
 };
 
-use crate::{
-    controllers::auth::{
-        create_account, forgotten_password, login, request_refresh_token, set_new_password,
-        verify_account,
-    },
-    states::ServicesState,
+use crate::api::http::handlers::auth::{
+    create_account, forgotten_password, login, request_refresh_token, set_new_password,
+    verify_account,
 };
+
+use crate::states::ServicesState;
 
 pub(super) fn authentication_routes(state: ServicesState) -> Router {
     Router::new()

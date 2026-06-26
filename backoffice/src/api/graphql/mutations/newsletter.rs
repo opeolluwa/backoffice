@@ -7,10 +7,8 @@ use seaography::{
 };
 use validator::Validate;
 
-use crate::{
-    errors::app_error::AppError, types::newsletter::SubscribeToNewsletterInput,
-    utils::error::format_validation_errors,
-};
+use crate::api::graphql::types::newsletter::SubscribeToNewsletterInput;
+use crate::{errors::app_error::AppError, utils::error::format_validation_errors};
 
 pub struct SubscribeNewsletter;
 

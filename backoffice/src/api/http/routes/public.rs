@@ -1,6 +1,7 @@
 use axum::{Router, routing::get};
 
-use crate::{controllers::root::health_check, states::ServicesState};
+use crate::api::http::handlers::root::health_check;
+use crate::states::ServicesState;
 
 pub(super) fn public_routes(state: ServicesState) -> Router {
     Router::new()

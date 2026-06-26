@@ -1,7 +1,7 @@
 use axum::routing::{delete, post, put};
 use axum::{Router, routing::get};
 
-use crate::controllers::marketplaces::{
+use crate::api::http::handlers::marketplaces::{
     count_marketplaces, create_marketplace, delete_marketplace_by_identifier,
     find_all_marketplaces, find_marketplace_by_identifier, update_marketplace_by_identifier,
 };

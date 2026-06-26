@@ -1,6 +1,7 @@
 use axum::{Router, routing::get};
 
-use crate::{controllers::user::retrieve_information, states::ServicesState};
+use crate::api::http::handlers::user::retrieve_information;
+use crate::states::ServicesState;
 
 pub(super) fn user_routes(state: ServicesState) -> Router {
     Router::new()

@@ -12,13 +12,13 @@ use axum::{
     routing::get,
 };
 use backoffice_lib::{
+    api::{load_graphql_routes, load_http_routes},
     config::{
         app::{create_cors_layer, shutdown_signal},
         app_config::AppConfig,
         database::AppDatabase,
         logger::AppLogger,
     },
-    api::load_http_routes,
     errors,
     fs::filesystem::AppFileSystem,
     states::GraphQlState,
@@ -51,9 +51,8 @@ async fn main() -> Result<(), AppError> {
     AppLogger::init();
     AppFileSystem::init(&app_config)?;
 
-    let schema =
-        backoffice_lib::query_root::schema(db_conn.clone(), Some(100), app_config.complexity_limit)
-            .map_err(|err| AppError::GraphQLError(err.to_string()))?;
+    let schema = load_graphql_routes(db_conn.clone(), Some(100), app_config.complexity_limit)
+        .map_err(|err| AppError::GraphQLError(err.to_string()))?;
 
     let graphql_state = GraphQlState {
         schema,
