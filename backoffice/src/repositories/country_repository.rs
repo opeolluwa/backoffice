@@ -1,6 +1,7 @@
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
 use crate::{
+    domain::ports::country_repository::CountryRepositoryExt,
     entities::countries::{self, Entity as CountryEntity},
     errors::database_error::DatabaseError,
     repositories::base::Repository,
@@ -9,15 +10,6 @@ use crate::{
 #[derive(Clone)]
 pub struct CountryRepository {
     db: DatabaseConnection,
-}
-
-pub(crate) trait CountryRepositoryExt {
-    async fn fetch_all_countries(&self) -> Result<Vec<countries::Model>, DatabaseError>;
-
-    async fn fetch_country_by_identifier(
-        &self,
-        identifier: &str,
-    ) -> Result<Option<countries::Model>, DatabaseError>;
 }
 
 impl Repository for CountryRepository {

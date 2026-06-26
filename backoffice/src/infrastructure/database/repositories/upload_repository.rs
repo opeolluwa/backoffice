@@ -6,6 +6,7 @@ use ulid::Ulid;
 
 use crate::{
     adapters::requests::upload::{CreateUploadRequest, UpdateUploadRequest},
+    domain::ports::upload_repository::UploadRepositoryExt,
     entities::uploads::{self, Entity as UploadEntity},
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
@@ -20,45 +21,6 @@ impl Repository for UploadRepository {
     fn init(db: &DatabaseConnection) -> Self {
         Self { db: db.clone() }
     }
-}
-
-pub(crate) trait UploadRepositoryExt {
-    async fn create_upload(
-        &self,
-        request: &CreateUploadRequest,
-        user_identifier: &str,
-    ) -> Result<uploads::Model, DatabaseError>;
-
-    async fn find_upload_by_identifier(
-        &self,
-        identifier: &str,
-        user_identifier: &str,
-    ) -> Result<uploads::Model, DatabaseError>;
-
-    async fn find_all_uploads(
-        &self,
-        user_identifier: &str,
-    ) -> Result<Vec<uploads::Model>, DatabaseError>;
-
-    async fn find_starred_uploads(
-        &self,
-        user_identifier: &str,
-    ) -> Result<Vec<uploads::Model>, DatabaseError>;
-
-    async fn update_upload(
-        &self,
-        identifier: &str,
-        request: &UpdateUploadRequest,
-        user_identifier: &str,
-    ) -> Result<uploads::Model, DatabaseError>;
-
-    async fn delete_upload(
-        &self,
-        identifier: &str,
-        user_identifier: &str,
-    ) -> Result<(), DatabaseError>;
-
-    async fn count_uploads(&self, user_identifier: &str) -> Result<i64, DatabaseError>;
 }
 
 impl UploadRepositoryExt for UploadRepository {

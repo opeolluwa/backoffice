@@ -6,7 +6,8 @@ use crate::adapters::dto::user::UserDto;
 use crate::config::app_config::AppConfig;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
-use crate::repositories::user_repository::{UserRepository, UserRepositoryTrait};
+use crate::domain::ports::user_repository::UserRepositoryTrait;
+use crate::repositories::user_repository::UserRepository;
 
 #[derive(Clone)]
 pub struct UserService {

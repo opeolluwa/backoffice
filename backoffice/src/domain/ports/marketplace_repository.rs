@@ -42,5 +42,12 @@ pub(crate) trait MarketplaceRepositoryExt {
         user_identifier: &str,
     ) -> Result<(), DatabaseError>;
 
+    #[allow(dead_code)]
+    async fn marketplace_exists(
+        &self,
+        identifier: &str,
+        user_identifier: &str,
+    ) -> Result<bool, DatabaseError>;
+
     async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, DatabaseError>;
 }

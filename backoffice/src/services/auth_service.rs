@@ -9,6 +9,7 @@ use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE
 use crate::config::app_config::AppConfig;
 use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
+use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::repositories::base::Repository;
 use crate::{
     adapters::{
@@ -22,7 +23,7 @@ use crate::{
         },
     },
     errors::auth_service_error::AuthenticationServiceError,
-    repositories::user_repository::{UserRepository, UserRepositoryTrait},
+    repositories::user_repository::UserRepository,
     services::user_helper_service::{UserHelperService, UserHelperServiceTrait},
 };
 

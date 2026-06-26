@@ -7,12 +7,13 @@ use backoffice_utils::extract_env;
 use crate::{
     adapters::requests::products::{CreateProductRequest, SaveProductRequest},
     config::app_config::AppConfig,
+    domain::ports::product_repository::ProductRepositoryExt,
     entities::products::Model as Product,
     errors::{app_error::AppError, service_error::ServiceError},
     fs::filesystem::AppFileSystem,
     repositories::{
         base::Repository,
-        product_repository::{ProductRepository, ProductRepositoryExt},
+        product_repository::ProductRepository,
     },
 };
 
