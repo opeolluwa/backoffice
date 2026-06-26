@@ -4,13 +4,13 @@ use axum::{
 };
 
 use crate::{
-    adapters::{
+    api::http::extractors::{
         dto::jwt::Claims,
         requests::{
             api_request::AuthenticatedRequest,
             team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
         },
-        response::api_response::ApiResponse,
+        responses::api_response::ApiResponse,
     },
     entities::teams,
     errors::service_error::ServiceError,

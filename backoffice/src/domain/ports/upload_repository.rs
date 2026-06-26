@@ -1,5 +1,5 @@
 use crate::{
-    adapters::requests::upload::{CreateUploadRequest, UpdateUploadRequest},
+    api::http::extractors::requests::upload::{CreateUploadRequest, UpdateUploadRequest},
     entities::uploads,
     errors::database_error::DatabaseError,
 };

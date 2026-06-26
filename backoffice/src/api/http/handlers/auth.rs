@@ -1,17 +1,17 @@
 use axum::extract::State;
 use axum::http::StatusCode;
 
-use crate::adapters::dto::jwt::Claims;
-use crate::adapters::requests::auth::VerifyAccountRequest;
-use crate::adapters::response::api_response::ApiResponseBuilder;
-use crate::adapters::response::auth::{ForgottenPasswordResponse, RefreshTokenResponse};
+use crate::api::http::extractors::dto::jwt::Claims;
+use crate::api::http::extractors::requests::auth::VerifyAccountRequest;
+use crate::api::http::extractors::responses::api_response::ApiResponseBuilder;
+use crate::api::http::extractors::responses::auth::{ForgottenPasswordResponse, RefreshTokenResponse};
 use crate::middlewares::validator::ValidatedRequest;
 use crate::{
-    adapters::{
+    api::http::extractors::{
         requests::auth::{
             CreateUserRequest, ForgottenPasswordRequest, LoginRequest, SetNewPasswordRequest,
         },
-        response::{
+        responses::{
             api_response::ApiResponse,
             auth::{CreateUserResponse, LoginResponse, VerifyAccountResponse},
         },

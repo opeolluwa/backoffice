@@ -4,16 +4,16 @@ use crate::infrastructure::mailer::{
     AutoRespondTemplate, EmailRequestBuilder, PasswordResetTemplate, ZeptoMail,
 };
 
-use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
+use crate::api::http::extractors::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
 use crate::{
-    adapters::{
+    api::http::extractors::{
         requests::auth::{
             CreateUserRequest, ForgottenPasswordRequest, LoginRequest, RefreshTokenRequest,
             SetNewPasswordRequest, VerifyAccountRequest,
         },
-        response::auth::{
+        responses::auth::{
             ForgottenPasswordResponse, LoginResponse, RefreshTokenResponse, SetNewPasswordResponse,
             VerifyAccountResponse,
         },

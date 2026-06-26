@@ -4,10 +4,10 @@ use axum::{
 };
 
 use crate::{
-    adapters::{
+    api::http::extractors::{
         dto::jwt::Claims,
         requests::{api_request::AuthenticatedRequest, marketplace::CreateMarketplaceRequest},
-        response::api_response::ApiResponse,
+        responses::api_response::ApiResponse,
     },
     entities::marketplaces,
     errors::service_error::ServiceError,

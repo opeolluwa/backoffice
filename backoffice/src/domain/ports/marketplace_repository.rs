@@ -1,5 +1,5 @@
 use crate::{
-    adapters::requests::marketplace::CreateMarketplaceRequest,
+    api::http::extractors::requests::marketplace::CreateMarketplaceRequest,
     entities::marketplaces,
     errors::database_error::DatabaseError,
 };

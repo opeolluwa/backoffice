@@ -1,5 +1,5 @@
 use crate::{
-    adapters::requests::products::SaveProductRequest,
+    api::http::extractors::requests::products::SaveProductRequest,
     entities::products,
     errors::database_error::DatabaseError,
 };

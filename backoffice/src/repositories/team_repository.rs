@@ -2,7 +2,7 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait,
 use ulid::Ulid;
 
 use crate::{
-    adapters::requests::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
+    api::http::extractors::requests::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     domain::ports::team_repository::TeamRepositoryExt,
     entities::teams::{self, Entity as TeamEntity},
     errors::database_error::DatabaseError,

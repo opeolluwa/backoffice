@@ -1,4 +1,3 @@
-pub mod adapters;
 pub mod cli;
 pub mod config;
 pub mod controllers;
@@ -19,3 +18,4 @@ pub mod types;
 mod utils;
 pub mod domain;
 pub mod infrastructure;
+pub mod api;

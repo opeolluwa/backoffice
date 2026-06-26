@@ -3,7 +3,7 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Qu
 use ulid::Ulid;
 
 use crate::{
-    adapters::requests::products::SaveProductRequest,
+    api::http::extractors::requests::products::SaveProductRequest,
     domain::ports::product_repository::ProductRepositoryExt,
     entities::{
         countries,

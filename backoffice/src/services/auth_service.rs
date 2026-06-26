@@ -5,19 +5,19 @@ use backoffice_email_client::auto_respond::AutoRespondTemplate;
 use backoffice_email_client::password_reset::PasswordResetTemplate;
 use backoffice_email_client::zepto_mailer::{EmailRequestBuilder, ZeptoMail};
 
-use crate::adapters::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
+use crate::api::http::extractors::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::config::app_config::AppConfig;
 use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
 use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::repositories::base::Repository;
 use crate::{
-    adapters::{
+    api::http::extractors::{
         requests::auth::{
             CreateUserRequest, ForgottenPasswordRequest, LoginRequest, RefreshTokenRequest,
             SetNewPasswordRequest, VerifyAccountRequest,
         },
-        response::auth::{
+        responses::auth::{
             ForgottenPasswordResponse, LoginResponse, RefreshTokenResponse, SetNewPasswordResponse,
             VerifyAccountResponse,
         },
