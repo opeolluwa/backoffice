@@ -14,7 +14,7 @@ alias r:= restart
 
 set dotenv-required
 set dotenv-load := true
-set dotenv-path := "./.env"
+set dotenv-path := "./backoffice/.env"
 set export :=  true
 
 FRONTEND_DIR:='frontend'

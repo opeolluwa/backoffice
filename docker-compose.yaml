@@ -11,7 +11,7 @@ services:
     environment:
       - PORT=8000
     env_file:
-      - ".env"
+      - "backoffice/.env"
     depends_on:
       postgres:
         condition: service_healthy
