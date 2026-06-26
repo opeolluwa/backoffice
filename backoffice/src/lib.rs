@@ -17,3 +17,4 @@ pub mod shared;
 pub mod states;
 pub mod types;
 mod utils;
+pub mod domain;
