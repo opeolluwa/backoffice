@@ -8,7 +8,7 @@ use crate::{
     adapters::requests::upload::{CreateUploadRequest, UpdateUploadRequest},
     entities::uploads::{self, Entity as UploadEntity},
     errors::database_error::DatabaseError,
-    repositories::base::Repository,
+    infrastructure::database::repositories::base::Repository,
 };
 
 #[derive(Debug, Clone)]

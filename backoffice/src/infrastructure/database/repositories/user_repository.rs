@@ -5,7 +5,7 @@ use crate::{
     adapters::{dto::user::UserDto, requests::auth::CreateUserRequest},
     entities::users::{self, Entity as UserEntity},
     errors::service_error::ServiceError,
-    repositories::base::Repository,
+    infrastructure::database::repositories::base::Repository,
 };
 
 #[derive(Clone)]

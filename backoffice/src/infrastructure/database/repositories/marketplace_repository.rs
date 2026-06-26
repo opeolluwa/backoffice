@@ -11,7 +11,7 @@ use crate::{
     adapters::requests::marketplace::CreateMarketplaceRequest,
     entities::marketplaces::{self, Entity as MarketplaceEntity},
     errors::database_error::DatabaseError,
-    repositories::base::Repository,
+    infrastructure::database::repositories::base::Repository,
 };
 
 #[derive(Debug, Clone)]

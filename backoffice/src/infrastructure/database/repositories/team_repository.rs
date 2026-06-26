@@ -5,7 +5,7 @@ use crate::{
     adapters::requests::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     entities::teams::{self, Entity as TeamEntity},
     errors::database_error::DatabaseError,
-    repositories::base::Repository,
+    infrastructure::database::repositories::base::Repository,
 };
 
 #[derive(Debug, Clone)]

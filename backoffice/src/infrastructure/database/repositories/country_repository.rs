@@ -3,7 +3,7 @@ use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 use crate::{
     entities::countries::{self, Entity as CountryEntity},
     errors::database_error::DatabaseError,
-    repositories::base::Repository,
+    infrastructure::database::repositories::base::Repository,
 };
 
 #[derive(Clone)]

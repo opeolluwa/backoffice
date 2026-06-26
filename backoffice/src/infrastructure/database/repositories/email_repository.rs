@@ -8,7 +8,7 @@ use crate::{
     adapters::requests::email::{CreateEmailRequest, UpdateEmailRequest},
     entities::emails::{self, Entity as EmailEntity},
     errors::database_error::DatabaseError,
-    repositories::base::Repository,
+    infrastructure::database::repositories::base::Repository,
 };
 
 #[derive(Debug, Clone)]

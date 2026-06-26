@@ -1,3 +1,5 @@
+// use redis;
+
 #[derive(Debug, thiserror::Error)]
 pub enum RedisError {
     #[error("redis connection failed: {0}")]
@@ -6,6 +8,6 @@ pub enum RedisError {
     OperationFailed(String),
     #[error("key not found: {0}")]
     KeyNotFound(String),
-    #[error(transparent)]
-    ClientError(#[from] redis::RedisError),
+    // #[error(transparent)]
+    // ClientError(#[from] redis::RedisError),
 }

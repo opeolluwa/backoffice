@@ -4,7 +4,6 @@ pub mod email_repository;
 pub mod file_storage;
 pub mod marketplace_repository;
 pub mod product_repository;
-pub mod resource_repository;
 pub mod team_repository;
 pub mod upload_repository;
 pub mod user_repository;

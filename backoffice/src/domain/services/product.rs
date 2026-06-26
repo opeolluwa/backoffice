@@ -9,7 +9,7 @@ use crate::{
     domain::ports::product_repository::ProductRepositoryExt,
     entities::products::Model as Product,
     errors::{app_error::AppError, service_error::ServiceError},
-    fs::filesystem::AppFileSystem,
+    infrastructure::fs::AppFileSystem,
 };
 
 #[derive(Clone)]

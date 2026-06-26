@@ -10,7 +10,7 @@ use crate::{
         products::{self, Entity as ProductEntity},
     },
     errors::database_error::DatabaseError,
-    repositories::base::Repository,
+    infrastructure::database::repositories::base::Repository,
 };
 
 #[derive(Debug, Clone)]
