@@ -14,12 +14,12 @@ alias r:= restart
 
 set dotenv-required
 set dotenv-load := true
-set dotenv-path := "./.env"
+set dotenv-path := "./backoffice/.env"
 set export :=  true
 
 FRONTEND_DIR:='frontend'
 DOCKER_CMD := "docker compose -f docker-compose.yaml"
-DEV_DB_URL:="postgres://backoffice:backoffice@localhost:5400/backoffice"
+DEV_DB_URL:="postgres://backoffice:backoffice@localhost:6543/backoffice"
 
 @default: 
     @just --list --list-heading $'Available commands\n'
@@ -73,7 +73,8 @@ migrate-add target:
 		--database-url {{DEV_DB_URL}} \
 		--with-serde both \
 		--model-extra-attributes 'serde(rename_all="camelCase")' \
-		-o src/entities --seaography
+		--ignore-tables backoffice_server_migrations \
+		-o backoffice/src/domain/models --seaography
 
 
 

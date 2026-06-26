@@ -1,0 +1,13 @@
+# Exclude everything by default
+**
+
+# Include only the backoffice Rust source
+!backoffice/
+!backoffice/**
+
+# Exclude build artifacts, secrets, and temp files within backoffice
+backoffice/target/
+backoffice/.env
+backoffice/.env.*
+backoffice/tmp/
+backoffice/**/.DS_Store

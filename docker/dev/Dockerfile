@@ -17,11 +17,11 @@ RUN set -e && \
     rm -rf /var/lib/apt/lists/*
 
     
+RUN cargo install cargo-watch
+
 WORKDIR /app
 
-COPY . .
-
-RUN cargo install cargo-watch
+COPY ./backoffice .
 
 RUN cargo build
 

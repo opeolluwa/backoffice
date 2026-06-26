@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Rust
+target/
+**/*.rs.bk
+
+# Node.js
+node_modules/
+*.tsbuildinfo
+.npm
+.eslintcache
+
+# Frontend build outputs
+dist/
+.next/
+.nuxt/
+.output/
+out/
+assets/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Temp
+tmp/
