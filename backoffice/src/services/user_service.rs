@@ -2,7 +2,7 @@ use sea_orm::DatabaseConnection;
 
 use backoffice_email_client::zepto_mailer::ZeptoMail;
 
-use crate::api::http::extractors::dto::user::UserDto;
+use crate::api::http::extractors::user::UserDto;
 use crate::config::app_config::AppConfig;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;

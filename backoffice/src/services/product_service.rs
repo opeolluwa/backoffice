@@ -5,7 +5,7 @@ use backoffice_imagekit::ImagekitClient;
 use backoffice_utils::extract_env;
 
 use crate::{
-    api::http::extractors::requests::products::{CreateProductRequest, SaveProductRequest},
+    api::http::extractors::products::{CreateProductRequest, SaveProductRequest},
     config::app_config::AppConfig,
     domain::ports::product_repository::ProductRepositoryExt,
     entities::products::Model as Product,

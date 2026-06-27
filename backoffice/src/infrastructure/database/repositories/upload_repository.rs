@@ -5,7 +5,7 @@ use sea_orm::{
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::requests::upload::{CreateUploadRequest, UpdateUploadRequest},
+    api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
     domain::ports::upload_repository::UploadRepositoryExt,
     entities::uploads::{self, Entity as UploadEntity},
     errors::database_error::DatabaseError,

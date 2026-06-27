@@ -1,6 +1,6 @@
 use sea_orm::DatabaseConnection;
 
-use crate::api::http::extractors::requests::marketplace::CreateMarketplaceRequest;
+use crate::api::http::extractors::marketplace::CreateMarketplaceRequest;
 use crate::entities::marketplaces;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;

@@ -3,7 +3,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 
-use crate::api::http::extractors::responses::api_response::ApiResponseBuilder;
+use crate::api::http::dto::api_response::ApiResponseBuilder;
 
 #[derive(Debug, thiserror::Error)]
 pub enum AppFileSystemError {

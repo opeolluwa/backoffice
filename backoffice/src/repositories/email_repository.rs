@@ -5,7 +5,7 @@ use sea_orm::{
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::requests::email::{CreateEmailRequest, UpdateEmailRequest},
+    api::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest},
     domain::ports::email_repository::EmailRepositoryExt,
     entities::emails::{self, Entity as EmailEntity},
     errors::database_error::DatabaseError,

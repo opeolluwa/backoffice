@@ -1,7 +1,7 @@
 use sea_orm::DatabaseConnection;
 
 use crate::{
-    api::http::extractors::requests::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
+    api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     domain::ports::team_repository::TeamRepositoryExt,
     entities::teams,
     errors::service_error::ServiceError,

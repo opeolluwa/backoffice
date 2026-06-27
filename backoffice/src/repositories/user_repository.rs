@@ -2,7 +2,7 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Qu
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::{dto::user::UserDto, requests::auth::CreateUserRequest},
+    api::http::extractors::{auth::CreateUserRequest, user::UserDto},
     domain::ports::user_repository::UserRepositoryTrait,
     entities::users::{self, Entity as UserEntity},
     errors::service_error::ServiceError,

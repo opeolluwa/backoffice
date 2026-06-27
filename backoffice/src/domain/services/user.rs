@@ -1,4 +1,4 @@
-use crate::api::http::extractors::dto::user::UserDto;
+use crate::api::http::extractors::user::UserDto;
 use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::errors::service_error::ServiceError;
 

@@ -5,10 +5,8 @@ use axum::{
 use axum_typed_multipart::TypedMultipart;
 
 use crate::{
-    api::http::extractors::{
-        dto::jwt::Claims, requests::products::CreateProductRequest,
-        responses::api_response::ApiResponse,
-    },
+    api::http::dto::{api_response::ApiResponse, jwt::Claims},
+    api::http::extractors::products::CreateProductRequest,
     entities::products::Model as Product,
     errors::service_error::ServiceError,
     services::product_service::{ProductService, ProductServiceStateExt},

@@ -4,19 +4,14 @@ use crate::infrastructure::mailer::{
     AutoRespondTemplate, EmailRequestBuilder, PasswordResetTemplate, ZeptoMail,
 };
 
-use crate::api::http::extractors::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
+use crate::api::http::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
 use crate::{
-    api::http::extractors::{
-        requests::auth::{
-            CreateUserRequest, ForgottenPasswordRequest, LoginRequest, RefreshTokenRequest,
-            SetNewPasswordRequest, VerifyAccountRequest,
-        },
-        responses::auth::{
-            ForgottenPasswordResponse, LoginResponse, RefreshTokenResponse, SetNewPasswordResponse,
-            VerifyAccountResponse,
-        },
+    api::http::extractors::auth::{
+        CreateUserRequest, ForgottenPasswordRequest, ForgottenPasswordResponse, LoginRequest,
+        LoginResponse, RefreshTokenRequest, RefreshTokenResponse, SetNewPasswordRequest,
+        SetNewPasswordResponse, VerifyAccountRequest, VerifyAccountResponse,
     },
     domain::{
         ports::user_repository::UserRepositoryTrait,
@@ -78,8 +73,7 @@ pub trait AuthenticationServiceTrait {
     fn request_refresh_token(
         &self,
         request: &RefreshTokenRequest,
-    ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>>
-    + Send;
+    ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>> + Send;
 }
 
 impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
@@ -191,7 +185,12 @@ impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
     ) -> Result<SetNewPasswordResponse, AuthenticationServiceError> {
         let new_password = self.user_helper_service.hash_password(&request.password)?;
 
-        if self.repo.find_by_identifier(&claims.identifier).await.is_none() {
+        if self
+            .repo
+            .find_by_identifier(&claims.identifier)
+            .await
+            .is_none()
+        {
             return Err(AuthenticationServiceError::InvalidToken);
         };
 
@@ -207,7 +206,12 @@ impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
         claims: &Claims,
         _request: &VerifyAccountRequest,
     ) -> Result<VerifyAccountResponse, AuthenticationServiceError> {
-        if self.repo.find_by_identifier(&claims.identifier).await.is_none() {
+        if self
+            .repo
+            .find_by_identifier(&claims.identifier)
+            .await
+            .is_none()
+        {
             return Err(AuthenticationServiceError::InvalidToken);
         };
 

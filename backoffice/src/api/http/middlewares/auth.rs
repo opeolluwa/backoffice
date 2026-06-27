@@ -6,7 +6,7 @@ use axum_extra::{
 use jsonwebtoken::{Validation, decode};
 
 use crate::errors::auth_service_error::AuthenticationServiceError;
-use crate::api::http::extractors::dto::jwt::{Claims, Keys};
+use crate::api::http::dto::jwt::{Claims, Keys};
 use crate::shared::extract_env::extract_env;
 
 impl<S> FromRequestParts<S> for Claims
