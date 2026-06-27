@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -6,16 +8,19 @@ use axum::{
 use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::marketplace::CreateMarketplaceRequest,
+    api::state::AppState,
+    domain::services::marketplace::MarketplaceServiceExt,
     entities::marketplaces,
     errors::service_error::ServiceError,
-    services::marketplace_service::{MarketplaceService, MarketplaceServiceExt},
 };
 
 pub async fn create_marketplace(
-    State(marketplace_service): State<MarketplaceService>,
+    State(state): State<Arc<AppState>>,
     request: AuthenticatedRequest<CreateMarketplaceRequest>,
 ) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
-    let marketplace = marketplace_service
+    let marketplace = state
+        .services
+        .marketplace_service
         .create_marketplace(&request.data, &request.claims.identifier)
         .await?;
 
@@ -27,11 +32,13 @@ pub async fn create_marketplace(
 }
 
 pub async fn find_marketplace_by_identifier(
-    State(marketplace_service): State<MarketplaceService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
     Path(marketplace_identifier): axum::extract::Path<String>,
 ) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
-    let marketplace = marketplace_service
+    let marketplace = state
+        .services
+        .marketplace_service
         .find_marketplace_by_identifier(&marketplace_identifier, &claims.identifier)
         .await?;
 
@@ -42,10 +49,12 @@ pub async fn find_marketplace_by_identifier(
 }
 
 pub async fn find_all_marketplaces(
-    State(marketplace_service): State<MarketplaceService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
 ) -> Result<ApiResponse<Vec<marketplaces::Model>>, ServiceError> {
-    let marketplaces = marketplace_service
+    let marketplaces = state
+        .services
+        .marketplace_service
         .find_all_marketplaces(&claims.identifier)
         .await?;
 
@@ -56,10 +65,12 @@ pub async fn find_all_marketplaces(
 }
 
 pub async fn count_marketplaces(
-    State(marketplace_service): State<MarketplaceService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
 ) -> Result<ApiResponse<i64>, ServiceError> {
-    let count = marketplace_service
+    let count = state
+        .services
+        .marketplace_service
         .count_marketplaces(&claims.identifier)
         .await?;
 
@@ -70,11 +81,13 @@ pub async fn count_marketplaces(
 }
 
 pub async fn update_marketplace_by_identifier(
-    State(marketplace_service): State<MarketplaceService>,
+    State(state): State<Arc<AppState>>,
     Path(identifier): Path<String>,
     AuthenticatedRequest { data, claims }: AuthenticatedRequest<CreateMarketplaceRequest>,
 ) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
-    let updated_marketplace = marketplace_service
+    let updated_marketplace = state
+        .services
+        .marketplace_service
         .update_marketplace_by_identifier(&identifier, &data, &claims.identifier)
         .await?;
 
@@ -85,11 +98,13 @@ pub async fn update_marketplace_by_identifier(
 }
 
 pub async fn delete_marketplace_by_identifier(
-    State(marketplace_service): State<MarketplaceService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<()>, ServiceError> {
-    marketplace_service
+    state
+        .services
+        .marketplace_service
         .delete_marketplace_by_identifier(&identifier, &claims.identifier)
         .await?;
 

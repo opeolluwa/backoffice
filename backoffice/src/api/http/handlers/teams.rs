@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -6,16 +8,21 @@ use axum::{
 use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
+    api::state::AppState,
+    domain::services::team::TeamServiceExt,
     entities::teams,
     errors::service_error::ServiceError,
-    services::team_service::{TeamService, TeamServiceExt},
 };
 
 pub async fn create_team_member(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     request: AuthenticatedRequest<CreateTeamMemberRequest>,
 ) -> Result<ApiResponse<teams::Model>, ServiceError> {
-    let member = team_service.create_team_member(&request.data).await?;
+    let member = state
+        .services
+        .team_service
+        .create_team_member(&request.data)
+        .await?;
     Ok(ApiResponse::builder()
         .message("Team member created successfully")
         .status_code(StatusCode::CREATED)
@@ -24,10 +31,10 @@ pub async fn create_team_member(
 }
 
 pub async fn find_all_team_members(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     _claims: Claims,
 ) -> Result<ApiResponse<Vec<teams::Model>>, ServiceError> {
-    let members = team_service.find_all_team_members().await?;
+    let members = state.services.team_service.find_all_team_members().await?;
     Ok(ApiResponse::builder()
         .message("Team members fetched successfully")
         .data(members)
@@ -35,11 +42,13 @@ pub async fn find_all_team_members(
 }
 
 pub async fn find_team_member_by_identifier(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     _claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<teams::Model>, ServiceError> {
-    let member = team_service
+    let member = state
+        .services
+        .team_service
         .find_team_member_by_identifier(&identifier)
         .await?;
     Ok(ApiResponse::builder()
@@ -49,11 +58,15 @@ pub async fn find_team_member_by_identifier(
 }
 
 pub async fn update_team_member(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     Path(identifier): Path<String>,
     AuthenticatedRequest { data, claims: _ }: AuthenticatedRequest<UpdateTeamMemberRequest>,
 ) -> Result<ApiResponse<teams::Model>, ServiceError> {
-    let member = team_service.update_team_member(&identifier, &data).await?;
+    let member = state
+        .services
+        .team_service
+        .update_team_member(&identifier, &data)
+        .await?;
     Ok(ApiResponse::builder()
         .message("Team member updated successfully")
         .data(member)
@@ -61,22 +74,30 @@ pub async fn update_team_member(
 }
 
 pub async fn delete_team_member(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     _claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<()>, ServiceError> {
-    team_service.delete_team_member(&identifier).await?;
+    state
+        .services
+        .team_service
+        .delete_team_member(&identifier)
+        .await?;
     Ok(ApiResponse::builder()
         .message("Team member deleted successfully")
         .build())
 }
 
 pub async fn block_team_member(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     _claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<teams::Model>, ServiceError> {
-    let member = team_service.block_team_member(&identifier, true).await?;
+    let member = state
+        .services
+        .team_service
+        .block_team_member(&identifier, true)
+        .await?;
     Ok(ApiResponse::builder()
         .message("Team member blocked successfully")
         .data(member)
@@ -84,11 +105,15 @@ pub async fn block_team_member(
 }
 
 pub async fn unblock_team_member(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     _claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<teams::Model>, ServiceError> {
-    let member = team_service.block_team_member(&identifier, false).await?;
+    let member = state
+        .services
+        .team_service
+        .block_team_member(&identifier, false)
+        .await?;
     Ok(ApiResponse::builder()
         .message("Team member unblocked successfully")
         .data(member)
@@ -96,10 +121,10 @@ pub async fn unblock_team_member(
 }
 
 pub async fn count_team_members(
-    State(team_service): State<TeamService>,
+    State(state): State<Arc<AppState>>,
     _claims: Claims,
 ) -> Result<ApiResponse<i64>, ServiceError> {
-    let count = team_service.count_team_members().await?;
+    let count = state.services.team_service.count_team_members().await?;
     Ok(ApiResponse::builder()
         .message("Team members counted successfully")
         .data(count)

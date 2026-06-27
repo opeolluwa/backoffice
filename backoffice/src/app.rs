@@ -4,16 +4,18 @@ use std::{
 };
 
 use crate::{
-    api::{load_graphql_routes, load_http_routes, state::AppState},
+    api::{
+        load_graphql_routes, load_http_routes,
+        state::{AppState, GraphQlState},
+    },
     config::{
         app::{create_cors_layer, shutdown_signal},
-        app_config::AppConfig,
-        database::AppDatabase,
+        app_config::load_config,
         logger::AppLogger,
     },
     errors,
     fs::filesystem::AppFileSystem,
-    states::GraphQlState,
+    infrastructure::database::connection::init_db_pool,
 };
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
@@ -42,8 +44,8 @@ async fn graphql_handler(
 }
 
 pub async fn run() -> Result<(), AppError> {
-    let app_config = AppConfig::from_env()?;
-    let db_conn = AppDatabase::init_pool().await?;
+    let app_config = load_config()?;
+    let db_conn = init_db_pool().await?;
     let body_limit_bytes = app_config.body_limit_mb * 1024 * 1024;
     let time_out_duration = Duration::from_secs(10);
 
@@ -56,7 +58,7 @@ pub async fn run() -> Result<(), AppError> {
         db_conn.clone(),
         Some(100),
         app_config.complexity_limit,
-        app_state,
+        app_state.clone(),
     )
     .map_err(|err| AppError::GraphQLError(err.to_string()))?;
 
@@ -65,7 +67,7 @@ pub async fn run() -> Result<(), AppError> {
         endpoint: app_config.endpoint.clone(),
     };
 
-    let http_routes = load_http_routes(db_conn, &app_config);
+    let http_routes = load_http_routes(app_state);
 
     let graphql_router = Router::new()
         .route(

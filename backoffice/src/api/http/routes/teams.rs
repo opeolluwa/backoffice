@@ -1,15 +1,20 @@
+use std::sync::Arc;
+
 use axum::{
     Router,
     routing::{delete, get, post, put},
 };
 
-use crate::api::http::handlers::teams::{
-    block_team_member, count_team_members, create_team_member, delete_team_member,
-    find_all_team_members, find_team_member_by_identifier, unblock_team_member, update_team_member,
+use crate::api::{
+    http::handlers::teams::{
+        block_team_member, count_team_members, create_team_member, delete_team_member,
+        find_all_team_members, find_team_member_by_identifier, unblock_team_member,
+        update_team_member,
+    },
+    state::AppState,
 };
-use crate::states::ServicesState;
 
-pub(super) fn team_routes(state: ServicesState) -> Router {
+pub(super) fn team_routes(state: Arc<AppState>) -> Router {
     let routes = Router::new()
         .route("/", post(create_team_member))
         .route("/", get(find_all_team_members))

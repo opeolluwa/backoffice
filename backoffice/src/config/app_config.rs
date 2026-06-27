@@ -89,3 +89,7 @@ impl AppConfig {
         })
     }
 }
+
+pub fn load_config() -> Result<AppConfig, AppError> {
+    AppConfig::from_env()
+}
