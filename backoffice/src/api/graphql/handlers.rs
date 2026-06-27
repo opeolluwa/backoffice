@@ -8,13 +8,12 @@ use axum::{
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql::http::{GraphQLPlaygroundConfig, playground_source};
 
+use super::query_root;
 use crate::{
     api::state::{AppState, GraphQlState},
     config::app_config::AppConfig,
     errors::app_error::AppError,
 };
-
-use super::query_root;
 
 pub async fn graphql_playground(
     State(GraphQlState { endpoint, .. }): State<GraphQlState>,

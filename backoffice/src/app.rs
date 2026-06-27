@@ -3,6 +3,10 @@ use std::{
     time::Duration,
 };
 
+use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
+use errors::app_error::AppError;
+use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
+
 use crate::{
     api::{load_graphql_router, load_http_routes, state::AppState},
     config::{
@@ -14,9 +18,6 @@ use crate::{
     fs::filesystem::AppFileSystem,
     infrastructure::database::connection::init_db_pool,
 };
-use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
-use errors::app_error::AppError;
-use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
 pub async fn run() -> Result<(), AppError> {
     let app_config = load_config()?;

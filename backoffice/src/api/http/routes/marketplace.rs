@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use axum::routing::{delete, post, put};
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
 
 use crate::api::http::handlers::marketplaces::{
     count_marketplaces, create_marketplace, delete_marketplace_by_identifier,
