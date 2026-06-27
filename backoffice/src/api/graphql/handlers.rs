@@ -35,13 +35,8 @@ pub fn build_router(
     app_config: &AppConfig,
     app_state: AppState,
 ) -> Result<Router, AppError> {
-    let schema = query_root::schema(
-        db_conn,
-        Some(100),
-        app_config.complexity_limit,
-        app_state,
-    )
-    .map_err(|err| AppError::GraphQLError(err.to_string()))?;
+    let schema = query_root::schema(db_conn, Some(100), app_config.complexity_limit, app_state)
+        .map_err(|err| AppError::GraphQLError(err.to_string()))?;
 
     let state = GraphQlState {
         schema,

@@ -1,13 +1,12 @@
 use std::sync::Arc;
 
 use axum::routing::{delete, post, put};
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 
 use crate::api::http::handlers::marketplaces::{
     count_marketplaces, create_marketplace, delete_marketplace_by_identifier,
     find_all_marketplaces, find_marketplace_by_identifier, update_marketplace_by_identifier,
 };
-
 use crate::api::state::{AppState, ServicesState};
 
 pub(super) fn marketplace_routes(state: Arc<AppState>) -> Router {

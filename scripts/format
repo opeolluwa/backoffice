@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+cd backoffice 
+
 # Ensure rustfmt exists
 if ! rustup component list --installed | grep -q rustfmt; then
   echo "Installing rustfmt..."

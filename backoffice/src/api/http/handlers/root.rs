@@ -7,9 +7,7 @@ use crate::api::state::AppState;
 use crate::domain::services::root::RootServiceTrait;
 use crate::errors::app_error::AppError;
 
-pub async fn health_check(
-    State(state): State<Arc<AppState>>,
-) -> Result<ApiResponse<()>, AppError> {
+pub async fn health_check(State(state): State<Arc<AppState>>) -> Result<ApiResponse<()>, AppError> {
     state.services.root_service.health_check()?;
     Ok(ApiResponseBuilder::new()
         .message("service is healthy")

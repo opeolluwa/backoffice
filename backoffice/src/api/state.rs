@@ -2,9 +2,10 @@ use std::sync::Arc;
 
 use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
-use backoffice_email_client::zepto_mailer::ZeptoMail;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
+
+use backoffice_email_client::zepto_mailer::ZeptoMail;
 
 use crate::{
     config::app_config::AppConfig,
