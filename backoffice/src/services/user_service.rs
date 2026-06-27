@@ -4,9 +4,9 @@ use backoffice_email_client::zepto_mailer::ZeptoMail;
 
 use crate::api::http::extractors::user::UserDto;
 use crate::config::app_config::AppConfig;
+use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::errors::service_error::ServiceError;
 use crate::repositories::base::Repository;
-use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::repositories::user_repository::UserRepository;
 
 #[derive(Clone)]

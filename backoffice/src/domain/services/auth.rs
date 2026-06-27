@@ -20,14 +20,13 @@ use crate::{
     errors::auth_service_error::AuthenticationServiceError,
 };
 
-#[derive(Clone)]
 pub struct AuthenticationService<R: UserRepositoryTrait> {
     repo: R,
     user_helper_service: UserHelperService,
     email_client: ZeptoMail,
 }
 
-impl<R: UserRepositoryTrait + Clone> AuthenticationService<R> {
+impl<R: UserRepositoryTrait> AuthenticationService<R> {
     pub fn new(repo: R, email_client: ZeptoMail) -> Self {
         Self {
             repo,
@@ -76,9 +75,7 @@ pub trait AuthenticationServiceTrait {
     ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>> + Send;
 }
 
-impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
-    for AuthenticationService<R>
-{
+impl<R: UserRepositoryTrait + Send + Sync> AuthenticationServiceTrait for AuthenticationService<R> {
     async fn create_user(&self, request: &CreateUserRequest) -> Result<(), ServiceError> {
         if self.repo.find_by_email(&request.email).await.is_some() {
             return Err(DatabaseError::DuplicateEmailForUser.into());

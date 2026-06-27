@@ -5,12 +5,11 @@ use crate::{
     errors::service_error::ServiceError,
 };
 
-#[derive(Clone)]
 pub struct TeamService<R: TeamRepositoryExt> {
     repo: R,
 }
 
-impl<R: TeamRepositoryExt + Clone> TeamService<R> {
+impl<R: TeamRepositoryExt> TeamService<R> {
     pub fn new(repo: R) -> Self {
         Self { repo }
     }
@@ -46,7 +45,7 @@ pub(crate) trait TeamServiceExt {
     async fn count_team_members(&self) -> Result<i64, ServiceError>;
 }
 
-impl<R: TeamRepositoryExt + Clone + Send + Sync> TeamServiceExt for TeamService<R> {
+impl<R: TeamRepositoryExt + Send + Sync> TeamServiceExt for TeamService<R> {
     async fn create_team_member(
         &self,
         request: &CreateTeamMemberRequest,

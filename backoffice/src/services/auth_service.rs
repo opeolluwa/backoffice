@@ -7,18 +7,15 @@ use backoffice_email_client::zepto_mailer::{EmailRequestBuilder, ZeptoMail};
 
 use crate::api::http::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::config::app_config::AppConfig;
+use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
-use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::repositories::base::Repository;
 use crate::{
-    api::http::extractors::{
-        auth::{
-            CreateUserRequest, ForgottenPasswordRequest, LoginRequest, RefreshTokenRequest,
-            SetNewPasswordRequest, VerifyAccountRequest,
-            ForgottenPasswordResponse, LoginResponse, RefreshTokenResponse, SetNewPasswordResponse,
-            VerifyAccountResponse,
-        },
+    api::http::extractors::auth::{
+        CreateUserRequest, ForgottenPasswordRequest, ForgottenPasswordResponse, LoginRequest,
+        LoginResponse, RefreshTokenRequest, RefreshTokenResponse, SetNewPasswordRequest,
+        SetNewPasswordResponse, VerifyAccountRequest, VerifyAccountResponse,
     },
     errors::auth_service_error::AuthenticationServiceError,
     repositories::user_repository::UserRepository,

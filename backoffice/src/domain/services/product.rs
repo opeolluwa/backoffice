@@ -12,12 +12,11 @@ use crate::{
     infrastructure::fs::AppFileSystem,
 };
 
-#[derive(Clone)]
 pub struct ProductService<R: ProductRepositoryExt> {
     repo: R,
 }
 
-impl<R: ProductRepositoryExt + Clone> ProductService<R> {
+impl<R: ProductRepositoryExt> ProductService<R> {
     pub fn new(repo: R) -> Self {
         Self { repo }
     }
@@ -38,7 +37,7 @@ pub(crate) trait ProductServiceStateExt {
     ) -> Result<Product, ServiceError>;
 }
 
-impl<R: ProductRepositoryExt + Clone + Send + Sync> ProductServiceStateExt for ProductService<R> {
+impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductService<R> {
     async fn add_product(
         &self,
         TypedMultipart(CreateProductRequest {

@@ -1,10 +1,8 @@
 use sea_orm::DatabaseConnection;
 
 use crate::{
-    domain::ports::country_repository::CountryRepositoryExt,
-    entities::countries,
-    errors::service_error::ServiceError,
-    repositories::base::Repository,
+    domain::ports::country_repository::CountryRepositoryExt, entities::countries,
+    errors::service_error::ServiceError, repositories::base::Repository,
     repositories::country_repository::CountryRepository,
 };
 

@@ -3,12 +3,11 @@ use crate::domain::ports::marketplace_repository::MarketplaceRepositoryExt;
 use crate::entities::marketplaces;
 use crate::errors::service_error::ServiceError;
 
-#[derive(Clone)]
 pub struct MarketplaceService<R: MarketplaceRepositoryExt> {
     repo: R,
 }
 
-impl<R: MarketplaceRepositoryExt + Clone> MarketplaceService<R> {
+impl<R: MarketplaceRepositoryExt> MarketplaceService<R> {
     pub fn new(repo: R) -> Self {
         Self { repo }
     }
@@ -48,9 +47,7 @@ pub(crate) trait MarketplaceServiceExt {
     async fn count_marketplaces(&self, user_identifier: &str) -> Result<i64, ServiceError>;
 }
 
-impl<R: MarketplaceRepositoryExt + Clone + Send + Sync> MarketplaceServiceExt
-    for MarketplaceService<R>
-{
+impl<R: MarketplaceRepositoryExt + Send + Sync> MarketplaceServiceExt for MarketplaceService<R> {
     async fn create_marketplace(
         &self,
         request: &CreateMarketplaceRequest,

@@ -11,10 +11,7 @@ use crate::{
     entities::products::Model as Product,
     errors::{app_error::AppError, service_error::ServiceError},
     fs::filesystem::AppFileSystem,
-    repositories::{
-        base::Repository,
-        product_repository::ProductRepository,
-    },
+    repositories::{base::Repository, product_repository::ProductRepository},
 };
 
 #[derive(Clone)]

@@ -5,10 +5,7 @@ use crate::{
     domain::ports::team_repository::TeamRepositoryExt,
     entities::teams,
     errors::service_error::ServiceError,
-    repositories::{
-        base::Repository,
-        team_repository::TeamRepository,
-    },
+    repositories::{base::Repository, team_repository::TeamRepository},
 };
 
 #[derive(Clone)]

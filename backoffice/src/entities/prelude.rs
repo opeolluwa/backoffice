@@ -3,6 +3,7 @@
 pub use super::activities::Entity as Activities;
 pub use super::admin_users::Entity as AdminUsers;
 pub use super::app_config::Entity as AppConfig;
+pub use super::backoffice_server_migrations::Entity as BackofficeServerMigrations;
 pub use super::countries::Entity as Countries;
 pub use super::emails::Entity as Emails;
 pub use super::marketplaces::Entity as Marketplaces;
@@ -12,4 +13,3 @@ pub use super::teams::Entity as Teams;
 pub use super::uploads::Entity as Uploads;
 pub use super::user_roles::Entity as UserRoles;
 pub use super::users::Entity as Users;
-pub use super::backoffice_server_migrations::Entity as BackofficeServerMigrations;

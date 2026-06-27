@@ -3,6 +3,7 @@
 pub mod activities;
 pub mod admin_users;
 pub mod app_config;
+pub mod backoffice_server_migrations;
 pub mod countries;
 pub mod emails;
 pub mod marketplaces;
@@ -13,7 +14,6 @@ pub mod teams;
 pub mod uploads;
 pub mod user_roles;
 pub mod users;
-pub mod backoffice_server_migrations;
 
 seaography::register_entity_modules!([
     activities,
