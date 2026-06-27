@@ -1,6 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse};
 
-use crate::{api::http::extractors::responses::api_response::ApiResponseBuilder, errors::app_error::AppError};
+use crate::{api::http::dto::api_response::ApiResponseBuilder, errors::app_error::AppError};
 
 #[derive(Debug, thiserror::Error)]
 pub enum AuthenticationError {

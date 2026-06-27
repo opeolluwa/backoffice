@@ -8,7 +8,7 @@ use crate::shared::extract_env::extract_env;
 
 extern crate dotenv;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AppConfig {
     pub database_url: String,
     pub max_db_connections: u32,
@@ -88,4 +88,8 @@ impl AppConfig {
             complexity_limit,
         })
     }
+}
+
+pub fn load_config() -> Result<AppConfig, AppError> {
+    AppConfig::from_env()
 }

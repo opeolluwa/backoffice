@@ -8,7 +8,7 @@ use sea_orm::{
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::requests::marketplace::CreateMarketplaceRequest,
+    api::http::extractors::marketplace::CreateMarketplaceRequest,
     domain::ports::marketplace_repository::MarketplaceRepositoryExt,
     entities::marketplaces::{self, Entity as MarketplaceEntity},
     errors::database_error::DatabaseError,

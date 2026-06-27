@@ -1,5 +1,5 @@
 use crate::{
-    api::http::extractors::{dto::user::UserDto, requests::auth::CreateUserRequest},
+    api::http::extractors::{auth::CreateUserRequest, user::UserDto},
     entities::users,
     errors::service_error::ServiceError,
 };

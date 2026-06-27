@@ -1,5 +1,5 @@
 use crate::{
-    api::http::extractors::requests::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
+    api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     entities::teams,
     errors::database_error::DatabaseError,
 };

@@ -1,4 +1,5 @@
 pub mod api;
+pub mod app;
 pub mod cli;
 pub mod config;
 pub mod domain;
@@ -6,10 +7,5 @@ pub mod entities;
 pub mod errors;
 pub mod fs;
 pub mod infrastructure;
-pub mod macros;
-pub mod middlewares;
-pub mod repositories;
-pub mod services;
 pub mod shared;
-pub mod states;
 mod utils;

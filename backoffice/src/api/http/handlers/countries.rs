@@ -1,15 +1,18 @@
+use std::sync::Arc;
+
 use axum::extract::{Path, State};
 
 use crate::{
-    api::http::extractors::responses::api_response::ApiResponse, entities::countries,
-    errors::service_error::ServiceError, services::country_service::CountryService,
-    services::country_service::CountryServiceExt,
+    api::{http::dto::api_response::ApiResponse, state::AppState},
+    domain::services::country::CountryServiceExt,
+    entities::countries,
+    errors::service_error::ServiceError,
 };
 
 pub async fn fetch_all_countries(
-    State(country_service): State<CountryService>,
+    State(state): State<Arc<AppState>>,
 ) -> Result<ApiResponse<Vec<countries::Model>>, ServiceError> {
-    let countries = country_service.get_all_countries().await?;
+    let countries = state.services.country_service.get_all_countries().await?;
 
     Ok(ApiResponse::builder()
         .message("Countries fetched successfully")
@@ -18,10 +21,12 @@ pub async fn fetch_all_countries(
 }
 
 pub async fn fetch_country_by_identifier(
-    State(country_service): State<CountryService>,
+    State(state): State<Arc<AppState>>,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<Option<countries::Model>>, ServiceError> {
-    let country = country_service
+    let country = state
+        .services
+        .country_service
         .get_country_by_identifier(&identifier)
         .await?;
 

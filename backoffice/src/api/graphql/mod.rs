@@ -1,4 +1,6 @@
+pub mod handlers;
 mod mutations;
 mod queries;
-mod types;
 pub mod query_root;
+mod types;
+pub use handlers::build_router;

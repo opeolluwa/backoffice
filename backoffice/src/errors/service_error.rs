@@ -4,7 +4,7 @@ use axum::{http::StatusCode, response::IntoResponse};
 
 use backoffice_imagekit::ImagekitError;
 
-use crate::api::http::extractors::responses::api_response::ApiResponseBuilder;
+use crate::api::http::dto::api_response::ApiResponseBuilder;
 use crate::errors::app_error::AppError;
 use crate::errors::authentication_error::AuthenticationError;
 use crate::errors::database_error::DatabaseError;

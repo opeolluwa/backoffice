@@ -1,15 +1,13 @@
 use crate::{
-    domain::ports::country_repository::CountryRepositoryExt,
-    entities::countries,
+    domain::ports::country_repository::CountryRepositoryExt, entities::countries,
     errors::service_error::ServiceError,
 };
 
-#[derive(Clone)]
 pub struct CountryService<R: CountryRepositoryExt> {
     repo: R,
 }
 
-impl<R: CountryRepositoryExt + Clone> CountryService<R> {
+impl<R: CountryRepositoryExt> CountryService<R> {
     pub fn new(repo: R) -> Self {
         Self { repo }
     }
@@ -24,7 +22,7 @@ pub(crate) trait CountryServiceExt {
     ) -> Result<Option<countries::Model>, ServiceError>;
 }
 
-impl<R: CountryRepositoryExt + Clone + Send + Sync> CountryServiceExt for CountryService<R> {
+impl<R: CountryRepositoryExt + Send + Sync> CountryServiceExt for CountryService<R> {
     async fn get_all_countries(&self) -> Result<Vec<countries::Model>, ServiceError> {
         self.repo
             .fetch_all_countries()

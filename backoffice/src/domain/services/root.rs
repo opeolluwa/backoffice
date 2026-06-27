@@ -1,6 +1,5 @@
 use crate::errors::app_error::AppError;
 
-#[derive(Clone)]
 pub struct RootService {}
 
 impl RootService {

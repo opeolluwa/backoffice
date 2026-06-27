@@ -1,16 +1,19 @@
+use std::sync::Arc;
+
 use axum::{
     Router,
     routing::{get, post},
 };
 
-use crate::api::http::handlers::auth::{
-    create_account, forgotten_password, login, request_refresh_token, set_new_password,
-    verify_account,
+use crate::api::{
+    http::handlers::auth::{
+        create_account, forgotten_password, login, request_refresh_token, set_new_password,
+        verify_account,
+    },
+    state::AppState,
 };
 
-use crate::states::ServicesState;
-
-pub(super) fn authentication_routes(state: ServicesState) -> Router {
+pub(super) fn authentication_routes(state: Arc<AppState>) -> Router {
     Router::new()
         .route("/signup", post(create_account))
         .route("/login", post(login))

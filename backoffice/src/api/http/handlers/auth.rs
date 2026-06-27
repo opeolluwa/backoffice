@@ -1,63 +1,73 @@
+use std::sync::Arc;
+
 use axum::extract::State;
 use axum::http::StatusCode;
 
-use crate::api::http::extractors::dto::jwt::Claims;
-use crate::api::http::extractors::requests::auth::VerifyAccountRequest;
-use crate::api::http::extractors::responses::api_response::ApiResponseBuilder;
-use crate::api::http::extractors::responses::auth::{ForgottenPasswordResponse, RefreshTokenResponse};
-use crate::middlewares::validator::ValidatedRequest;
+use crate::api::http::dto::api_response::ApiResponseBuilder;
+use crate::api::http::dto::jwt::Claims;
+use crate::api::http::extractors::auth::VerifyAccountRequest;
+use crate::api::http::extractors::auth::{ForgottenPasswordResponse, RefreshTokenResponse};
+use crate::api::http::middlewares::validator::ValidatedRequest;
+use crate::api::state::AppState;
 use crate::{
-    api::http::extractors::{
-        requests::auth::{
-            CreateUserRequest, ForgottenPasswordRequest, LoginRequest, SetNewPasswordRequest,
-        },
-        responses::{
-            api_response::ApiResponse,
-            auth::{CreateUserResponse, LoginResponse, VerifyAccountResponse},
-        },
+    api::http::dto::api_response::ApiResponse,
+    api::http::extractors::auth::{
+        CreateUserRequest, CreateUserResponse, ForgottenPasswordRequest, LoginRequest,
+        LoginResponse, SetNewPasswordRequest, VerifyAccountResponse,
     },
+    domain::services::auth::AuthenticationServiceTrait,
     errors::auth_service_error::AuthenticationServiceError,
-    services::auth_service::{AuthenticationService, AuthenticationServiceTrait},
 };
 
 pub async fn create_account(
-    State(auth_service): State<AuthenticationService>,
+    State(state): State<Arc<AppState>>,
     ValidatedRequest(request): ValidatedRequest<CreateUserRequest>,
 ) -> Result<ApiResponse<CreateUserResponse>, AuthenticationServiceError> {
-    auth_service.create_user(&request).await?;
+    state.services.auth_service.create_user(&request).await?;
 
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::CREATED)
         .message("Account created successfully")
         .build())
 }
+
 pub async fn login(
-    State(auth_service): State<AuthenticationService>,
+    State(state): State<Arc<AppState>>,
     ValidatedRequest(request): ValidatedRequest<LoginRequest>,
 ) -> Result<ApiResponse<LoginResponse>, AuthenticationServiceError> {
-    let login_response = auth_service.login(&request).await?;
+    let login_response = state.services.auth_service.login(&request).await?;
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::OK)
         .data(login_response)
         .message("logged in successfully")
         .build())
 }
+
 pub async fn verify_account(
-    State(auth_service): State<AuthenticationService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
     ValidatedRequest(request): ValidatedRequest<VerifyAccountRequest>,
 ) -> Result<ApiResponse<VerifyAccountResponse>, AuthenticationServiceError> {
-    let verify_account_response = auth_service.verify_account(&claims, &request).await?;
+    let verify_account_response = state
+        .services
+        .auth_service
+        .verify_account(&claims, &request)
+        .await?;
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::OK)
         .data(verify_account_response)
         .build())
 }
+
 pub async fn forgotten_password(
-    State(auth_service): State<AuthenticationService>,
+    State(state): State<Arc<AppState>>,
     ValidatedRequest(request): ValidatedRequest<ForgottenPasswordRequest>,
 ) -> Result<ApiResponse<ForgottenPasswordResponse>, AuthenticationServiceError> {
-    let forgotten_password_response = auth_service.forgotten_password(&request).await?;
+    let forgotten_password_response = state
+        .services
+        .auth_service
+        .forgotten_password(&request)
+        .await?;
 
     Ok(ApiResponseBuilder::new()
         .data(forgotten_password_response)
@@ -66,11 +76,15 @@ pub async fn forgotten_password(
 }
 
 pub async fn set_new_password(
-    State(auth_service): State<AuthenticationService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
     ValidatedRequest(request): ValidatedRequest<SetNewPasswordRequest>,
 ) -> Result<ApiResponse<()>, AuthenticationServiceError> {
-    let _ = auth_service.set_new_password(&request, &claims).await?;
+    let _ = state
+        .services
+        .auth_service
+        .set_new_password(&request, &claims)
+        .await?;
 
     Ok(ApiResponseBuilder::new()
         .data(())
@@ -79,10 +93,14 @@ pub async fn set_new_password(
 }
 
 pub async fn request_refresh_token(
-    State(auth_service): State<AuthenticationService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
 ) -> Result<ApiResponse<RefreshTokenResponse>, AuthenticationServiceError> {
-    let refresh_token_response = auth_service.request_refresh_token(&claims).await?;
+    let refresh_token_response = state
+        .services
+        .auth_service
+        .request_refresh_token(&claims)
+        .await?;
 
     Ok(ApiResponseBuilder::new()
         .data(refresh_token_response)

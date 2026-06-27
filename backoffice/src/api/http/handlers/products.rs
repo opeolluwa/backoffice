@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -5,22 +7,23 @@ use axum::{
 use axum_typed_multipart::TypedMultipart;
 
 use crate::{
-    api::http::extractors::{
-        dto::jwt::Claims, requests::products::CreateProductRequest,
-        responses::api_response::ApiResponse,
-    },
+    api::http::dto::{api_response::ApiResponse, jwt::Claims},
+    api::http::extractors::products::CreateProductRequest,
+    api::state::AppState,
+    domain::services::product::ProductServiceStateExt,
     entities::products::Model as Product,
     errors::service_error::ServiceError,
-    services::product_service::{ProductService, ProductServiceStateExt},
 };
 
 pub async fn add_product_to_marketplace(
-    State(product_service): State<ProductService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
     Path(marketplace_identifier): Path<String>,
     request: TypedMultipart<CreateProductRequest>,
 ) -> Result<ApiResponse<Product>, ServiceError> {
-    let product = product_service
+    let product = state
+        .services
+        .product_service
         .add_product(request, &claims.identifier, &marketplace_identifier)
         .await?;
 
@@ -32,11 +35,13 @@ pub async fn add_product_to_marketplace(
 }
 
 pub async fn retrieve_product_from_marketplace(
-    State(product_service): State<ProductService>,
+    State(state): State<Arc<AppState>>,
     claims: Claims,
     Path(product_identifier): Path<String>,
 ) -> Result<ApiResponse<Product>, ServiceError> {
-    let product = product_service
+    let product = state
+        .services
+        .product_service
         .fetch_product(&product_identifier, &claims.identifier)
         .await?;
 
@@ -45,18 +50,3 @@ pub async fn retrieve_product_from_marketplace(
         .message("marketplace product")
         .build())
 }
-
-// pub async fn fetch_product_from_marketplace(
-//     State(product_service): State<ProductService>,
-//     Path(marketplace_identifier): Path<String>,
-//     claims: Claims,
-// ) -> Result<ApiResponse<MarketplaceWithProducts>, ServiceError> {
-//     let marketplace_with_products = product_service
-//         .fetch_marketplace_products(&marketplace_identifier, &claims.identifier)
-//         .await?;
-
-//     Ok(ApiResponse::builder()
-//         .data(marketplace_with_products)
-//         .message("marketplace with products")
-//         .build())
-// }

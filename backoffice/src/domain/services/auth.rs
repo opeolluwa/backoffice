@@ -1,22 +1,16 @@
 use askama::Template;
 
+use crate::api::http::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
+use crate::errors::database_error::DatabaseError;
+use crate::errors::service_error::ServiceError;
 use crate::infrastructure::mailer::{
     AutoRespondTemplate, EmailRequestBuilder, PasswordResetTemplate, ZeptoMail,
 };
-
-use crate::api::http::extractors::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
-use crate::errors::database_error::DatabaseError;
-use crate::errors::service_error::ServiceError;
 use crate::{
-    api::http::extractors::{
-        requests::auth::{
-            CreateUserRequest, ForgottenPasswordRequest, LoginRequest, RefreshTokenRequest,
-            SetNewPasswordRequest, VerifyAccountRequest,
-        },
-        responses::auth::{
-            ForgottenPasswordResponse, LoginResponse, RefreshTokenResponse, SetNewPasswordResponse,
-            VerifyAccountResponse,
-        },
+    api::http::extractors::auth::{
+        CreateUserRequest, ForgottenPasswordRequest, ForgottenPasswordResponse, LoginRequest,
+        LoginResponse, RefreshTokenRequest, RefreshTokenResponse, SetNewPasswordRequest,
+        SetNewPasswordResponse, VerifyAccountRequest, VerifyAccountResponse,
     },
     domain::{
         ports::user_repository::UserRepositoryTrait,
@@ -25,14 +19,13 @@ use crate::{
     errors::auth_service_error::AuthenticationServiceError,
 };
 
-#[derive(Clone)]
 pub struct AuthenticationService<R: UserRepositoryTrait> {
     repo: R,
     user_helper_service: UserHelperService,
     email_client: ZeptoMail,
 }
 
-impl<R: UserRepositoryTrait + Clone> AuthenticationService<R> {
+impl<R: UserRepositoryTrait> AuthenticationService<R> {
     pub fn new(repo: R, email_client: ZeptoMail) -> Self {
         Self {
             repo,
@@ -78,13 +71,10 @@ pub trait AuthenticationServiceTrait {
     fn request_refresh_token(
         &self,
         request: &RefreshTokenRequest,
-    ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>>
-    + Send;
+    ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>> + Send;
 }
 
-impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
-    for AuthenticationService<R>
-{
+impl<R: UserRepositoryTrait + Send + Sync> AuthenticationServiceTrait for AuthenticationService<R> {
     async fn create_user(&self, request: &CreateUserRequest) -> Result<(), ServiceError> {
         if self.repo.find_by_email(&request.email).await.is_some() {
             return Err(DatabaseError::DuplicateEmailForUser.into());
@@ -191,7 +181,12 @@ impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
     ) -> Result<SetNewPasswordResponse, AuthenticationServiceError> {
         let new_password = self.user_helper_service.hash_password(&request.password)?;
 
-        if self.repo.find_by_identifier(&claims.identifier).await.is_none() {
+        if self
+            .repo
+            .find_by_identifier(&claims.identifier)
+            .await
+            .is_none()
+        {
             return Err(AuthenticationServiceError::InvalidToken);
         };
 
@@ -207,7 +202,12 @@ impl<R: UserRepositoryTrait + Clone + Send + Sync> AuthenticationServiceTrait
         claims: &Claims,
         _request: &VerifyAccountRequest,
     ) -> Result<VerifyAccountResponse, AuthenticationServiceError> {
-        if self.repo.find_by_identifier(&claims.identifier).await.is_none() {
+        if self
+            .repo
+            .find_by_identifier(&claims.identifier)
+            .await
+            .is_none()
+        {
             return Err(AuthenticationServiceError::InvalidToken);
         };
 

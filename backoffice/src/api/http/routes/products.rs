@@ -1,10 +1,14 @@
+use std::sync::Arc;
+
 use axum::Router;
 use axum::routing::{get, post};
 
-use crate::api::http::handlers::products::{add_product_to_marketplace, retrieve_product_from_marketplace};
-use crate::states::ServicesState;
+use crate::api::http::handlers::products::{
+    add_product_to_marketplace, retrieve_product_from_marketplace,
+};
+use crate::api::state::AppState;
 
-pub(super) fn product_routes(state: ServicesState) -> Router {
+pub(super) fn product_routes(state: Arc<AppState>) -> Router {
     Router::new()
         .route("/", post(add_product_to_marketplace))
         // .route("/", get(fetch_product_from_marketplace))
