@@ -4,10 +4,7 @@ use std::{
 };
 
 use crate::{
-    api::{
-        load_graphql_routes, load_http_routes,
-        state::{AppState, GraphQlState},
-    },
+    api::{load_graphql_router, load_http_routes, state::AppState},
     config::{
         app::{create_cors_layer, shutdown_signal},
         app_config::load_config,
@@ -17,31 +14,9 @@ use crate::{
     fs::filesystem::AppFileSystem,
     infrastructure::database::connection::init_db_pool,
 };
-use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
-use axum::{
-    Router,
-    extract::{DefaultBodyLimit, State},
-    http::StatusCode,
-    response::{self, IntoResponse},
-    routing::get,
-};
+use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
 use errors::app_error::AppError;
-use seaography::async_graphql::http::{GraphQLPlaygroundConfig, playground_source};
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
-
-async fn graphql_playground(
-    State(GraphQlState { endpoint, .. }): State<GraphQlState>,
-) -> impl IntoResponse {
-    response::Html(playground_source(GraphQLPlaygroundConfig::new(&endpoint)))
-}
-
-async fn graphql_handler(
-    State(GraphQlState { schema, .. }): State<GraphQlState>,
-    req: GraphQLRequest,
-) -> GraphQLResponse {
-    let req = req.into_inner();
-    schema.execute(req).await.into()
-}
 
 pub async fn run() -> Result<(), AppError> {
     let app_config = load_config()?;
@@ -54,27 +29,8 @@ pub async fn run() -> Result<(), AppError> {
 
     let app_state = AppState::new(&db_conn)?;
 
-    let schema = load_graphql_routes(
-        db_conn.clone(),
-        Some(100),
-        app_config.complexity_limit,
-        app_state.clone(),
-    )
-    .map_err(|err| AppError::GraphQLError(err.to_string()))?;
-
-    let graphql_state = GraphQlState {
-        schema,
-        endpoint: app_config.endpoint.clone(),
-    };
-
+    let graphql_router = load_graphql_router(db_conn, &app_config, app_state.clone())?;
     let http_routes = load_http_routes(app_state);
-
-    let graphql_router = Router::new()
-        .route(
-            &app_config.endpoint,
-            get(graphql_playground).post(graphql_handler),
-        )
-        .with_state(graphql_state);
 
     let app = Router::new()
         .merge(graphql_router)
