@@ -18,7 +18,6 @@ dist/
 .nuxt/
 .output/
 out/
-assets/
 
 # Environment files
 .env

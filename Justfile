@@ -10,14 +10,25 @@ alias b:= build
 alias l:= logs
 alias install := install-dependencies
 alias r:= restart
+alias cfg:= copy-env
 
 
-set dotenv-required
+@copy-env:
+    {{ if os_family() == "windows" { "Copy-Item -Path '.env.example' -Destination '.env' -Force" } else { "cp .env.example .env" } }}
+
+set shell := if os_family() == "windows" {
+  ["powershell.exe", "-NoProfile", "-Command", "-"]
+} else {
+  ["sh", "-cu"]
+}
+
+
+set dotenv-required := false
 set dotenv-load := true
 set dotenv-path := "./backoffice/.env"
 set export :=  true
 
-FRONTEND_DIR:='frontend'
+FRONTEND_DIR:='backoffice-web'
 DOCKER_CMD := "docker compose -f docker-compose.yaml"
 DEV_DB_URL:="postgres://backoffice:backoffice@localhost:6543/backoffice"
 
@@ -26,16 +37,16 @@ DEV_DB_URL:="postgres://backoffice:backoffice@localhost:6543/backoffice"
 
 
 
-[working-directory :'frontend']
+[working-directory :'backoffice-web']
 @run-frontend:
     npm run dev
 
 
-[working-directory :'frontend']
+[working-directory :'backoffice-web']
 @build-frontend:
     npm run generate
-    rm -rf ../assets
-    cp  -r .output/public ../assets
+    {{ if os_family() == "windows" { "Remove-Item -Recurse -Force ../assets" } else { "rm -rf ../assets" } }}
+    {{ if os_family() == "windows" { "Copy-Item -Recurse .output/public ../assets" } else { "cp -r .output/public ../assets" } }}
 
 
 run:
@@ -45,10 +56,10 @@ run:
 
 
 lint:
-    cd {{FRONTEND_DIR}} && npm run lint 
-    cargo sort -w 
+    {{ if os_family() == "windows" { "Set-Location " + FRONTEND_DIR + "; if ($?) { npm run lint }" } else { "cd " + FRONTEND_DIR + " && npm run lint" } }}
+    cargo sort -w
     cargo group-imports --fix
-    cargo fmt 
+    cargo fmt
 
 test:
     cargo test
