@@ -41,36 +41,9 @@
       class="relative z-10 w-1/3 min-w-80 mx-auto px-4 overflow-y-auto max-h-screen py-10"
     >
       <div
-        class="bg-white border border-gray-100 rounded-2xl px-8 py-10 shadow-lg dark:bg-brand-dark-600/80 dark:backdrop-blur-md dark:border-white/8 dark:shadow-2xl"
+        class="bg-white border border-gray-100 rounded-2xl px-8 py-10 shadow-sm dark:bg-brand-dark-600/80 dark:backdrop-blur-md dark:border-white/8"
       >
-        <!-- Brand mark -->
-        <div class="flex items-center justify-center gap-2.5 mb-8">
-          <div class="w-7 h-7 shrink-0">
-            <svg
-              viewBox="0 0 120 90"
-              fill="none"
-              class="w-full h-full text-brand"
-              stroke="currentColor"
-              stroke-width="14"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <polyline points="8,8 38,78 60,32 82,78 112,8" />
-            </svg>
-          </div>
-          <div>
-            <p
-              class="font-bold text-gray-900 text-[15px] leading-tight tracking-tight dark:text-white"
-            >
-              Backoffice
-            </p>
-            <p
-              class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5 dark:text-white/30"
-            >
-              Agro · Veterinary
-            </p>
-          </div>
-        </div>
+
 
         <!-- Page content -->
         <slot />

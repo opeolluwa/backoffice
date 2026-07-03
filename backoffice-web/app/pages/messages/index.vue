@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Email } from "../../../../bindings/Email";
+import type { Email } from "@bindings/Email";
 import { useEmailStore } from "~/stores/emails";
 
 definePageMeta({

@@ -1,5 +1,5 @@
 import api from "~/plugin/api";
-import type { MarketPlace } from "../../../bindings/MarketPlace";
+import type { MarketPlace } from "@bindings/Marketplace";
 
 const useMarketplaceStore = defineStore("marketplace", {
   state: () => ({

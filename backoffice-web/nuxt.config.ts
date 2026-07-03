@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["./app/assets/css/main.css"],
+  alias: {
+    "@bindings": "./../backoffice/bindings",
+  },
   vite: {
     plugins: [tailwindcss()],
   },
@@ -13,7 +16,7 @@ export default defineNuxtConfig({
     pageTransition: { name: "slide-left", mode: "out-in" },
   },
   colorMode: {
-    preference: "light",
+    preference: "dark",
     fallback: "light",
     classSuffix: "",
   },

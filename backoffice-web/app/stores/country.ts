@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import api from "~/plugin/api";
 
-import type { Country } from "../../../bindings/Country";
+import type { Country } from "@bindings/Country";
 
 export const useCountryStore = defineStore("locale_store", {
   state: () => ({
