@@ -50,8 +50,8 @@
       </div>
 
       <!-- Footer -->
-      <p class="text-center text-[11px] text-gray-400 mt-6 dark:text-white/20">
-        &copy; {{ new Date().getFullYear() }} backoffice. All rights reserved.
+      <p class="text-center text-[11px] text-gray-400 mt-6 dark:text-white/20 ">
+      Powered by <a href="https://github.com/opeolluwa/backoffice" target="_blank" class="underline font-medium">Backoffice</a> 
       </p>
     </div>
   </div>
