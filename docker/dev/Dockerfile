@@ -21,7 +21,7 @@ RUN cargo install cargo-watch
 
 WORKDIR /app
 
-COPY ./backoffice/* .
+COPY ./backoffice .
 
 RUN cargo build
 
