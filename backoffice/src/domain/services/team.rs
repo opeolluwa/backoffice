@@ -1,7 +1,7 @@
 use crate::{
     api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     domain::ports::team_repository::TeamRepositoryExt,
-    entities::teams,
+    domain::models::teams,
     errors::service_error::ServiceError,
 };
 

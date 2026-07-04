@@ -5,7 +5,7 @@ use ulid::Ulid;
 use crate::{
     api::http::extractors::products::SaveProductRequest,
     domain::ports::product_repository::ProductRepositoryExt,
-    entities::{
+    domain::models::{
         countries,
         marketplaces::{self, Entity as MarketplaceEntity},
         products::{self, Entity as ProductEntity},

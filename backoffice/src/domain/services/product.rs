@@ -7,9 +7,9 @@ use crate::{
     api::http::extractors::products::{CreateProductRequest, SaveProductRequest},
     config::app_config::AppConfig,
     domain::ports::product_repository::ProductRepositoryExt,
-    entities::products::Model as Product,
+    domain::models::products::Model as Product,
     errors::{app_error::AppError, service_error::ServiceError},
-    infrastructure::fs::AppFileSystem,
+    // infrastructure::fs::AppFileSystem,
 };
 
 pub struct ProductService<R: ProductRepositoryExt> {
@@ -59,29 +59,31 @@ impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductSe
             ImagekitClient::new(&public_key, &private_key).map_err(ServiceError::from)?;
 
         let config = AppConfig::from_env()?;
-        let file_system = AppFileSystem::new(&config)?;
+        // let file_system = AppFileSystem::new(&config)?;
 
-        let file = file_system.save_file_to_disk(picture)?;
+        // let file = file_system.save_file_to_disk(picture)?;
 
-        let upload_response = imagekit_client
-            .upload_file(file.file_path.clone(), &file.file_name)
-            .await?;
+        // let upload_response = imagekit_client
+        //     .upload_file(file.file_path.clone(), &file.file_name)
+        //     .await?;
 
-        let save_product = SaveProductRequest {
-            picture: upload_response.url,
-            name,
-            description,
-            price,
-            currency_identifier,
-        };
+        // let save_product = SaveProductRequest {
+        //     picture: "upload_response.url".to_string(), // Replace with the actual URL from the upload response
+        //     name,
+        //     description,
+        //     price,
+        //     currency_identifier,
+        // };
 
-        let product = self
-            .repo
-            .create_product(&save_product, user_identifier, marketplace_identifier)
-            .await?;
+        // let product = self
+        //     .repo
+        //     .create_product(&save_product, user_identifier, marketplace_identifier)
+        //     .await?;
 
-        file_system.delete_file_if_exists(file.file_path.to_str().unwrap())?;
-        Ok(product)
+        // file_system.delete_file_if_exists(file.file_path.to_str().unwrap())?;
+        // Ok(product)
+
+        todo!("implement file upload")
     }
 
     async fn fetch_product(

@@ -1,4 +1,4 @@
-use crate::{entities::countries, errors::database_error::DatabaseError};
+use crate::{domain::models::countries, errors::database_error::DatabaseError};
 
 pub(crate) trait CountryRepositoryExt {
     async fn fetch_all_countries(&self) -> Result<Vec<countries::Model>, DatabaseError>;

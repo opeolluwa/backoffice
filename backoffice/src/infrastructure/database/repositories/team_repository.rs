@@ -4,7 +4,7 @@ use ulid::Ulid;
 use crate::{
     api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     domain::ports::team_repository::TeamRepositoryExt,
-    entities::teams::{self, Entity as TeamEntity},
+    domain::models::teams::{self, Entity as TeamEntity},
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };

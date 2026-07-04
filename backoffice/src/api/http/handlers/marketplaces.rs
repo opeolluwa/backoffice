@@ -10,7 +10,7 @@ use crate::{
     api::http::extractors::marketplace::CreateMarketplaceRequest,
     api::state::AppState,
     domain::services::marketplace::MarketplaceServiceExt,
-    entities::marketplaces,
+    domain::models::marketplaces,
     errors::service_error::ServiceError,
 };
 

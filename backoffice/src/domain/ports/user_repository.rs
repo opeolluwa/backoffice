@@ -1,6 +1,6 @@
 use crate::{
     api::http::extractors::{auth::CreateUserRequest, user::UserDto},
-    entities::users,
+    domain::models::users,
     errors::service_error::ServiceError,
 };
 

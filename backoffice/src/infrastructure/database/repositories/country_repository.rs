@@ -2,7 +2,7 @@ use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
 use crate::{
     domain::ports::country_repository::CountryRepositoryExt,
-    entities::countries::{self, Entity as CountryEntity},
+    domain::models::countries::{self, Entity as CountryEntity},
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };

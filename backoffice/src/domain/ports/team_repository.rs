@@ -1,6 +1,6 @@
 use crate::{
     api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
-    entities::teams,
+    domain::models::teams,
     errors::database_error::DatabaseError,
 };
 

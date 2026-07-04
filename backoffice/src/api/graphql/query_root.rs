@@ -3,7 +3,7 @@ use sea_orm::DatabaseConnection;
 use seaography::{Builder, BuilderContext, async_graphql, lazy_static::lazy_static};
 
 use super::mutations;
-use crate::{api::state::AppState, entities::*};
+use crate::{api::state::AppState, domain::models::*};
 
 lazy_static! {
     static ref CONTEXT: BuilderContext = BuilderContext::default();
