@@ -1,5 +1,5 @@
 import api from "~/plugin/api";
-import type { Email } from "../../../bindings/Email";
+import type { Email } from "@bindings/Email";
 
 const useEmailStore = defineStore("emails", {
   state: () => ({

@@ -5,7 +5,7 @@ use axum::extract::{Path, State};
 use crate::{
     api::{http::dto::api_response::ApiResponse, state::AppState},
     domain::services::country::CountryServiceExt,
-    entities::countries,
+    domain::models::countries,
     errors::service_error::ServiceError,
 };
 

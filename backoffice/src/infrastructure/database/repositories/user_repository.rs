@@ -4,7 +4,7 @@ use ulid::Ulid;
 use crate::{
     api::http::extractors::{auth::CreateUserRequest, user::UserDto},
     domain::ports::user_repository::UserRepositoryTrait,
-    entities::users::{self, Entity as UserEntity},
+    domain::models::users::{self, Entity as UserEntity},
     errors::service_error::ServiceError,
     infrastructure::database::repositories::base::Repository,
 };

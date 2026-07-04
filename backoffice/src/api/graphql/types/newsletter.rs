@@ -9,9 +9,9 @@ pub struct SubscribeToNewsletterInput {
     pub email: String,
 }
 
-impl Into<crate::entities::newsletter::ActiveModel> for SubscribeToNewsletterInput {
-    fn into(self) -> crate::entities::newsletter::ActiveModel {
-        crate::entities::newsletter::ActiveModel {
+impl Into<crate::domain::models::newsletter::ActiveModel> for SubscribeToNewsletterInput {
+    fn into(self) -> crate::domain::models::newsletter::ActiveModel {
+        crate::domain::models::newsletter::ActiveModel {
             identifier: sea_orm::ActiveValue::Set(Ulid::new().to_string()),
             email: sea_orm::ActiveValue::Set(self.email),
             ..Default::default()

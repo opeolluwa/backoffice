@@ -17,7 +17,7 @@ impl SubscribeNewsletter {
     async fn subscribe_to_newsletter(
         ctx: &Context<'_>,
         input: SubscribeToNewsletterInput,
-    ) -> async_graphql::Result<crate::entities::newsletter::Model> {
+    ) -> async_graphql::Result<crate::domain::models::newsletter::Model> {
         if let Err(err) = input.validate() {
             let better_error_message = format_validation_errors(err);
             return Err(AppError::GraphQLError(better_error_message.into_iter().join(",")).into());
@@ -27,9 +27,9 @@ impl SubscribeNewsletter {
             .data::<DatabaseConnection>()
             .map_err(|err| AppError::GraphQLError(err.message))?;
 
-        let active_model: crate::entities::newsletter::ActiveModel = input.into();
+        let active_model: crate::domain::models::newsletter::ActiveModel = input.into();
 
-        let model: crate::entities::newsletter::Model =
+        let model: crate::domain::models::newsletter::Model =
             active_model.insert(db_conn).await.map_err(|err: DbErr| {
                 let msg = err.to_string();
                 if msg.contains("UNIQUE constraint failed") || msg.contains("duplicate key") {

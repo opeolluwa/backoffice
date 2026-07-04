@@ -10,7 +10,7 @@ use crate::{
     api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     api::state::AppState,
     domain::services::team::TeamServiceExt,
-    entities::teams,
+    domain::models::teams,
     errors::service_error::ServiceError,
 };
 

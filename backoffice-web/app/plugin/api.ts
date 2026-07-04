@@ -1,12 +1,13 @@
 import axios from "axios";
 import { useTokenStore } from "~/stores/token";
+const NETWORK_REQUEST_TIMEOUT = 7500; // 7.5 seconds
 
 const api = axios.create({
   baseURL: "http://localhost:5006/api",
   headers: {
     Accept: "application/json",
   },
-  timeout: 10000,
+  timeout: NETWORK_REQUEST_TIMEOUT,
 });
 
 api.interceptors.request.use(

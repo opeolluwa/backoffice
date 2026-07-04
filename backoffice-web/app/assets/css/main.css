@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme{
+    --color-primary: oklch(51.546% 0.25256 264.74);
+--color-primary-50: oklch(88.231% 0.05412 271.45);
+--color-primary-100: oklch(83.579% 0.07657 271.6);
+--color-primary-200: oklch(74.821% 0.12063 270.23);
+--color-primary-300: oklch(66.319% 0.166 268.56);
+--color-primary-400: oklch(58.284% 0.21304 266.78);
+--color-primary-500: oklch(51.546% 0.25256 264.74);
+--color-primary-600: oklch(43.672% 0.23384 264.31);
+--color-primary-700: oklch(35.426% 0.18345 264.42);
+--color-primary-800: oklch(26.682% 0.12927 264.22);
+--color-primary-900: oklch(17.19% 0.07083 263.75);
+--color-primary-950: oklch(11.862% 0.03661 260.4);
+}

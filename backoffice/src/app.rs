@@ -15,7 +15,7 @@ use crate::{
         logger::AppLogger,
     },
     errors,
-    fs::filesystem::AppFileSystem,
+    // fs::filesystem::AppFileSystem,
     infrastructure::database::connection::init_db_pool,
 };
 
@@ -26,7 +26,7 @@ pub async fn run() -> Result<(), AppError> {
     let time_out_duration = Duration::from_secs(10);
 
     AppLogger::init();
-    AppFileSystem::init(&app_config)?;
+    // AppFileSystem::init(&app_config)?;
 
     let app_state = AppState::new(&db_conn)?;
 

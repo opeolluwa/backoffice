@@ -1,4 +1,4 @@
-FROM rust:1.90.0-slim-bullseye
+FROM rust:1.94.0-slim-bullseye
 
 ENV CARGO_TARGET_DIR=/cargo-target
 

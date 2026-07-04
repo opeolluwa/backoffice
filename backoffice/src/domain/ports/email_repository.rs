@@ -1,6 +1,6 @@
 use crate::{
     api::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest},
-    entities::emails,
+    domain::models::emails,
     errors::database_error::DatabaseError,
 };
 

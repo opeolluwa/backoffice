@@ -11,7 +11,7 @@ use crate::{
     api::http::extractors::products::CreateProductRequest,
     api::state::AppState,
     domain::services::product::ProductServiceStateExt,
-    entities::products::Model as Product,
+    domain::models::products::Model as Product,
     errors::service_error::ServiceError,
 };
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import api from "~/plugin/api";
-import type { MarketplaceWithProducts } from "../../../../../bindings/MarketplaceWithProducts";
+import type { MarketplaceWithProducts } from "@bindings/MarketplaceWithProducts";
 import { useCountryStore } from "~/stores/country";
 
 import { z } from "zod";

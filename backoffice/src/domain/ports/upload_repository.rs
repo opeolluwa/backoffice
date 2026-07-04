@@ -1,6 +1,6 @@
 use crate::{
     api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
-    entities::uploads,
+    domain::models::uploads,
     errors::database_error::DatabaseError,
 };
 
