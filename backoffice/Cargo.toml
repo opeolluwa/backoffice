@@ -47,7 +47,7 @@ redis = { version = "1.2.4", features = ["tls-rustls"] }
 regex = "1.12.2"
 reqwest.workspace = true
 rust_decimal = { version = "1.39.0", features = ["macros", "serde"] }
-sea-orm = { version = "2.0.0-rc.37", features = [
+sea-orm = { version = "=2.0.0-rc.37", features = [
     "runtime-tokio-rustls",
     "sqlx-postgres",
     "macros",
@@ -61,7 +61,7 @@ sea-orm = { version = "2.0.0-rc.37", features = [
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["raw_value"] }
 serde_with = "3.16.0"
-sqlx = { version = "0.8", features = [
+sqlx = { version = "=0.8", features = [
     "runtime-tokio",
     "postgres",
     "macros",
@@ -90,7 +90,7 @@ ulid = { version = "1.2.1", features = ["serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
 
 [dependencies.seaography]
-version = "~2.0.0-rc.8" # seaography version
+version = "=2.0.0-rc.8" # seaography version
 features = [
     "graphql-playground",
     "with-decimal",
