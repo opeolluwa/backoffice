@@ -16,12 +16,13 @@ alias cfg:= copy-env
 @copy-env:
     {{ if os_family() == "windows" { "Copy-Item -Path '.env.example' -Destination '.env' -Force" } else { "cp .env.example .env" } }}
 
-set shell := if os_family() == "windows" {
-  ["powershell.exe", "-NoProfile", "-Command", "-"]
-} else {
-  ["sh", "-cu"]
-}
+#set shell := if os_family() == "windows" {
+#  ["powershell.exe", "-NoProfile", "-Command", "-"]
+#} else {
+#  ["sh", "-cu"]
+# }
 
+set shell := ["powershell.exe", "-NoProfile", "-Command"]
 
 set dotenv-required := false
 set dotenv-load := true
