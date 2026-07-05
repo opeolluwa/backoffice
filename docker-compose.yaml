@@ -23,7 +23,6 @@ services:
       - ./backoffice:/app:cached
       - cargo-target:/cargo-target:delegated
       - rust-cache:/usr/local/cargo/registry:delegated
-    # command: cargo watch -qcx run
     stdin_open: true
     tty: true
     healthcheck:

@@ -1,22 +1,46 @@
 use std::env;
 
 use dotenv::dotenv;
+use serde::{Deserialize, Serialize};
 use tower_http::cors::AllowOrigin;
+use std::str::FromStr;
 
 use crate::errors::app_error::AppError;
 use crate::shared::extract_env::extract_env;
 
 extern crate dotenv;
 
+
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum Environment {
+    Development,
+    Production,
+    Test
+}
+
+impl FromStr for Environment {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "development" => Ok(Environment::Development),
+            "production" => Ok(Environment::Production),
+            "test" => Ok(Environment::Test),
+            other => Err(format!("invalid environment: {}", other)),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct AppConfig {
+    pub environment : Environment, 
     pub database_url: String,
     pub max_db_connections: u32,
     pub body_limit_mb: usize,
     pub upload_path: String,
     pub export_path: String,
     pub port: u16,
-    pub environment: String,
     pub allowed_origins: AllowOrigin,
     pub email_api_key: String,
     pub email_api_user: String,
