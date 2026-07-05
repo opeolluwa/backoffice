@@ -112,11 +112,12 @@ migrate-add target:
 		--database-url {{DEV_DB_URL}} \
 		--with-serde both \
 		--model-extra-attributes 'serde(rename_all=\"camelCase\")' \
-		--model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
+		--model-extra-derives 'ts_rs::TS' \
+		--model-extra-attributes 'ts(export)' \
+		--enum-extra-derives 'ts_rs::TS' \
+		--enum-extra-attributes 'ts(export)' \
 		--ignore-tables backoffice_server_migrations \
 		-o backoffice/src/domain/models --seaography
-
-
 
 [working-directory:'backoffice']
 @run-migrations:
@@ -129,7 +130,5 @@ export-bindings:
 db-pull:
     just run-migrations
     just generate-entities 
-    just export-bindings
-    node scripts/ts-export.js 
 
 

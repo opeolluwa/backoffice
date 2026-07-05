@@ -6,6 +6,7 @@
     "backoffice",
     "healthcheck",
     "rustup",
+    "seaorm",
     "Zepto"
   ]
 }

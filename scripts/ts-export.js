@@ -183,7 +183,7 @@ function main() {
     console.log("  nothing to patch (no bare #[ts(export)] found)");
   }
 
-  const cargoDir = path.resolve(__dirname, "..", "backoffice", "backoffice");
+  const cargoDir = path.resolve(__dirname, "..", "backoffice");
   updateBindings(entitiesDir, cargoDir);
 
   generateIndex(entitiesDir, special);

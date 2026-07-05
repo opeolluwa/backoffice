@@ -3,10 +3,10 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, ts_rs :: TS)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "activities")]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "activities.ts")]
+#[backoffice_macros::ts_rs_export_sea_orm_entity_name]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub identifier: String,

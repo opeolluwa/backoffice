@@ -3,17 +3,17 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, ts_rs :: TS)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "products")]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "products.ts")]
+#[backoffice_macros::ts_rs_export_sea_orm_entity_name]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub identifier: String,
     pub name: String,
     pub picture: Option<String>,
     #[sea_orm(column_type = "Decimal(Some((12, 2)))")]
-    #[ts(type = "number")]
+    #[ts(type = "string")]
     pub price: Decimal,
     #[sea_orm(column_type = "Text")]
     pub description: String,
