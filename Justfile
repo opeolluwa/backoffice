@@ -1,9 +1,3 @@
-import 'scripts/build.just'
-import 'scripts/package.just'
-import 'scripts/server.just'
-import 'scripts/lint.just'
-
-
 alias w:= watch
 alias k:= kill
 alias b:= build
@@ -11,6 +5,39 @@ alias l:= logs
 alias install := install-dependencies
 alias r:= restart
 alias cfg:= copy-env
+
+
+[doc('Install all application dependencies (backend + frontend)')]
+@install-dependencies:
+    @echo "Installing frontend dependencies..."
+    {{ if os_family() == "windows" { "Set-Location frontend; if ($?) { npm install }" } else { "cd frontend && npm install" } }}
+    @echo "Done. Copy .env.example to .env.local if you haven't already."
+
+
+@fmt:
+    {{ if os_family() == "windows" { "cargo fmt; if ($?) { cargo fix }" } else { "cargo fmt && cargo fix" } }}
+
+
+@watch:
+    docker compose up -d
+    @just l
+
+
+@logs:
+    docker compose logs -f --tail='30' app
+
+
+build:
+    cargo run build --release
+
+
+@kill:
+    docker compose down -v
+
+
+@restart:
+    @just kill
+    @just watch
 
 
 @copy-env:
@@ -84,11 +111,19 @@ migrate-add target:
 	sea-orm-cli generate entity \
 		--database-url {{DEV_DB_URL}} \
 		--with-serde both \
-		--model-extra-attributes 'serde(rename_all="camelCase")' \
+		--model-extra-attributes 'serde(rename_all=\"camelCase\")' \
+		--model-extra-derives 'ts_rs::TS' \
+		--model-extra-attributes 'ts(export)' \
+		--enum-extra-derives 'ts_rs::TS' \
+		--enum-extra-attributes 'ts(export)' \
 		--ignore-tables backoffice_server_migrations \
 		-o backoffice/src/domain/models --seaography
 
 
 
+export-bindings:
+ node scripts/ts-export.js
+
 db-pull:
-    just generate-entities
+    just export-bindings
+

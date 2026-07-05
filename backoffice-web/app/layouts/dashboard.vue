@@ -2,7 +2,17 @@
 import * as v from "valibot";
 import useLogout from "~/composables/useLogout";
 
-const items = useBreadcrumbItems();
+const items = useBreadcrumbItems({
+  overrides:[
+    
+    undefined,
+    {
+      label: "Dashboard",
+      icon: "heroicons:squares-2x2",
+      path:'/home',
+    }
+  ]
+});
 
 const searchInputRef = ref<HTMLInputElement | null>(null);
 

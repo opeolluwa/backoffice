@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "countries.js",
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "export:bindings": "node ts-export.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "ulid": "^3.0.1"
+    "ulid": "^3.0.2"
   }
 }

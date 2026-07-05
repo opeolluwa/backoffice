@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ["./app/assets/css/main.css"],
   alias: {
-    "@bindings": "./../backoffice/bindings",
+    "@bindings": "./app/bindings",
   },
   vite: {
     plugins: [tailwindcss()],
