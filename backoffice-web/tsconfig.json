@@ -3,7 +3,7 @@
   "files": [],
   "compilerOptions": {
     "paths": {
-      "@bindings/*": ["../backoffice/bindings/*"]
+      "@bindings/*": ["./app/bindings/*"]
     }
   },
   "references": [

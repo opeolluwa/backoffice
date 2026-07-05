@@ -5,7 +5,7 @@ use backoffice_utils::extract_env;
 
 use crate::{
     api::http::extractors::products::{CreateProductRequest, SaveProductRequest},
-    config::app_config::AppConfig,
+    config::env::AppConfig,
     domain::ports::product_repository::ProductRepositoryExt,
     domain::models::products::Model as Product,
     errors::{app_error::AppError, service_error::ServiceError},

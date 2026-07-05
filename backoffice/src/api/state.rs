@@ -8,7 +8,7 @@ use seaography::async_graphql;
 use backoffice_email_client::zepto_mailer::ZeptoMail;
 
 use crate::{
-    config::app_config::AppConfig,
+    config::env::AppConfig,
     domain::services::{
         admin::AdminService, auth::AuthenticationService, country::CountryService,
         marketplace::MarketplaceService, product::ProductService, root::RootService,

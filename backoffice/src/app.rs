@@ -8,15 +8,7 @@ use errors::app_error::AppError;
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
 use crate::{
-    api::{load_graphql_router, load_http_routes, state::AppState},
-    config::{
-        app::{create_cors_layer, shutdown_signal},
-        app_config::load_config,
-        logger::AppLogger,
-    },
-    errors,
-    // fs::filesystem::AppFileSystem,
-    infrastructure::database::connection::init_db_pool,
+    api::{load_graphql_router, load_http_routes, state::AppState}, config::{cors::init_cors, env::load_config, logger::AppLogger, shutdown::shutdown_signal}, errors, infrastructure::database::connection::init_db_pool,
 };
 
 pub async fn run() -> Result<(), AppError> {
@@ -26,7 +18,6 @@ pub async fn run() -> Result<(), AppError> {
     let time_out_duration = Duration::from_secs(10);
 
     AppLogger::init();
-    // AppFileSystem::init(&app_config)?;
 
     let app_state = AppState::new(&db_conn)?;
 
@@ -43,7 +34,7 @@ pub async fn run() -> Result<(), AppError> {
             time_out_duration,
         ))
         .layer(tower_http::trace::TraceLayer::new_for_http())
-        .layer(create_cors_layer(&app_config));
+        .layer(init_cors(&app_config));
 
     let ip_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, app_config.port));
     tracing::info!(

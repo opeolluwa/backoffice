@@ -4,8 +4,12 @@ import { useMarketplaceStore } from "~/stores/marketplace";
 
 definePageMeta({
   layout: "dashboard",
+  breadcrumb: {
+    icon: "heroicons:squares-2x2",
+    ariaLabel: "dashboard",
+    title: "Dashboard",
+  },
 });
-
 const userStore = useUserInformationStore();
 const marketplaceStore = useMarketplaceStore();
 
@@ -64,7 +68,11 @@ function barHeight(val: number) {
 
 // Quick links
 const quickLinks = [
-  { label: "Marketplace", path: "/marketplace", icon: "heroicons:building-storefront" },
+  {
+    label: "Marketplace",
+    path: "/marketplace",
+    icon: "heroicons:building-storefront",
+  },
   { label: "Uploads", path: "/uploads", icon: "heroicons:arrow-up-tray" },
   { label: "Team", path: "/teams", icon: "heroicons:users" },
   { label: "Metrics", path: "/metrics", icon: "heroicons:chart-bar-square" },
@@ -95,11 +103,12 @@ function formatDate(dt?: string | null) {
 
 <template>
   <div class="space-y-8">
-
     <!-- Greeting row -->
     <div class="flex items-start justify-between">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-white/30 mb-1">
+        <p
+          class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-white/30 mb-1"
+        >
           Dashboard
         </p>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -109,12 +118,10 @@ function formatDate(dt?: string | null) {
           Here's what's happening across your workspace today.
         </p>
       </div>
-    
     </div>
 
     <!-- Stat cards + chart -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
       <!-- Stat cards (2/3 width) -->
       <div class="xl:col-span-2 grid grid-cols-2 gap-4">
         <div
@@ -126,7 +133,9 @@ function formatDate(dt?: string | null) {
             <span class="text-sm text-gray-500 dark:text-white/40 font-medium">
               {{ stat.label }}
             </span>
-            <div class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand/10 flex items-center justify-center">
+            <div
+              class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand/10 flex items-center justify-center"
+            >
               <UIcon :name="stat.icon" class="size-4 text-brand" />
             </div>
           </div>
@@ -136,7 +145,11 @@ function formatDate(dt?: string | null) {
             </p>
             <div class="flex items-center gap-1.5 mt-1.5">
               <UIcon
-                :name="stat.up ? 'heroicons:arrow-trending-up' : 'heroicons:arrow-trending-down'"
+                :name="
+                  stat.up
+                    ? 'heroicons:arrow-trending-up'
+                    : 'heroicons:arrow-trending-down'
+                "
                 :class="stat.up ? 'text-brand' : 'text-red-500'"
                 class="size-3.5"
               />
@@ -146,19 +159,25 @@ function formatDate(dt?: string | null) {
               >
                 {{ stat.trend }}
               </span>
-              <span class="text-xs text-gray-400 dark:text-white/25">vs last month</span>
+              <span class="text-xs text-gray-400 dark:text-white/25"
+                >vs last month</span
+              >
             </div>
           </div>
         </div>
       </div>
 
       <!-- Activity chart (1/3 width) -->
-      <div class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5">
+      <div
+        class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      >
         <div class="flex items-center justify-between mb-4">
           <p class="text-sm font-semibold text-gray-700 dark:text-white/80">
             Activity
           </p>
-          <span class="text-xs text-gray-400 dark:text-white/30">Last 6 months</span>
+          <span class="text-xs text-gray-400 dark:text-white/30"
+            >Last 6 months</span
+          >
         </div>
 
         <!-- Bar chart -->
@@ -167,19 +186,25 @@ function formatDate(dt?: string | null) {
             <div class="flex-1 flex flex-col items-center gap-1">
               <div
                 class="w-full rounded-md transition-all"
-                :class="i === chartValues.length - 1
-                  ? 'bg-brand'
-                  : 'bg-brand-100 dark:bg-brand/20'"
+                :class="
+                  i === chartValues.length - 1
+                    ? 'bg-brand'
+                    : 'bg-brand-100 dark:bg-brand/20'
+                "
                 :style="{ height: `${barHeight(val)}%` }"
               />
-              <span class="text-[9px] text-gray-400 dark:text-white/25 font-medium">
+              <span
+                class="text-[9px] text-gray-400 dark:text-white/25 font-medium"
+              >
                 {{ chartMonths[i] }}
               </span>
             </div>
           </template>
         </div>
 
-        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
+        <div
+          class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-between"
+        >
           <div>
             <p class="text-lg font-bold text-gray-900 dark:text-white">
               {{ chartValues[chartValues.length - 1] }}
@@ -189,7 +214,10 @@ function formatDate(dt?: string | null) {
             </p>
           </div>
           <div class="flex items-center gap-1">
-            <UIcon name="heroicons:arrow-trending-up" class="size-3.5 text-brand" />
+            <UIcon
+              name="heroicons:arrow-trending-up"
+              class="size-3.5 text-brand"
+            />
             <span class="text-xs font-semibold text-brand">+44%</span>
           </div>
         </div>
@@ -198,9 +226,10 @@ function formatDate(dt?: string | null) {
 
     <!-- Quick links + Recent marketplaces -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
       <!-- Quick links -->
-      <div class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5">
+      <div
+        class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      >
         <p class="text-sm font-semibold text-gray-700 dark:text-white/80 mb-4">
           Quick access
         </p>
@@ -215,7 +244,9 @@ function formatDate(dt?: string | null) {
               :name="link.icon"
               class="size-5 text-gray-400 dark:text-white/30 group-hover:text-brand transition-colors"
             />
-            <span class="text-[10px] font-medium text-gray-500 dark:text-white/40 group-hover:text-brand transition-colors text-center leading-tight">
+            <span
+              class="text-[10px] font-medium text-gray-500 dark:text-white/40 group-hover:text-brand transition-colors text-center leading-tight"
+            >
               {{ link.label }}
             </span>
           </NuxtLink>
@@ -223,7 +254,9 @@ function formatDate(dt?: string | null) {
       </div>
 
       <!-- Recent marketplaces -->
-      <div class="xl:col-span-2 bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5">
+      <div
+        class="xl:col-span-2 bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      >
         <div class="flex items-center justify-between mb-4">
           <p class="text-sm font-semibold text-gray-700 dark:text-white/80">
             Recent stores
@@ -241,12 +274,19 @@ function formatDate(dt?: string | null) {
           v-if="recentMarketplaces.length === 0"
           class="flex flex-col items-center justify-center py-10 gap-3 text-center"
         >
-          <div class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-            <UIcon name="heroicons:building-storefront" class="size-5 text-gray-300 dark:text-white/20" />
+          <div
+            class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center"
+          >
+            <UIcon
+              name="heroicons:building-storefront"
+              class="size-5 text-gray-300 dark:text-white/20"
+            />
           </div>
           <p class="text-sm text-gray-400 dark:text-white/30">
             No stores yet.
-            <NuxtLink to="/marketplace" class="text-brand hover:underline ml-1">Create one →</NuxtLink>
+            <NuxtLink to="/marketplace" class="text-brand hover:underline ml-1"
+              >Create one →</NuxtLink
+            >
           </p>
         </div>
 
@@ -258,13 +298,20 @@ function formatDate(dt?: string | null) {
             class="flex items-center gap-4 py-3"
           >
             <!-- Avatar -->
-            <div class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand/10 flex items-center justify-center shrink-0">
-              <UIcon name="heroicons:building-storefront" class="size-4 text-brand" />
+            <div
+              class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand/10 flex items-center justify-center shrink-0"
+            >
+              <UIcon
+                name="heroicons:building-storefront"
+                class="size-4 text-brand"
+              />
             </div>
 
             <!-- Info -->
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90 truncate">
+              <p
+                class="text-sm font-medium text-gray-800 dark:text-white/90 truncate"
+              >
                 {{ mp.name }}
               </p>
               <p class="text-xs text-gray-400 dark:text-white/30 truncate">
@@ -290,7 +337,6 @@ function formatDate(dt?: string | null) {
         </div>
       </div>
     </div>
-
   </div>
 </template>
 

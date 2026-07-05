@@ -3,7 +3,7 @@ import { useTokenStore } from "~/stores/token";
 const NETWORK_REQUEST_TIMEOUT = 7500; // 7.5 seconds
 
 const api = axios.create({
-  baseURL: "http://localhost:5006/api",
+  baseURL: "http://localhost:8000/api",
   headers: {
     Accept: "application/json",
   },

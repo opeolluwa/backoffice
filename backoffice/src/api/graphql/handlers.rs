@@ -11,7 +11,7 @@ use seaography::async_graphql::http::{GraphQLPlaygroundConfig, playground_source
 use super::query_root;
 use crate::{
     api::state::{AppState, GraphQlState},
-    config::app_config::AppConfig,
+    config::env::AppConfig,
     errors::app_error::AppError,
 };
 

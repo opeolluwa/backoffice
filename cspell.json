@@ -3,6 +3,9 @@
     "backoffice"
   ],
   "words": [
-    "backoffice"
+    "backoffice",
+    "healthcheck",
+    "rustup",
+    "Zepto"
   ]
 }

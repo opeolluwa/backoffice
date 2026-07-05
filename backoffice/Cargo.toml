@@ -85,7 +85,13 @@ tower-http = { version = "0.6.6", features = [
 ] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-ts-rs = "11.1.0"
+ts-rs = { version = "11.1.0", features = [
+    "uuid-impl",
+    "chrono-impl",
+    "format",
+    "serde-json-impl",
+    "bigdecimal-impl"
+] }
 ulid = { version = "1.2.1", features = ["serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
 
