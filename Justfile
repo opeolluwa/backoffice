@@ -129,5 +129,7 @@ export-bindings:
 db-pull:
     just run-migrations
     just generate-entities 
+    just export-bindings
+    node scripts/ts-export.js 
 
 
