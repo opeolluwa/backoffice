@@ -56,7 +56,7 @@ set dotenv-load := true
 set dotenv-path := "./backoffice/.env"
 set export :=  true
 
-FRONTEND_DIR:='backoffice-web'
+FRONTEND_DIR:='backoffice_web'
 DOCKER_CMD := "docker compose -f docker-compose.yaml"
 DEV_DB_URL:="postgres://backoffice:backoffice@localhost:6543/backoffice"
 
@@ -65,12 +65,12 @@ DEV_DB_URL:="postgres://backoffice:backoffice@localhost:6543/backoffice"
 
 
 
-[working-directory :'backoffice-web']
+[working-directory :'backoffice_web']
 @run-frontend:
     npm run dev
 
 
-[working-directory :'backoffice-web']
+[working-directory :'backoffice_web']
 @build-frontend:
     npm run generate
     {{ if os_family() == "windows" { "Remove-Item -Recurse -Force ../assets" } else { "rm -rf ../assets" } }}
