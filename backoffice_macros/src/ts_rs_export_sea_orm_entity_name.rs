@@ -15,7 +15,7 @@ pub(crate) fn expand(
     // Append attribute argument or default value of "Entity"
     let entity_name_append = syn::parse::<Option<LitStr>>(args)?
         .map(|x| x.value())
-        .unwrap_or(String::from("Entity"));
+        .unwrap_or(String::from("Interface"));
 
     input
         .attrs

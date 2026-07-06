@@ -12,7 +12,7 @@ Usage (from repo root):
     node scripts/ts-export.js [entities_dir]
 
 entities_dir defaults to backoffice/backoffice/src/domain/models.
-Bindings are written to backoffice-web/app/bindings/.
+Bindings are written to backoffice_web/app/bindings/.
 */
 
 import fs from "node:fs";
@@ -115,7 +115,7 @@ function generateIndex(entitiesDir, special) {
 }
 
 function bindingsDir(entitiesDir) {
-  return path.resolve(entitiesDir, "../../../../backoffice-web/app/bindings");
+  return path.resolve(entitiesDir, "../../../../backoffice_web/app/bindings");
 }
 
 function updateBindings(entitiesDir, cargoDir) {
