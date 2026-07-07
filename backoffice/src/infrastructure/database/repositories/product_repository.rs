@@ -4,12 +4,8 @@ use ulid::Ulid;
 
 use crate::{
     api::http::extractors::products::SaveProductRequest,
+    domain::models::products::{self, Entity as ProductEntity},
     domain::ports::product_repository::ProductRepositoryExt,
-    domain::models::{
-        countries,
-        marketplaces::{self, Entity as MarketplaceEntity},
-        products::{self, Entity as ProductEntity},
-    },
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };

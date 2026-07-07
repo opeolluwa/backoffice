@@ -32,6 +32,7 @@ axum-extra = { version = "0.12.1", features = ["typed-header"] }
 axum_typed_multipart = { version = "0.16.3", features = ["tempfile_3"] }
 backoffice_email_client = { version = "0.1.0", path = "crates/backoffice_email_client" }
 backoffice_imagekit = { version = "0.1.0", path = "crates/backoffice_imagekit" }
+backoffice_macros = { path = "../backoffice_macros" }
 backoffice_utils = { version = "0.1.0", path = "crates/backoffice_utils" }
 bcrypt = "0.17.0"
 chrono = { version = "0.4.41", features = ["serde"] }
@@ -58,6 +59,7 @@ sea-orm = { version = "=2.0.0-rc.37", features = [
     "with-rust_decimal",
     "with-uuid",
 ] }
+secrecy = { version = "0.10.3", features = ["serde"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["raw_value"] }
 serde_with = "3.16.0"
@@ -75,14 +77,7 @@ thiserror.workspace = true
 time = { version = "0.3.44", features = ["serde"] }
 tokio = { version = "1.44.2", features = ["full", "macros"] }
 tower = { version = "0.5.2", features = ["limit", "timeout"] }
-tower-http = { version = "0.6.6", features = [
-    "limit",
-    "fs",
-    "trace",
-    "cors",
-    "timeout",
-    "sensitive-headers",
-] }
+tower-http = { version = "0.6.6", features = ["limit", "fs", "trace", "cors", "timeout", "sensitive-headers", "request-id"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 ts-rs = { version = "11.1.0", features = [
@@ -90,11 +85,10 @@ ts-rs = { version = "11.1.0", features = [
     "chrono-impl",
     "format",
     "serde-json-impl",
-    "bigdecimal-impl"
+    "bigdecimal-impl",
 ] }
 ulid = { version = "1.2.1", features = ["serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
-backoffice_macros = { path = "../backoffice_macros" }
 
 [dependencies.seaography]
 version = "=2.0.0-rc.8" # seaography version

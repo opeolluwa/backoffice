@@ -10,8 +10,8 @@ use crate::{
     api::http::dto::{api_response::ApiResponse, jwt::Claims},
     api::http::extractors::products::CreateProductRequest,
     api::state::AppState,
-    domain::services::product::ProductServiceStateExt,
     domain::models::products::Model as Product,
+    domain::services::product::ProductServiceStateExt,
     errors::service_error::ServiceError,
 };
 

@@ -4,8 +4,8 @@ use axum::extract::{Path, State};
 
 use crate::{
     api::{http::dto::api_response::ApiResponse, state::AppState},
-    domain::services::country::CountryServiceExt,
     domain::models::countries,
+    domain::services::country::CountryServiceExt,
     errors::service_error::ServiceError,
 };
 

@@ -9,8 +9,8 @@ use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::marketplace::CreateMarketplaceRequest,
     api::state::AppState,
-    domain::services::marketplace::MarketplaceServiceExt,
     domain::models::marketplaces,
+    domain::services::marketplace::MarketplaceServiceExt,
     errors::service_error::ServiceError,
 };
 

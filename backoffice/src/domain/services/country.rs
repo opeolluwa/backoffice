@@ -1,5 +1,5 @@
 use crate::{
-    domain::ports::country_repository::CountryRepositoryExt, domain::models::countries,
+    domain::models::countries, domain::ports::country_repository::CountryRepositoryExt,
     errors::service_error::ServiceError,
 };
 

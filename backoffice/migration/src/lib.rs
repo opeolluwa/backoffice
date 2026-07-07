@@ -15,6 +15,7 @@ mod m20260328_100001_create_emails_table;
 mod m20260329_000000_add_pk_to_activities;
 mod m20260330_012735_xreate_admin_table;
 mod m20260330_013623_create_newsletter_table;
+mod m20260706_222817_update_uploads_table;
 
 pub use sea_orm_migration::prelude::*;
 
@@ -44,6 +45,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260329_000000_add_pk_to_activities::Migration),
             Box::new(m20260330_012735_xreate_admin_table::Migration),
             Box::new(m20260330_013623_create_newsletter_table::Migration),
+            Box::new(m20260706_222817_update_uploads_table::Migration),
         ]
     }
 }
