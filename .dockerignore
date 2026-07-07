@@ -1,9 +1,13 @@
 # Exclude everything by default
 **
 
-# Include only the backoffice Rust source
+# Include source directories
 !backoffice/
 !backoffice/**
+!backoffice_macros/
+!backoffice_macros/**
+!backoffice_web/
+!backoffice_web/**
 
 # Exclude build artifacts, secrets, and temp files within backoffice
 backoffice/target/
