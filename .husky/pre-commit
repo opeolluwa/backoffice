@@ -1,11 +1,30 @@
-# #!/bin/sh
-# # Pre-commit hook: run lint before committing
+#!/usr/bin/env bash
+set -e
 
-echo "Running lint..."
-npm scripts/format
-if [ $? -ne 0 ]; then
-  echo "❌ Lint failed. Commit aborted."
-  exit 1
+cd backoffice 
+
+# Ensure rustfmt exists
+if ! rustup component list --installed | grep -q rustfmt; then
+  echo "Installing rustfmt..."
+  rustup component add rustfmt
 fi
 
-echo "✅ Lint passed."
+# Ensure cargo-sort exists
+if ! command -v cargo-sort >/dev/null 2>&1; then
+  echo "Installing cargo-sort..."
+  cargo install cargo-sort
+fi
+
+# Ensure cargo-clippy exists
+if ! rustup component list --installed | grep -q clippy; then
+  echo "Installing clippy..."
+  rustup component add clippy
+fi
+
+echo "Running formatting and checks..."
+
+cargo fmt
+cargo sort
+
+cargo group-imports --fix 
+# cargo clippy -- -D warnings || exit 1

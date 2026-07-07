@@ -111,9 +111,11 @@ migrate-add target:
 	sea-orm-cli generate entity \
 		--database-url {{DEV_DB_URL}} \
 		--with-serde both \
+		--enum-extra-derives 'ts_rs::TS' \
 		--model-extra-attributes 'serde(rename_all=\"camelCase\")' \
 		--model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
-		--ignore-tables backoffice_server_migrations \
+		--enum-extra-attributes 'ts(export)' \
+		--ignore-tables backoffice_server_migrations,products \
 		-o backoffice/src/domain/models --seaography
 
 

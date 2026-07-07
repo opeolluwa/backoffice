@@ -4,7 +4,7 @@ export type ProductsInterface = {
   identifier: string;
   name: string;
   picture: string | null;
-  price: string;
+  price: number;
   description: string;
   createdByIdentifier: string | null;
   marketplaceIdentifier: string | null;
