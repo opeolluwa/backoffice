@@ -75,14 +75,7 @@ thiserror.workspace = true
 time = { version = "0.3.44", features = ["serde"] }
 tokio = { version = "1.44.2", features = ["full", "macros"] }
 tower = { version = "0.5.2", features = ["limit", "timeout"] }
-tower-http = { version = "0.6.6", features = [
-    "limit",
-    "fs",
-    "trace",
-    "cors",
-    "timeout",
-    "sensitive-headers",
-] }
+tower-http = { version = "0.6.6", features = ["limit", "fs", "trace", "cors", "timeout", "sensitive-headers", "request-id"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 ts-rs = { version = "11.1.0", features = [
@@ -95,6 +88,7 @@ ts-rs = { version = "11.1.0", features = [
 ulid = { version = "1.2.1", features = ["serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
 backoffice_macros = { path = "../backoffice_macros" }
+secrecy = { version = "0.10.3", features = ["serde"] }
 
 [dependencies.seaography]
 version = "=2.0.0-rc.8" # seaography version

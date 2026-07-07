@@ -1,119 +1,168 @@
-use std::env;
+use std::{str::FromStr, time::Duration};
 
 use dotenv::dotenv;
+use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
-use tower_http::cors::AllowOrigin;
-use std::str::FromStr;
 
-use crate::errors::app_error::AppError;
-use crate::shared::extract_env::extract_env;
+use crate::{errors::app_error::AppError, shared::extract_env::extract_env};
 
-extern crate dotenv;
-
-
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "lowercase")]
-pub enum Environment {
-    Development,
-    Production,
-    Test
-}
-
-impl FromStr for Environment {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "development" => Ok(Environment::Development),
-            "production" => Ok(Environment::Production),
-            "test" => Ok(Environment::Test),
-            other => Err(format!("invalid environment: {}", other)),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct AppConfig {
-    pub environment : Environment, 
-    pub database_url: String,
-    pub max_db_connections: u32,
-    pub body_limit_mb: usize,
-    pub upload_path: String,
-    pub export_path: String,
+    // Server
+    #[serde(default = "default_port")]
     pub port: u16,
-    pub allowed_origins: AllowOrigin,
+
+    #[serde(default = "default_environment")]
+    pub environment: Environment,
+
+    #[serde(default = "default_body_limit_bytes")]
+    pub body_limit_bytes: usize,
+
+    // Storage
+    #[serde(default = "default_upload_path")]
+    pub upload_path: String,
+
+    #[serde(default = "default_export_path")]
+    pub export_path: String,
+
+    // CORS
+    #[serde(default = "default_allowed_origins")]
+    pub allowed_origins: Vec<String>,
+
+    // Email
     pub email_api_key: String,
     pub email_api_user: String,
 
-    // GraphQL / API settings
+    // Database
+    pub database_url: SecretString,
+    pub max_db_connections: u32,
+
+    // GraphQL
+    #[serde(default = "default_graphql_endpoint")]
     pub endpoint: String,
+
+    #[serde(default = "default_graphql_depth_limit")]
     pub depth_limit: Option<usize>,
+
+    #[serde(default = "default_graphql_complexity_limit")]
     pub complexity_limit: Option<usize>,
+
+    #[serde(default = "default_requests_time_out")]
+    pub requests_time_out: Duration,
 }
 
 impl AppConfig {
     pub fn from_env() -> Result<Self, AppError> {
         dotenv().ok();
 
-        let port = extract_env::<u16>("PORT")?;
+        tracing::info!("Loading application configuration...");
 
-        let max_db_connections = extract_env::<u32>("MAX_DB_CONNECTIONS")?;
+        let database_url = extract_env::<String>("DATABASE_URL")?;
+        let database_url = database_url.into_boxed_str();
 
-        let body_limit_mb = extract_env::<usize>("BODY_LIMIT_MB")?;
-
-        let export_path = extract_env("EXPORT_PATH").unwrap_or_else(|_| "/tmp/export".to_string());
-        let upload_path = extract_env("UPLOAD_PATH").unwrap_or_else(|_| "/tmp/upload".to_string());
-
-        let environment = extract_env("ENVIRONMENT")?;
-
-        // Parse allowed origins (comma-separated list)
-        let allowed_origins_str =
-            extract_env("ALLOWED_ORIGINS").unwrap_or_else(|_| "*".to_string());
-        let allowed_origins = if allowed_origins_str == "*" {
-            AllowOrigin::any()
-        } else {
-            let origins: Vec<_> = allowed_origins_str
-                .split(',')
-                .map(|s| s.trim().to_string())
-                .collect();
-            AllowOrigin::list(origins.into_iter().map(|s| s.parse().unwrap()))
-        };
-
-        tracing::info!("App Config loaded!");
-
-        let email_api_user = extract_env("ZEPTO_EMAIL_API_USER")?;
-        let email_api_key = extract_env("ZEPTO_EMAIL_API_KEY")?;
-
-        let database_url = extract_env("DATABASE_URL")?;
-
-        let endpoint = env::var("ENDPOINT").unwrap_or_else(|_| "/graphql".into());
-
-        let depth_limit = env::var("DEPTH_LIMIT")
-            .ok()
-            .map(|v| v.parse().unwrap_or_else(|_| 100));
-
-        let complexity_limit = env::var("COMPLEXITY_LIMIT")
-            .ok()
-            .map(|v| v.parse().unwrap_or_else(|_| 1000));
+        let requests_time_out = extract_env::<u64>("REQUESTS_TIME_OUT")
+            .unwrap_or_else(|_| default_requests_time_out().as_secs());
 
         Ok(Self {
-            database_url,
-            max_db_connections,
-            body_limit_mb,
-            upload_path,
-            export_path,
-            port,
-            environment,
-            allowed_origins,
-            email_api_key,
-            email_api_user,
-            endpoint,
-            depth_limit,
-            complexity_limit,
+            // Server
+            port: extract_env("PORT").unwrap_or_else(|_| default_port()),
+            environment: extract_env("ENVIRONMENT").unwrap_or_else(|_| default_environment()),
+            body_limit_bytes: extract_env("BODY_LIMIT_BYTES")
+                .unwrap_or_else(|_| default_body_limit_bytes()),
+
+            // Storage
+            upload_path: extract_env("UPLOAD_PATH").unwrap_or_else(|_| default_upload_path()),
+            export_path: extract_env("EXPORT_PATH").unwrap_or_else(|_| default_export_path()),
+
+            // CORS
+            allowed_origins: extract_env::<String>("ALLOWED_ORIGINS")
+                .unwrap_or_else(|_| "*".into())
+                .split(',')
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(ToOwned::to_owned)
+                .collect(),
+
+            // Email
+            email_api_user: extract_env("ZEPTO_EMAIL_API_USER")?,
+            email_api_key: extract_env("ZEPTO_EMAIL_API_KEY")?,
+
+            // Database
+            database_url: SecretString::new(database_url),
+            max_db_connections: extract_env("MAX_DB_CONNECTIONS")?,
+
+            // GraphQL
+            endpoint: extract_env("ENDPOINT").unwrap_or_else(|_| default_graphql_endpoint()),
+            depth_limit: extract_env::<usize>("DEPTH_LIMIT").ok(),
+            complexity_limit: extract_env::<usize>("COMPLEXITY_LIMIT").ok(),
+
+            requests_time_out: Duration::from_secs(requests_time_out),
         })
     }
 }
 
 pub fn load_config() -> Result<AppConfig, AppError> {
     AppConfig::from_env()
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Environment {
+    Development,
+    Production,
+    Test,
+}
+
+impl FromStr for Environment {
+    type Err = String;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value.to_lowercase().as_str() {
+            "development" => Ok(Self::Development),
+            "production" => Ok(Self::Production),
+            "test" => Ok(Self::Test),
+            _ => Err(format!("Invalid environment: {value}")),
+        }
+    }
+}
+
+fn default_port() -> u16 {
+    8080
+}
+
+fn default_environment() -> Environment {
+    Environment::Development
+}
+
+fn default_body_limit_bytes() -> usize {
+    10 * 1024 * 1024 // 10 MiB
+}
+
+fn default_upload_path() -> String {
+    "/tmp/upload".into()
+}
+
+fn default_export_path() -> String {
+    "/tmp/export".into()
+}
+
+fn default_allowed_origins() -> Vec<String> {
+    vec!["*".into()]
+}
+
+fn default_graphql_endpoint() -> String {
+    "/graphql".into()
+}
+
+fn default_graphql_depth_limit() -> Option<usize> {
+    Some(100)
+}
+
+fn default_graphql_complexity_limit() -> Option<usize> {
+    Some(1000)
+}
+
+
+fn default_requests_time_out() -> Duration {
+    Duration::from_secs(10)
 }
