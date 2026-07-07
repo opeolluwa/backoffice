@@ -1,6 +1,6 @@
 use crate::api::http::extractors::marketplace::CreateMarketplaceRequest;
-use crate::domain::ports::marketplace_repository::MarketplaceRepositoryExt;
 use crate::domain::models::marketplaces;
+use crate::domain::ports::marketplace_repository::MarketplaceRepositoryExt;
 use crate::errors::service_error::ServiceError;
 
 pub struct MarketplaceService<R: MarketplaceRepositoryExt> {

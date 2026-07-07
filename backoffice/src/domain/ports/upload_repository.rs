@@ -16,13 +16,9 @@ pub(crate) trait UploadRepositoryExt {
         identifier: &str,
     ) -> Result<uploads::Model, DatabaseError>;
 
-    async fn find_all_uploads(
-        &self,
-    ) -> Result<Vec<uploads::Model>, DatabaseError>;
+    async fn find_all_uploads(&self) -> Result<Vec<uploads::Model>, DatabaseError>;
 
-    async fn find_starred_uploads(
-        &self,
-    ) -> Result<Vec<uploads::Model>, DatabaseError>;
+    async fn find_starred_uploads(&self) -> Result<Vec<uploads::Model>, DatabaseError>;
 
     async fn update_upload(
         &self,
@@ -30,10 +26,7 @@ pub(crate) trait UploadRepositoryExt {
         request: &UpdateUploadRequest,
     ) -> Result<uploads::Model, DatabaseError>;
 
-    async fn delete_upload(
-        &self,
-        identifier: &str,
-    ) -> Result<(), DatabaseError>;
+    async fn delete_upload(&self, identifier: &str) -> Result<(), DatabaseError>;
 
     async fn count_uploads(&self) -> Result<i64, DatabaseError>;
 }

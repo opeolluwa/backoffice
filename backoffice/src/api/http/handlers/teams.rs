@@ -9,8 +9,8 @@ use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     api::state::AppState,
-    domain::services::team::TeamServiceExt,
     domain::models::teams,
+    domain::services::team::TeamServiceExt,
     errors::service_error::ServiceError,
 };
 

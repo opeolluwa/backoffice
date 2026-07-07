@@ -6,8 +6,8 @@ use backoffice_utils::extract_env;
 use crate::{
     api::http::extractors::products::{CreateProductRequest, SaveProductRequest},
     config::env::AppConfig,
-    domain::ports::product_repository::ProductRepositoryExt,
     domain::models::products::Model as Product,
+    domain::ports::product_repository::ProductRepositoryExt,
     errors::{app_error::AppError, service_error::ServiceError},
     // infrastructure::fs::AppFileSystem,
 };

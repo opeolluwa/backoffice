@@ -15,7 +15,6 @@ pub fn ts_rs_export_sea_orm_entity_name(args: TokenStream, input: TokenStream) -
     }
 }
 
-
 pub(crate) fn expand(
     mut input: DeriveInput,
     args: TokenStream,
@@ -90,4 +89,3 @@ pub fn convert_snake_to_pascal(input: &str) -> String {
     }
     ret
 }
-

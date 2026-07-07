@@ -23,7 +23,7 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-                      manager
+        manager
             .alter_table(
                 Table::alter()
                     .table("uploads")
@@ -54,8 +54,7 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-
-          manager
+        manager
             .alter_table(
                 Table::alter()
                     .table("uploads")
@@ -64,8 +63,7 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-
-             manager
+        manager
             .alter_table(
                 Table::alter()
                     .table("uploads")
@@ -74,7 +72,7 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-                     manager
+        manager
             .alter_table(
                 Table::alter()
                     .table("uploads")

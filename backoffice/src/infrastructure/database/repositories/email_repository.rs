@@ -6,8 +6,8 @@ use ulid::Ulid;
 
 use crate::{
     api::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest},
-    domain::ports::email_repository::EmailRepositoryExt,
     domain::models::emails::{self, Entity as EmailEntity},
+    domain::ports::email_repository::EmailRepositoryExt,
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };

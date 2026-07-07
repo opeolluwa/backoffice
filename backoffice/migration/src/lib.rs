@@ -17,7 +17,6 @@ mod m20260330_012735_xreate_admin_table;
 mod m20260330_013623_create_newsletter_table;
 mod m20260706_222817_update_uploads_table;
 
-
 pub use sea_orm_migration::prelude::*;
 
 pub struct Migrator;

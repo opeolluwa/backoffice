@@ -162,7 +162,6 @@ fn default_graphql_complexity_limit() -> Option<usize> {
     Some(1000)
 }
 
-
 fn default_requests_time_out() -> Duration {
     Duration::from_secs(10)
 }

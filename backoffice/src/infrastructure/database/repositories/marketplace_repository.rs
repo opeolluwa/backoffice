@@ -9,8 +9,8 @@ use ulid::Ulid;
 
 use crate::{
     api::http::extractors::marketplace::CreateMarketplaceRequest,
-    domain::ports::marketplace_repository::MarketplaceRepositoryExt,
     domain::models::marketplaces::{self, Entity as MarketplaceEntity},
+    domain::ports::marketplace_repository::MarketplaceRepositoryExt,
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };

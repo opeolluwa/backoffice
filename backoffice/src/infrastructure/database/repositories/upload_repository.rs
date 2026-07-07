@@ -4,18 +4,17 @@ use sea_orm::{
 };
 use ulid::Ulid;
 
+use crate::domain::models::sea_orm_active_enums::FileType;
 use crate::{
     api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
     domain::{
         models::uploads::{self, Entity as UploadEntity},
         ports::upload_repository::UploadRepositoryExt,
-        
     },
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };
 
-use crate::domain::models::sea_orm_active_enums::FileType;
 #[derive(Debug, Clone)]
 pub struct UploadRepository {
     db: DatabaseConnection,
