@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod countries;
+pub mod email;
 pub mod marketplaces;
 pub mod products;
 pub mod root;

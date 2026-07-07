@@ -2,6 +2,7 @@ pub mod activities;
 pub mod auth;
 pub mod collections;
 pub mod country;
+pub mod email;
 pub mod marketplace;
 pub mod products;
 pub mod public;

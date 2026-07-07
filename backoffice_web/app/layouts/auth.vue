@@ -15,7 +15,7 @@
       class="relative z-10 min-w-1/3 mx-auto px-4 overflow-y-auto py-10"
     >
       <div
-        class="bg-white border border-gray-100 rounded-2xl px-8 py-10 shadow-sm dark:bg-brand-dark-600/80 dark:backdrop-blur-md dark:border-white/8"
+        class=" border border-gray-100 rounded-2xl px-8 py-10 shadow-sm dark:bg-brand-dark-600/80 dark:backdrop-blur-md dark:border-white/8"
       >
 
 

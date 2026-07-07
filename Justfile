@@ -1,10 +1,23 @@
-alias w:= watch
-alias k:= kill
-alias b:= build
-alias l:= logs
+alias w := watch
+alias k := kill
+alias b := build
+alias l := logs
 alias install := install-dependencies
-alias r:= restart
-alias cfg:= copy-env
+alias r := restart
+alias cfg := copy-env
+
+set shell := ["bash.exe", "-c"]
+set dotenv-required := false
+set dotenv-load := true
+set dotenv-path := "./backoffice/.env"
+set export := true
+
+FRONTEND_DIR := 'backoffice_web'
+DOCKER_CMD := "podman compose -f docker-compose.yaml"
+DEV_DB_URL := "postgres://backoffice:backoffice@localhost:6543/backoffice"
+
+@default:
+    @just --list --list-heading $'Available commands\n'
 
 
 [doc('Install all application dependencies (backend + frontend)')]
@@ -19,12 +32,12 @@ alias cfg:= copy-env
 
 
 @watch:
-    docker compose up -d
+    {{ DOCKER_CMD }} up -d
     @just l
 
 
 @logs:
-    docker compose logs -f --tail='30' app
+    {{ DOCKER_CMD }} logs -f --tail='30' app
 
 
 build:
@@ -32,7 +45,7 @@ build:
 
 
 @kill:
-    docker compose down -v
+    {{ DOCKER_CMD }} down -v
 
 
 @restart:
@@ -49,28 +62,16 @@ build:
 #  ["sh", "-cu"]
 # }
 
-set shell := ["powershell.exe", "-NoProfile", "-Command"]
-
-set dotenv-required := false
-set dotenv-load := true
-set dotenv-path := "./backoffice/.env"
-set export :=  true
-
-FRONTEND_DIR:='backoffice_web'
-DOCKER_CMD := "docker compose -f docker-compose.yaml"
-DEV_DB_URL:="postgres://backoffice:backoffice@localhost:6543/backoffice"
-
-@default: 
-    @just --list --list-heading $'Available commands\n'
 
 
 
-[working-directory :'backoffice_web']
+
+[working-directory: 'backoffice_web']
 @run-frontend:
     npm run dev
 
 
-[working-directory :'backoffice_web']
+[working-directory: 'backoffice_web']
 @build-frontend:
     npm run generate
     {{ if os_family() == "windows" { "Remove-Item -Recurse -Force ../assets" } else { "rm -rf ../assets" } }}
@@ -78,7 +79,7 @@ DEV_DB_URL:="postgres://backoffice:backoffice@localhost:6543/backoffice"
 
 
 run:
-    {{ DOCKER_CMD }} up -d 
+    {{ DOCKER_CMD }} up -d
     {{ DOCKER_CMD }} logs -f --tail='30' app
 
 
@@ -94,11 +95,11 @@ test:
 
 
 db:
-    sqlx migrate run 
+    sqlx migrate run
     cargo sqlx prepare -- --bin cli
 
 run-cli:
-    cargo run --bin cli create-user 
+    cargo run --bin cli create-user
 
 run-init:
     cargo run --bin cli init
@@ -108,30 +109,30 @@ migrate-add target:
     sea-orm-cli migrate generate {{target}}
 
 @generate-entities:
-	sea-orm-cli generate entity \
-		--database-url {{DEV_DB_URL}} \
-		--with-serde both \
-		--enum-extra-derives 'ts_rs::TS' \
-		--model-extra-attributes 'serde(rename_all=\"camelCase\")' \
-		--model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
-		--enum-extra-attributes 'ts(export)' \
-		--ignore-tables backoffice_server_migrations,products \
-		-o backoffice/src/domain/models --seaography
+    sea-orm-cli generate entity \
+        --database-url {{DEV_DB_URL}} \
+        --with-serde both \
+        --enum-extra-derives 'ts_rs::TS' \
+        --model-extra-attributes 'serde(rename_all=\"camelCase\")' \
+        --model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
+        --enum-extra-attributes 'ts(export)' \
+        --ignore-tables backoffice_server_migrations,products \
+        -o backoffice/src/domain/models --seaography
 
 
 
-[working-directory:'backoffice']
+[working-directory: 'backoffice']
 @run-migrations:
     sea-orm-cli migrate up --database-url {{DEV_DB_URL}}
 
-[working-directory:'backoffice']
+[working-directory: 'backoffice']
 export-bindings:
     cargo test
 
 db-pull:
     just run-migrations
-    just generate-entities 
+    just generate-entities
     just export-bindings
-    node scripts/ts-export.js 
+    node scripts/ts-export.js
 
 

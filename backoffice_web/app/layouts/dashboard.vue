@@ -50,11 +50,11 @@ const routes: RouteItem[] = [
     path: "/home",
     icon: "heroicons:squares-2x2",
   },
-  {
-    label: "Calendar",
-    path: "/calendar",
-    icon: "heroicons:calendar-days",
-  },
+  // {
+  //   label: "Calendar",
+  //   path: "/calendar",
+  //   icon: "heroicons:calendar-days",
+  // },
   {
     divider: true,
     label: "Operations",
@@ -114,10 +114,10 @@ const getKey = (item: RouteItem) =>
 </script>
 
 <template>
-  <div class="flex h-screen bg-gray-50 dark:bg-brand-dark-500">
+  <div class="flex h-screen">
     <!-- Sidebar -->
     <aside
-      class="w-60 shrink-0 flex flex-col bg-white dark:bg-brand-dark-600 border-r border-gray-100 dark:border-white/5"
+      class="w-60 shrink-0 flex flex-col border-r border-gray-100 dark:border-white/5"
     >
       <!-- Brand mark -->
       <div class="px-5 py-5 border-b border-gray-100 dark:border-white/5">
@@ -143,8 +143,8 @@ const getKey = (item: RouteItem) =>
           <template v-else>
             <NuxtLink
               :href="item.path"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 dark:text-white/40 hover:text-gray-800 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all mb-0.5"
-              active-class="!text-brand dark:!text-brand-300 !bg-brand-50 dark:!bg-brand/10 font-medium"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 dark:text-white/40 hover:text-gray-800 dark:hover:text-white transition-all mb-0.5"
+              active-class="!text-brand dark:!text-brand-300  font-medium"
             >
               <UIcon :name="item.icon" class="size-4 shrink-0" />
               <span>{{ item.label }}</span>
@@ -156,7 +156,7 @@ const getKey = (item: RouteItem) =>
       <!-- Sign out -->
       <div class="px-3 pb-4 pt-3 border-t border-gray-100 dark:border-white/5">
         <button
-          class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 dark:text-white/25 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all cursor-pointer"
+          class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 dark:text-white/25 hover:text-red-500 dark:hover:text-red-400  transition-all cursor-pointer"
           @click="logout"
         >
           <UIcon
@@ -172,7 +172,7 @@ const getKey = (item: RouteItem) =>
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <!-- Header -->
       <header
-        class="flex items-center justify-between px-8 py-3.5 bg-white dark:bg-brand-dark-600 border-b border-gray-100 dark:border-white/5 shrink-0"
+        class="flex items-center justify-between px-8 py-3.5 border-b border-gray-100 dark:border-white/5 shrink-0"
       >
         <UForm :schema="schema" :state="state" class="w-80">
           <UFormField name="query">
@@ -187,7 +187,7 @@ const getKey = (item: RouteItem) =>
             >
               <template #trailing>
                 <kbd
-                  class="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-gray-200 dark:border-white/10 text-[10px] font-medium text-gray-400 dark:text-white/30 bg-gray-50 dark:bg-white/5 select-none"
+                  class="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-gray-200 dark:border-white/10 text-[10px] font-medium text-gray-400 dark:text-white/30 select-none"
                 >
                   {{ isMac ? "⌘" : "Ctrl" }}F
                 </kbd>

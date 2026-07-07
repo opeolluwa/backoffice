@@ -32,8 +32,7 @@ export default defineNuxtConfig({
     "pinia-plugin-persistedstate/nuxt",
     "@vueuse/nuxt",
     "nuxt-seo-utils",
-    "@nuxtjs/google-fonts",
-
+    '@nuxtjs/apollo',
     ['@nuxtjs/google-fonts', {
         families: {
           Roboto: true,
@@ -52,7 +51,15 @@ export default defineNuxtConfig({
         }
     }],
   ],
+  apollo: {
+    clientConfigs: {
+      default: {
+        httpEndpoint: 'http://localhost:4000',
+      }
+    }
+  },
   pinia: {
     storesDirs: ["./stores/**"],
   },
+  
 });
