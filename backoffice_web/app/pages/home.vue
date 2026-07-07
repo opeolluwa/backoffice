@@ -127,7 +127,7 @@ function formatDate(dt?: string | null) {
         <div
           v-for="stat in stats"
           :key="stat.label"
-          class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5 flex flex-col gap-4"
+          class="border border-gray-100 dark:border-white/5 rounded-2xl p-5 flex flex-col gap-4"
         >
           <div class="flex items-center justify-between">
             <span class="text-sm text-gray-500 dark:text-white/40 font-medium">
@@ -169,7 +169,7 @@ function formatDate(dt?: string | null) {
 
       <!-- Activity chart (1/3 width) -->
       <div
-        class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+        class="border border-gray-100 dark:border-white/5 rounded-2xl p-5"
       >
         <div class="flex items-center justify-between mb-4">
           <p class="text-sm font-semibold text-gray-700 dark:text-white/80">
@@ -228,7 +228,7 @@ function formatDate(dt?: string | null) {
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <!-- Quick links -->
       <div
-        class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+        class="border border-gray-100 dark:border-white/5 rounded-2xl p-5"
       >
         <p class="text-sm font-semibold text-gray-700 dark:text-white/80 mb-4">
           Quick access
@@ -238,7 +238,7 @@ function formatDate(dt?: string | null) {
             v-for="link in quickLinks"
             :key="link.path"
             :to="link.path"
-            class="flex flex-col items-center gap-2 p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-brand-50 dark:hover:bg-brand/10 hover:text-brand group transition-all"
+            class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-brand-50 dark:hover:bg-brand/10 hover:text-brand group transition-all"
           >
             <UIcon
               :name="link.icon"
@@ -255,7 +255,7 @@ function formatDate(dt?: string | null) {
 
       <!-- Recent marketplaces -->
       <div
-        class="xl:col-span-2 bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+        class="xl:col-span-2 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
       >
         <div class="flex items-center justify-between mb-4">
           <p class="text-sm font-semibold text-gray-700 dark:text-white/80">

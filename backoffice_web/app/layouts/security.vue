@@ -32,13 +32,13 @@
       class="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-brand/10 blur-[120px] pointer-events-none dark:bg-brand/20"
     />
     <div
-      class="absolute bottom-0 right-0 w-[320px] h-80 rounded-full bg-brand/8 blur-[100px] pointer-events-none dark:bg-brand/10"
+      class="absolute bottom-0 right-0 w-[320px] h-80 rounded-full  blur-[100px] pointer-events-none dark:bg-brand/10"
     />
 
     <!-- Card -->
     <div class="relative z-10 w-1/3 min-w-80 mx-auto px-4">
       <div
-        class="bg-white border border-gray-100 rounded-2xl px-8 py-10 shadow-lg dark:bg-brand-dark-600/80 dark:backdrop-blur-md dark:border-white/8 dark:shadow-2xl"
+        class=" rounded-2xl px-8 py-10 shadow-lg dark:bg-brand-dark-600/80 dark:backdrop-blur-md dark:border-white/8 dark:shadow-2xl"
       >
         <!-- Brand mark -->
         <div class="flex items-center justify-center gap-2.5 mb-8">
