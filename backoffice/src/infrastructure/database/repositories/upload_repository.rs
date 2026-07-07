@@ -6,12 +6,16 @@ use ulid::Ulid;
 
 use crate::{
     api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
-    domain::ports::upload_repository::UploadRepositoryExt,
-    domain::models::uploads::{self, Entity as UploadEntity},
+    domain::{
+        models::uploads::{self, Entity as UploadEntity},
+        ports::upload_repository::UploadRepositoryExt,
+        
+    },
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };
 
+use crate::domain::models::sea_orm_active_enums::FileType;
 #[derive(Debug, Clone)]
 pub struct UploadRepository {
     db: DatabaseConnection,
@@ -32,11 +36,10 @@ impl UploadRepositoryExt for UploadRepository {
         let model = uploads::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
             name: Set(request.name.clone()),
-            src: Set(request.src.clone()),
-            file_type: Set(request.file_type.clone()),
-            size: Set(request.size),
+            url: Set(request.src.clone()),
+            file_type: Set(None), //TODO: Set the file_type to None initially
+            file_size: Set(request.size),
             starred: Set(request.starred.unwrap_or(false)),
-            user_identifier: Set(Some(user_identifier.to_string())),
             ..Default::default()
         };
         model.insert(&self.db).await.map_err(DatabaseError::from)
@@ -45,35 +48,25 @@ impl UploadRepositoryExt for UploadRepository {
     async fn find_upload_by_identifier(
         &self,
         identifier: &str,
-        user_identifier: &str,
     ) -> Result<uploads::Model, DatabaseError> {
         UploadEntity::find()
             .filter(uploads::Column::Identifier.eq(identifier))
-            .filter(uploads::Column::UserIdentifier.eq(user_identifier))
             .one(&self.db)
             .await
             .map_err(DatabaseError::from)?
             .ok_or_else(|| DatabaseError::NotFound("upload not found".to_string()))
     }
 
-    async fn find_all_uploads(
-        &self,
-        user_identifier: &str,
-    ) -> Result<Vec<uploads::Model>, DatabaseError> {
+    async fn find_all_uploads(&self) -> Result<Vec<uploads::Model>, DatabaseError> {
         UploadEntity::find()
-            .filter(uploads::Column::UserIdentifier.eq(user_identifier))
             .order_by_desc(uploads::Column::CreatedAt)
             .all(&self.db)
             .await
             .map_err(DatabaseError::from)
     }
 
-    async fn find_starred_uploads(
-        &self,
-        user_identifier: &str,
-    ) -> Result<Vec<uploads::Model>, DatabaseError> {
+    async fn find_starred_uploads(&self) -> Result<Vec<uploads::Model>, DatabaseError> {
         UploadEntity::find()
-            .filter(uploads::Column::UserIdentifier.eq(user_identifier))
             .filter(uploads::Column::Starred.eq(true))
             .order_by_desc(uploads::Column::CreatedAt)
             .all(&self.db)
@@ -85,11 +78,9 @@ impl UploadRepositoryExt for UploadRepository {
         &self,
         identifier: &str,
         request: &UpdateUploadRequest,
-        user_identifier: &str,
     ) -> Result<uploads::Model, DatabaseError> {
         let upload = UploadEntity::find()
             .filter(uploads::Column::Identifier.eq(identifier))
-            .filter(uploads::Column::UserIdentifier.eq(user_identifier))
             .one(&self.db)
             .await
             .map_err(DatabaseError::from)?
@@ -105,23 +96,17 @@ impl UploadRepositoryExt for UploadRepository {
         active.update(&self.db).await.map_err(DatabaseError::from)
     }
 
-    async fn delete_upload(
-        &self,
-        identifier: &str,
-        user_identifier: &str,
-    ) -> Result<(), DatabaseError> {
+    async fn delete_upload(&self, identifier: &str) -> Result<(), DatabaseError> {
         UploadEntity::delete_many()
             .filter(uploads::Column::Identifier.eq(identifier))
-            .filter(uploads::Column::UserIdentifier.eq(user_identifier))
             .exec(&self.db)
             .await
             .map_err(DatabaseError::from)?;
         Ok(())
     }
 
-    async fn count_uploads(&self, user_identifier: &str) -> Result<i64, DatabaseError> {
+    async fn count_uploads(&self) -> Result<i64, DatabaseError> {
         let count = UploadEntity::find()
-            .filter(uploads::Column::UserIdentifier.eq(user_identifier))
             .count(&self.db)
             .await
             .map_err(DatabaseError::from)?;

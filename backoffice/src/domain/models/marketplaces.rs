@@ -21,8 +21,6 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::products::Entity")]
-    Products,
     #[sea_orm(
         belongs_to = "super::users::Entity",
         from = "Column::UserIdentifier",
@@ -31,12 +29,6 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Users,
-}
-
-impl Related<super::products::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Products.def()
-    }
 }
 
 impl Related<super::users::Entity> for Entity {
@@ -49,8 +41,6 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
 pub enum RelatedEntity {
-    #[sea_orm(entity = "super::products::Entity")]
-    Products,
     #[sea_orm(entity = "super::users::Entity")]
     Users,
 }

@@ -1,7 +1,4 @@
-use std::{
-    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
-    time::Duration,
-};
+use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 
 use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
 use errors::app_error::AppError;

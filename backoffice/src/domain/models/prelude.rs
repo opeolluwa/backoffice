@@ -7,7 +7,6 @@ pub use super::countries::Entity as Countries;
 pub use super::emails::Entity as Emails;
 pub use super::marketplaces::Entity as Marketplaces;
 pub use super::newsletter::Entity as Newsletter;
-pub use super::products::Entity as Products;
 pub use super::teams::Entity as Teams;
 pub use super::uploads::Entity as Uploads;
 pub use super::user_roles::Entity as UserRoles;

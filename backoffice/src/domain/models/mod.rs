@@ -9,12 +9,12 @@ pub mod countries;
 pub mod emails;
 pub mod marketplaces;
 pub mod newsletter;
-pub mod products;
+pub mod sea_orm_active_enums;
 pub mod teams;
 pub mod uploads;
 pub mod user_roles;
 pub mod users;
-
+pub mod products;
 seaography::register_entity_modules!([
     activities,
     admin_users,
@@ -23,9 +23,10 @@ seaography::register_entity_modules!([
     emails,
     marketplaces,
     newsletter,
-    products,
     teams,
     uploads,
     user_roles,
+    products,
     users,
 ]);
+seaography::register_active_enums!([sea_orm_active_enums::FileType,]);
