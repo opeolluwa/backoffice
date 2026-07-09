@@ -1,47 +1,32 @@
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 
-use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
-use errors::app_error::AppError;
+use axum::{Router, extract::DefaultBodyLimit, http::StatusCode, routing::get};
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
 use crate::{
-    api::{load_graphql_router, load_http_routes, state::AppState},
     config::{cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal},
-    errors,
-    infrastructure::database::connection::init_db_pool,
+    errors::StartupError,
 };
 
-pub async fn run() -> Result<(), AppError> {
+pub async fn run() -> Result<(), StartupError> {
     init_tracing();
 
-    let app_config = load_config()?;
-    let db_conn = init_db_pool().await?;
-
-    let app_state = AppState::new(&db_conn)?;
-    let graphql_router = load_graphql_router(db_conn, &app_config, app_state.clone())?;
-    let http_routes = load_http_routes(app_state);
+    let cfg = load_config();
 
     let app = Router::new()
-        .merge(graphql_router)
-        .merge(http_routes)
+        .route("/health", get(|| async { StatusCode::OK }))
         .layer(DefaultBodyLimit::disable())
-        .layer(RequestBodyLimitLayer::new(app_config.body_limit_bytes))
+        .layer(RequestBodyLimitLayer::new(cfg.body_limit_bytes))
         .layer(TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
-            app_config.requests_time_out,
+            cfg.request_timeout,
         ))
-        .layer(tower_http::trace::TraceLayer::new_for_http())
-        .layer(init_cors(&app_config));
+        .layer(init_cors());
 
-    let ip_address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, app_config.port));
-    tracing::info!(
-        "Visit GraphQL Playground at http://{}{}",
-        ip_address,
-        app_config.endpoint
-    );
-    tracing::info!("Service health check at http://{}/health", ip_address,);
+    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, cfg.port));
+    tracing::info!("Server listening on http://{}/health", addr);
 
-    let listener = tokio::net::TcpListener::bind(ip_address).await?;
+    let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
@@ -49,4 +34,3 @@ pub async fn run() -> Result<(), AppError> {
     tracing::info!("Server shutdown completed");
     Ok(())
 }
-
