@@ -32,34 +32,38 @@ export default defineNuxtConfig({
     "pinia-plugin-persistedstate/nuxt",
     "@vueuse/nuxt",
     "nuxt-seo-utils",
-    '@nuxtjs/apollo',
-    ['@nuxtjs/google-fonts', {
+    "@nuxtjs/google-fonts",
+
+    [
+      "@nuxtjs/apollo",
+      {
+        clientConfigs: {
+               default: '~/plugins/graphql.ts', 
+        }
+      },
+    ],
+    [
+      "@nuxtjs/google-fonts",
+      {
         families: {
           Roboto: true,
           Inter: [400, 700],
-          'Josefin+Sans': true,
+          "Josefin+Sans": true,
           Lato: [100, 300],
           Raleway: {
             wght: [100, 400],
-            ital: [100]
+            ital: [100],
           },
-          Poppins: '200..700',
-          'Crimson Pro': {
-            wght: '200..900',
-            ital: '200..700',
-          }
-        }
-    }],
+          Poppins: "200..700",
+          "Crimson Pro": {
+            wght: "200..900",
+            ital: "200..700",
+          },
+        },
+      },
+    ],
   ],
-  apollo: {
-    clientConfigs: {
-      default: {
-        httpEndpoint: 'http://localhost:4000',
-      }
-    }
-  },
   pinia: {
     storesDirs: ["./stores/**"],
   },
-  
 });

@@ -3,4 +3,13 @@ name = "backoffice_console"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "backoffice_console_lib"
+path = "src/lib.rs"
+
 [dependencies]
+axum = { version = "0.8", features = ["macros"] }
+serde = { version = "1.0.228", features = ["derive"] }
+validators = { version = "0.25.3", features = ["serde"] }
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
+sanitizer = { version = "1.0.0", features = ["derive"] }
