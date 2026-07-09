@@ -3,13 +3,8 @@
 
 <template>
   <div
-    class="h-screen w-full flex items-center justify-center overflow-hidden relative bg-linear-to-br from-brand-50 via-white to-brand-50 dark:bg-brand-dark-700"
+    class="h-screen w-full flex items-center justify-center overflow-hidden relative"
   >
-
-
-
-
-
     <!-- Centered card -->
     <div
       class="relative z-10 min-w-1/3 mx-auto px-4 overflow-y-auto py-10"

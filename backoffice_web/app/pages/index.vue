@@ -58,7 +58,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div>
+  <div class="bg-[#080616]">
     <AppLeadingText> Welcome </AppLeadingText>
 
     <p class="text-center text-gray-500 leading-6 mt-2">

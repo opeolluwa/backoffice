@@ -1,6 +1,21 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+:root {
+    --color-app-dark: oklch(13.676% 0.03548 287.59);
+    --color-app-dark-50: oklch(40.069% 0.18338 279.76);
+    --color-app-dark-100: oklch(37.506% 0.16855 280.32);
+    --color-app-dark-200: oklch(31.927% 0.13934 280.81);
+    --color-app-dark-300: oklch(26.109% 0.10843 281.58);
+    --color-app-dark-400: oklch(20.291% 0.07314 283.58);
+    --color-app-dark-500: oklch(13.676% 0.03548 287.59);
+    --color-app-dark-600: oklch(0% 0 none);
+    --color-app-dark-700: oklch(0% 0 none);
+    --color-app-dark-800: oklch(0% 0 none);
+    --color-app-dark-900: oklch(0% 0 none);
+    --color-app-dark-950: oklch(0% 0 none);
+}
+
 @theme{
     --color-primary: oklch(51.546% 0.25256 264.74);
 --color-primary-50: oklch(88.231% 0.05412 271.45);
@@ -14,4 +29,12 @@
 --color-primary-800: oklch(26.682% 0.12927 264.22);
 --color-primary-900: oklch(17.19% 0.07083 263.75);
 --color-primary-950: oklch(11.862% 0.03661 260.4);
+
+
+
+}
+
+
+.dark {
+    --ui-bg: var(--color-app-dark-500);     
 }
