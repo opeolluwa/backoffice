@@ -1,11 +1,12 @@
 <template>
   <div class="flex flex-wrap gap-4 pt-8">
-    <div class="w-1/4" v-for="component in conponents" :key="component.name">
+    <div class="w-1/4 cursor-pointer" v-for="component in conponents" :key="component.name">
       <UPageCard
         :title="component.name"
         :description="component.description"
         :icon="component.icon"
-        class="px-3 py-2 hover:bg-accented"
+        class="px-3 py-2 hover:bg-accented cursor-pointer"
+        :to="`/${component.name}`"
       />
     </div>
   </div>
