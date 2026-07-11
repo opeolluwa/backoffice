@@ -1,11 +1,12 @@
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 
-use axum::{Router, extract::DefaultBodyLimit, http::StatusCode, routing::get};
+use axum::{extract::DefaultBodyLimit, http::StatusCode};
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
 use crate::{
     config::{cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal},
     errors::StartupError,
+    router::router,
 };
 
 pub async fn run() -> Result<(), StartupError> {
@@ -13,8 +14,7 @@ pub async fn run() -> Result<(), StartupError> {
 
     let cfg = load_config();
 
-    let app = Router::new()
-        .route("/health", get(|| async { StatusCode::OK }))
+    let app = router()
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(cfg.body_limit_bytes))
         .layer(TimeoutLayer::with_status_code(

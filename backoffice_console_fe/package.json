@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "postgenerate": "cp -r .output/public/* ../backoffice_console/assets/"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.16.0",
@@ -21,5 +22,8 @@
     "typescript": "^6.0.3",
     "vue": "^3.5.39",
     "vue-router": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1"
   }
 }
