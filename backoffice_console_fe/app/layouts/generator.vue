@@ -12,7 +12,6 @@
             class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-accented transition-colors"
             active-class="bg-accented"
           >
-            <UIcon :name="link.icon" class="w-5 h-5" />
             <span>{{ link.label }}</span>
           </NuxtLink>
         </li>
