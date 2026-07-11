@@ -7,6 +7,7 @@
         :icon="component.icon"
         class="px-3 py-2 hover:bg-accented cursor-pointer"
         :to="`/${component.name}`"
+        :ui="{}"
       />
     </div>
   </div>
@@ -17,32 +18,32 @@ const conponents = ref([
   {
     name: "entity",
     description: "create entities",
-    icon: "",
+    icon: "lucide:database",
   },
   {
     name: "service",
     description: "create services",
-    icon: "",
+    icon: "lucide:server",
   },
   {
     name: "repository",
     description: "create repositories",
-    icon: "",
+    icon: "lucide:git-branch",
   },
   {
     name: "handlers",
     description: "create handlers",
-    icon: "",
+    icon: "lucide:pointer",
   },
   {
     name: "modules",
     description: "create modules",
-    icon: "",
+    icon: "lucide:puzzle",
   },
   {
     name: "views",
     description: "create views",
-    icon: "",
+    icon: "lucide:monitor",
   },
 ]);
 </script>
