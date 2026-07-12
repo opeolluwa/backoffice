@@ -6,10 +6,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "invitation")]
+#[serde(rename_all = "camelCase")]
 #[backoffice_macros::ts_rs_export_sea_orm_entity_name]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub identifier: i32,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub identifier: Uuid,
     pub email: String,
     pub status: Option<InvitationStatus>,
     pub token: String,

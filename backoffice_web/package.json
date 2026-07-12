@@ -51,5 +51,14 @@
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.73",
     "prettier": "3.6.2"
+  },
+  "allowScripts": {
+    "vue-demi@0.14.10": true,
+    "@parcel/watcher@2.5.1": true,
+    "@scarf/scarf@1.4.0": true,
+    "esbuild@0.25.11": true,
+    "fsevents@2.3.3": true,
+    "sharp@0.32.6": true,
+    "unrs-resolver@1.11.1": true
   }
 }

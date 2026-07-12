@@ -3,6 +3,7 @@ alias k := kill
 alias b := build
 alias l := logs
 alias install := install-dependencies
+alias run-fe := run-frontend
 alias r := restart
 alias cfg := copy-env
 
@@ -107,7 +108,7 @@ migrate-add target:
         --database-url {{DEV_DB_URL}} \
         --with-serde both \
         --enum-extra-derives 'ts_rs::TS' \
-        --model-extra-attributes 'serde(rename_all=\"camelCase\")' \
+        --model-extra-attributes 'serde(rename_all="camelCase")' \
         --model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
         --enum-extra-attributes 'ts(export)' \
         --ignore-tables backoffice_server_migrations \

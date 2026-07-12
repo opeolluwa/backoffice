@@ -79,7 +79,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       :schema="schema"
       :state="state"
       class="space-y-4 w-full mt-6"
-      :on-submit="onSubmit"
+      @submit="onSubmit"
     >
       <!-- Email Field -->
       <UFormField
