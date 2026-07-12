@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import type { UserProfile } from "~/bindings/UserProfile";
 import axios from "axios";
+import api from "~/plugin/api";
 
 export const useUserInformationStore = defineStore("user_information", {
   state: () => ({
@@ -10,16 +11,24 @@ export const useUserInformationStore = defineStore("user_information", {
     email: "",
     profilePicture: "",
     username: "",
+    fullName: "",
   }),
 
   getters: {
-    user: (state): UserProfile => ({
+    user: (
+      state,
+    ): UserProfile & {
+      fullName: string;
+      profilePicture: string;
+      username: string;
+    } => ({
       identifier: state.identifier,
       firstName: state.firstName,
       lastName: state.lastName,
       email: state.email,
-      // profilePicture: state.profilePicture,
-      // username: state.username,
+      profilePicture: state.profilePicture,
+      username: state.username,
+      fullName: `${state.firstName} ${state.lastName}`,
     }),
     fullName: (state) => `${state.firstName} ${state.lastName}`,
     userFirstName: (state) => state.firstName,
@@ -32,18 +41,16 @@ export const useUserInformationStore = defineStore("user_information", {
         state.firstName = userInformation.firstName ?? "";
         state.lastName = userInformation.lastName ?? "";
         state.email = userInformation.email;
-        // state.profilePicture = userInformation.profilePicture ?? "";
-        // state.username = userInformation.username ?? "";
       });
       return userInformation;
     },
     async fetchUserInformation(token: string): Promise<UserProfile> {
       try {
-        const response = await axios.get("/users/profile", {
+        const response = await api.get("/users/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log(response.data)
-        return response.data as UserProfile;
+
+        return response.data.data as UserProfile;
       } catch (error) {
         throw new Error(`Failed to fetch user information due to ${error}`);
       }

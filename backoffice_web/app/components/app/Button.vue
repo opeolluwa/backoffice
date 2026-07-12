@@ -5,7 +5,6 @@
     :loading="loading"
     :size="size"
     :disabled="disabled || loading"
-    :ui="{ base: 'py-3 pl-4' }"
   >
     <slot />
   </UButton>

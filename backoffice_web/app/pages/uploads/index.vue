@@ -112,27 +112,14 @@ function fileIcon(type: string) {
 
 <template>
   <div class="space-y-6">
-    <template v-if="!hasFiles">
-      <div
-        class="flex flex-col items-center justify-center py-16 gap-4 text-center"
-      >
-        <div class="w-16 h-16 rounded-2xl flex items-center justify-center">
-          <UIcon
-            name="heroicons:arrow-up-tray"
-            class="size-8 text-gray-300 dark:text-white/20"
-          />
-        </div>
-        <div>
-          <p class="font-medium text-base">No files uploaded yet</p>
-          <p class="text-sm text-muted mt-1">
-            Drag and drop files above or click to browse.
-          </p>
-        </div>
-        <UButton color="primary" @click="fileInputRef?.click()">
-          Browse files
-        </UButton>
-      </div>
-    </template>
+    <AppEmptyState
+      v-if="!hasFiles"
+      icon="heroicons:arrow-up-tray"
+      title="No files uploaded yet"
+      description="Drag and drop files above or click to browse."
+      action-label="Browse files"
+      @action="fileInputRef?.click()"
+    />
     <!-- File grid -->
     <template v-else>
       <div class="flex items-center justify-between">

@@ -15,7 +15,6 @@ definePageMeta({
 const userStore = useUserInformationStore();
 const toast = useToast();
 
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
 
 type TabKey = "profile" | "security" | "notifications";
 const activeTab = ref<TabKey>("profile");
@@ -41,7 +40,6 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
   },
 ];
 
-// ─── Profile ──────────────────────────────────────────────────────────────────
 
 const profileSchema = v.object({
   firstName: v.pipe(v.string(), v.minLength(1, "First name is required.")),
@@ -64,11 +62,7 @@ const profileState = reactive<ProfileSchema>({
 
 const profileLoading = ref(false);
 
-const initials = computed(() => {
-  const f = profileState.firstName?.[0] ?? "";
-  const l = profileState.lastName?.[0] ?? "";
-  return (f + l).toUpperCase() || "?";
-});
+const initials = computed(() => useGetInitials(userStore.user));
 
 async function onProfileSubmit({ data }: FormSubmitEvent<ProfileSchema>) {
   profileLoading.value = true;
@@ -82,7 +76,6 @@ async function onProfileSubmit({ data }: FormSubmitEvent<ProfileSchema>) {
   }
 }
 
-// ─── Security ─────────────────────────────────────────────────────────────────
 
 const passwordSchema = v.pipe(
   v.object({
@@ -133,7 +126,6 @@ async function onPasswordSubmit({ data: _ }: FormSubmitEvent<PasswordSchema>) {
   }
 }
 
-// ─── Notifications ────────────────────────────────────────────────────────────
 
 const notificationItems = [
   {
@@ -183,7 +175,7 @@ function saveNotifications() {
 
 <template>
   <div class="flex gap-6 items-start">
-    <!-- ── Left nav ─────────────────────────────────────────────────────────── -->
+    <!-- ── Left nav  -->
     <aside class="w-52 shrink-0">
       <div
         class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-2 sticky top-0"
@@ -224,7 +216,7 @@ function saveNotifications() {
       </div>
     </aside>
 
-    <!-- ── Content ──────────────────────────────────────────────────────────── -->
+    <!-- ── Content ─ -->
     <div class="flex-1 min-w-0 max-w-xl">
       <!-- Profile ── -->
       <template v-if="activeTab === 'profile'">
@@ -272,52 +264,43 @@ function saveNotifications() {
               :on-submit="onProfileSubmit"
             >
               <div class="grid grid-cols-2 gap-4">
+                <AppInput
+                  v-model="profileState.firstName"
+                  label="First name"
+                  name="firstName"
+                  placeholder="Jane"
+                />
 
-                <UFormField label="First name" name="firstName" required>
-                  <UInput
-                    v-model="profileState.firstName"
-                    placeholder="Jane"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField label="Last name" name="lastName" required>
-                  <UInput
-                    v-model="profileState.lastName"
-                    placeholder="Doe"
-                    class="w-full"
-                  />
-                </UFormField>
+                <AppInput
+                  v-model="profileState.lastName"
+                  label="Last name"
+                  name="lastName"
+                  placeholder="Doe"
+                />
               </div>
 
-              <UFormField label="Username" name="username" required>
-                <UInput
-                  v-model="profileState.username"
-                  placeholder="janedoe"
-                  class="w-full"
-                >
-                  <template #leading>
-                    <span class="text-muted text-sm">@</span>
-                  </template>
-                </UInput>
-              </UFormField>
+              <AppInput
+                v-model="profileState.username"
+                label="Username"
+                name="username"
+                placeholder="janedoe"
+              />
 
-              <UFormField label="Email address" name="email" required>
-                <UInput
-                  v-model="profileState.email"
-                  placeholder="jane@example.com"
-                  class="w-full"
-                />
-              </UFormField>
+              <AppInput
+                v-model="profileState.email"
+                label="Email address"
+                name="email"
+                placeholder="jane@example.com"
+              />
 
               <div class="pt-1 flex items-center justify-between">
-                <UButton
+                <AppButton
                   type="submit"
                   :loading="profileLoading"
                   :disabled="profileLoading"
                 >
                   Save changes
-                </UButton>
+                </AppButton>
               </div>
             </UForm>
           </div>
@@ -360,53 +343,42 @@ function saveNotifications() {
               class="space-y-4"
               :on-submit="onPasswordSubmit"
             >
-              <UFormField
+              <AppInput
+                v-model="passwordState.currentPassword"
                 label="Current password"
                 name="currentPassword"
-                required
-              >
-                <UInput
-                  v-model="passwordState.currentPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  class="w-full"
-                />
-              </UFormField>
+                type="password"
+                placeholder="••••••••"
+              />
 
               <div
                 class="border-t border-gray-100 dark:border-white/5 pt-4 space-y-4"
               >
-                <UFormField label="New password" name="newPassword" required>
-                  <UInput
-                    v-model="passwordState.newPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    class="w-full"
-                  />
-                </UFormField>
+                <AppInput
+                  v-model="passwordState.newPassword"
+                  label="New password"
+                  name="newPassword"
+                  type="password"
+                  placeholder="••••••••"
+                />
 
-                <UFormField
+                <AppInput
+                  v-model="passwordState.confirmPassword"
                   label="Confirm new password"
                   name="confirmPassword"
-                  required
-                >
-                  <UInput
-                    v-model="passwordState.confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    class="w-full"
-                  />
-                </UFormField>
+                  type="password"
+                  placeholder="••••••••"
+                />
               </div>
 
               <div class="pt-1">
-                <UButton
+                <AppButton
                   type="submit"
                   :loading="passwordLoading"
                   :disabled="passwordLoading"
                 >
                   Change password
-                </UButton>
+                </AppButton>
               </div>
             </UForm>
           </div>
@@ -452,7 +424,7 @@ function saveNotifications() {
           </div>
 
           <div class="mt-5 pt-4 border-t border-gray-100 dark:border-white/5">
-            <UButton @click="saveNotifications"> Save preferences </UButton>
+            <AppButton @click="saveNotifications"> Save preferences </AppButton>
           </div>
         </div>
       </template>

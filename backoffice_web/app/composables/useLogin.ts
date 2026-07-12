@@ -39,13 +39,8 @@ export function useLogin() {
 
       tokenStore.persistAccessToken(respData.data.token);
       tokenStore.setAccessTokenExpiry(decodeJwtExpiry(respData.data.token));
+      await userStore.initialize(respData.data.token);
 
-      try {
-        await userStore.initialize(respData.data.token);
-      } catch(error) {
-        // User profile fetch failed, but login was successful
-        console.error(error);
-      }
 
       await router.push("/home");
       return { success: true };

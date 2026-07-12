@@ -41,7 +41,7 @@ const emit = defineEmits<{
     <AppButton
       v-if="actionLabel"
       
-      size="sm"
+      size="md"
       class="mt-6"
       @click="emit('action')"
     >

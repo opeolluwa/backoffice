@@ -4,6 +4,9 @@ import * as v from "valibot";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
 import type { TeamsInterface } from "~/bindings/TeamsInterface";
+import type { Invitation } from "~/bindings/InvitationInterface";
+import { useTeamsStore } from "~/stores/teams";
+import { useInvitationsStore } from "~/stores/invitations";
 
 definePageMeta({
   layout: "dashboard",
@@ -14,7 +17,10 @@ definePageMeta({
   },
 });
 
-const mockTeamsInterfaces: TeamsInterface[] = [];
+const teamsStore = useTeamsStore();
+const invitationsStore = useInvitationsStore();
+
+const loading = ref(true);
 
 const roleGroups = [
   {
@@ -36,15 +42,17 @@ const roleGroups = [
   },
 ];
 
-const members = ref<TeamsInterface[]>(mockTeamsInterfaces);
-
+const members = computed(() => teamsStore.members);
+const invitations = computed(() => invitationsStore.invitations);
+const pendingInvitations = computed(() =>
+  invitations.value.filter((i) => i.status === "Pending"),
+);
 const hasMembers = computed(() => members.value.length > 0);
 
 function membersForRole(role: TeamsInterface["role"]) {
   return members.value.filter((m) => m.role === role);
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -80,7 +88,6 @@ function avatarColor(identifier: string) {
   return avatarColors[idx];
 }
 
-// ─── Table Columns ────────────────────────────────────────────────────────────
 
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
@@ -109,14 +116,17 @@ function getColumns(): TableColumn<TeamsInterface>[] {
       },
     },
     {
-      accessorKey: "dateAdded",
+      accessorKey: "createdAt",
       header: "Date added",
-      cell: ({ row }) => formatDate(row.getValue("dateAdded")),
+      cell: ({ row }) => formatDate(row.getValue("createdAt")),
     },
     {
-      accessorKey: "lastActive",
+      accessorKey: "updatedAt",
       header: "Last active",
-      cell: ({ row }) => formatDate(row.getValue("lastActive")),
+      cell: ({ row }) => {
+        const val = row.getValue("updatedAt") as string | null;
+        return val ? formatDate(val) : "—";
+      },
     },
     {
       accessorKey: "blocked",
@@ -178,29 +188,101 @@ function getRowItems(row: Row<TeamsInterface>) {
     {
       label: member.blocked ? "Unblock" : "Block",
       icon: member.blocked ? "i-lucide-shield-check" : "i-lucide-shield-off",
-      onSelect() {
-        const idx = members.value.findIndex(
-          (m) => m.identifier === member.identifier,
-        );
-        // if (idx !== -1) {
-        //   members.value[idx].blocked = !members.value[idx].blocked;
-        // }
+      async onSelect() {
+        if (member.blocked) {
+          await teamsStore.unblockMember(member.identifier);
+        } else {
+          await teamsStore.blockMember(member.identifier);
+        }
       },
     },
     {
       label: "Remove",
       icon: "i-lucide-trash",
       class: "text-red-500",
-      onSelect() {
-        members.value = members.value.filter(
-          (m) => m.identifier !== member.identifier,
-        );
+      async onSelect() {
+        await teamsStore.deleteMember(member.identifier);
       },
     },
   ];
 }
 
-// ─── Invite Modal ─────────────────────────────────────────────────────────────
+
+function getInvitationColumns(): TableColumn<Invitation>[] {
+  return [
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => {
+        const inv = row.original;
+        return h("div", { class: "flex items-center gap-3" }, [
+          h(
+            "div",
+            {
+              class: "size-8 rounded-full flex items-center justify-center bg-gray-200 dark:bg-white/10 text-xs font-semibold shrink-0",
+            },
+            getInitials(inv.email.split("@")[0]),
+          ),
+          h("div", { class: "flex flex-col" }, [
+            h("span", { class: "font-medium text-sm" }, inv.email),
+          ]),
+        ]);
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string | null;
+        const color =
+          status === "Pending"
+            ? "warning"
+            : status === "Accepted"
+              ? "success"
+              : status === "Rejected"
+                ? "error"
+                : "neutral";
+        return h(
+          UBadge,
+          { color, variant: "subtle", size: "sm" },
+          () => status ?? "Unknown",
+        );
+      },
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Sent",
+      cell: ({ row }) => formatDate(row.getValue("createdAt")),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const inv = row.original;
+        return h("div", { class: "text-right" }, [
+          h(UButton, {
+            icon: "i-lucide-trash",
+            color: "error",
+            variant: "ghost",
+            size: "sm",
+            "aria-label": "Revoke invitation",
+            onClick: () => revokeInvitation(inv.identifier),
+          }),
+        ]);
+      },
+    },
+  ];
+}
+
+async function revokeInvitation(identifier: string) {
+  try {
+    await invitationsStore.deleteInvitation(identifier);
+    toast.add({ title: "Invitation revoked", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to revoke invitation", color: "error" });
+  }
+}
+
+const invitationColumns = getInvitationColumns();
 
 const openInvite = ref(false);
 
@@ -231,19 +313,7 @@ function resetInviteForm() {
 async function onInviteSubmit({ data }: FormSubmitEvent<InviteSchema>) {
   inviteLoading.value = true;
   try {
-    // TODO: replace with actual API call
-    // await api.post("/invitations", data);
-
-    // Optimistically add to mock list
-    members.value.push({
-      identifier: `01HZTEAM${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      role: data.role as TeamsInterface["role"],
-      dateAdded: new Date().toISOString().slice(0, 10),
-      lastActive: new Date().toISOString().slice(0, 10),
-      blocked: false,
-    });
+    await invitationsStore.createInvitation(data.email);
 
     toast.add({
       title: "Invitation sent",
@@ -265,28 +335,63 @@ async function onInviteSubmit({ data }: FormSubmitEvent<InviteSchema>) {
 }
 
 const columns = getColumns();
+
+onMounted(async () => {
+  try {
+    await Promise.all([
+      teamsStore.fetchAllMembers(),
+      invitationsStore.fetchAllInvitations(),
+    ]);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
   <div class="space-y-2">
-    <!-- Header: only shown when members exist -->
-    <div v-if="hasMembers" class="flex items-start justify-between mb-8">
+    <div v-if="loading" class="flex items-center justify-center h-[60vh]">
+      <p class="text-sm text-muted">Loading team members…</p>
+    </div>
+
+    <template v-else>
+    <!-- Header -->
+    <div class="flex items-start justify-between mb-8" v-if="hasMembers || pendingInvitations.length > 0">
+      <div>
+        <h2 class="text-lg font-semibold">Team members</h2>
+        <p class="text-sm text-muted mt-1">Manage your team and invitations.</p>
+      </div>
       <UButton class="px-4 py-2 shrink-0" @click="openInvite = true">
         Add team member
       </UButton>
     </div>
 
-    <!-- Empty State -->
+    <!-- Empty State (no members AND no invitations) -->
     <AppEmptyState
-      v-if="!hasMembers"
+      v-if="!hasMembers && pendingInvitations.length === 0"
       title="No team members yet"
       description="Invite your first team member to get started."
       action-label="Add team member"
       @action="openInvite = true"
     />
 
-    <!-- Role Groups -->
     <template v-else>
+      <!-- Pending Invitations -->
+      <div v-if="pendingInvitations.length > 0" class="mb-8">
+        <div class="mb-4">
+          <p class="font-semibold text-sm">Pending invitations</p>
+          <p class="text-xs text-muted mt-1">
+            Invitations that have been sent but not yet accepted.
+          </p>
+        </div>
+        <UTable
+          :data="pendingInvitations"
+          :columns="invitationColumns"
+          class="rounded border border-default"
+        />
+      </div>
+
+      <!-- Role Groups -->
       <div
         v-for="group in roleGroups"
         :key="group.role"
@@ -372,6 +477,7 @@ const columns = getColumns();
         </UForm>
       </template>
     </UModal>
+    </template>
   </div>
 </template>
 
