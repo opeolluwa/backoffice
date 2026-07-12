@@ -11,15 +11,15 @@ use crate::{
     config::env::AppConfig,
     domain::services::{
         admin::AdminService, auth::AuthenticationService, country::CountryService,
-        emails::EmailsService, marketplace::MarketplaceService, product::ProductService,
-        root::RootService, team::TeamService, user::UserService,
+        emails::EmailsService, invitation::InvitationService, marketplace::MarketplaceService,
+        product::ProductService, root::RootService, team::TeamService, user::UserService,
     },
     errors::app_error::AppError,
     infrastructure::database::repositories::{
         base::Repository, country_repository::CountryRepository, email_repository::EmailRepository,
-        marketplace_repository::MarketplaceRepository, product_repository::ProductRepository,
-        team_repository::TeamRepository, upload_repository::UploadRepository,
-        user_repository::UserRepository,
+        invitation_repository::InvitationRepository, marketplace_repository::MarketplaceRepository,
+        product_repository::ProductRepository, team_repository::TeamRepository,
+        upload_repository::UploadRepository, user_repository::UserRepository,
     },
 };
 
@@ -33,6 +33,7 @@ pub struct ServicesState {
     pub country_service: Arc<CountryService<CountryRepository>>,
     pub team_service: Arc<TeamService<TeamRepository>>,
     pub emails_service: Arc<EmailsService<EmailRepository>>,
+    pub invitation_service: Arc<InvitationService<InvitationRepository>>,
 }
 
 impl FromRef<ServicesState> for Arc<UserService<UserRepository>> {
@@ -83,6 +84,12 @@ impl FromRef<ServicesState> for Arc<EmailsService<EmailRepository>> {
     }
 }
 
+impl FromRef<ServicesState> for Arc<InvitationService<InvitationRepository>> {
+    fn from_ref(input: &ServicesState) -> Self {
+        Arc::clone(&input.invitation_service)
+    }
+}
+
 impl ServicesState {
     pub fn new(
         user_repository: UserRepository,
@@ -91,6 +98,7 @@ impl ServicesState {
         product_repository: ProductRepository,
         team_repository: TeamRepository,
         email_repository: EmailRepository,
+        invitation_repository: InvitationRepository,
         email_client: ZeptoMail,
     ) -> Self {
         let user_service = Arc::new(UserService::new(user_repository.clone()));
@@ -103,6 +111,7 @@ impl ServicesState {
         let team_service = Arc::new(TeamService::new(team_repository));
         let root_service = Arc::new(RootService::init());
         let emails_service = Arc::new(EmailsService::new(email_repository));
+        let invitation_service = Arc::new(InvitationService::new(invitation_repository));
 
         Self {
             user_service,
@@ -113,6 +122,7 @@ impl ServicesState {
             root_service,
             marketplace_service,
             emails_service,
+            invitation_service,
         }
     }
 }
@@ -142,6 +152,7 @@ impl AppState {
         let _upload_repository = UploadRepository::init(db_conn);
         let user_repository = UserRepository::init(db_conn);
         let product_repository = ProductRepository::init(db_conn);
+        let invitation_repository = InvitationRepository::init(db_conn);
 
         // externals
         let email_client = ZeptoMail::new(app_config.email_api_key.clone());
@@ -154,6 +165,7 @@ impl AppState {
             product_repository,
             team_repository,
             email_repository,
+            invitation_repository,
             email_client,
         );
 
