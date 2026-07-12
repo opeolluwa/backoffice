@@ -38,8 +38,8 @@ export default defineNuxtConfig({
       "@nuxtjs/apollo",
       {
         clientConfigs: {
-               default: '~/plugins/graphql.ts', 
-        }
+          default: "~/plugins/graphql.ts",
+        },
       },
     ],
     [

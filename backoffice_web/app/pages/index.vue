@@ -30,30 +30,31 @@ const router = useRouter();
 const tokenStore = useTokenStore();
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
+  console.log({ data })
   loading.value = true;
   formError.value = "";
 
-  try {
-    const { status, data: respData } = await api.post("/login", data);
-    alert("help")
-    console.log({
-      respData,
-    });
+  // try {
+  //   const { status, data: respData } = await api.post("/login", data);
 
-    if (status !== 200) {
-      throw new Error(respData?.message || "Login failed");
-    }
-    tokenStore.persistAccessToken(respData.data.token);
-    const token = tokenStore.accessToken;
-    console.log("Access Token:", token);
+  //   console.log({
+  //     respData,
+  //   });
 
-    await router.push("/home");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    formError.value = err.message || "An error occurred. Please try again.";
-  } finally {
-    loading.value = false;
-  }
+  //   if (status !== 200) {
+  //     throw new Error(respData?.message || "Login failed");
+  //   }
+  //   tokenStore.persistAccessToken(respData.data.token);
+  //   const token = tokenStore.accessToken;
+  //   console.log("Access Token:", token);
+
+  //   await router.push("/home");
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // } catch (err: any) {
+  //   formError.value = err.message || "An error occurred. Please try again.";
+  // } finally {
+  //   loading.value = false;
+  // }
 }
 </script>
 
