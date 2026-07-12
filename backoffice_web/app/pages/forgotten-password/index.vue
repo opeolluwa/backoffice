@@ -36,7 +36,7 @@ async function onSubmit() {
       Enter your email to receive a reset link
     </p>
 
-    <UForm :state="{ email: '' }" class="w-full mt-6" @submit="onSubmit">
+    <UForm :state="{ email: '' }" class="w-full mt-6" :on-submit="onSubmit">
       <UFormField
         v-slot="{ error }"
         label="Email"

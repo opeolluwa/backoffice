@@ -397,7 +397,7 @@ function clearFilters() {
           class="space-y-4"
           :schema="schema"
           :state="state"
-          @submit.prevent="onSubmit"
+          :on-submit="onSubmit"
         >
           <UFormField
             v-slot="{ error }"

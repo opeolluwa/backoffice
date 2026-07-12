@@ -98,19 +98,19 @@ run-cli:
 run-init:
     cargo run --bin cli init
 
-
+[working-directory: 'backoffice']
 migrate-add target:
     sea-orm-cli migrate generate {{target}}
 
 @generate-entities:
-    sea-orm-cli generate entity \
+    RUST_BACKTRACE=full sea-orm-cli generate entity \
         --database-url {{DEV_DB_URL}} \
         --with-serde both \
         --enum-extra-derives 'ts_rs::TS' \
         --model-extra-attributes 'serde(rename_all=\"camelCase\")' \
         --model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
         --enum-extra-attributes 'ts(export)' \
-        --ignore-tables backoffice_server_migrations,products \
+        --ignore-tables backoffice_server_migrations \
         -o backoffice/src/domain/models --seaography
 
 

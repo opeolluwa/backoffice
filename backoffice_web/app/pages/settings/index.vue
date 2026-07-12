@@ -192,7 +192,7 @@ function saveNotifications() {
             <p class="font-semibold text-gray-900 dark:text-white mb-1">Personal information</p>
             <p class="text-xs text-gray-400 dark:text-white/30 mb-5">Update your name, username, and email.</p>
 
-            <UForm :schema="profileSchema" :state="profileState" class="space-y-4" @submit="onProfileSubmit">
+            <UForm :schema="profileSchema" :state="profileState" class="space-y-4" :on-submit="onProfileSubmit">
               <div class="grid grid-cols-2 gap-4">
                 <UFormField label="First name" name="firstName" required>
                   <UInput v-model="profileState.firstName" placeholder="Jane" class="w-full" />
@@ -241,7 +241,7 @@ function saveNotifications() {
             <p class="font-semibold text-gray-900 dark:text-white mb-1">Change password</p>
             <p class="text-xs text-gray-400 dark:text-white/30 mb-5">You'll be asked to sign in again after changing your password.</p>
 
-            <UForm :schema="passwordSchema" :state="passwordState" class="space-y-4" @submit="onPasswordSubmit">
+            <UForm :schema="passwordSchema" :state="passwordState" class="space-y-4" :on-submit="onPasswordSubmit">
               <UFormField label="Current password" name="currentPassword" required>
                 <UInput v-model="passwordState.currentPassword" type="password" placeholder="••••••••" class="w-full" />
               </UFormField>

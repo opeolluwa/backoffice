@@ -68,7 +68,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       :schema="schema"
       :state="state"
       class="space-y-4 mt-6"
-      @submit="onSubmit"
+      :on-submit="onSubmit"
     >
       <UFormField
         v-slot="{ error }"

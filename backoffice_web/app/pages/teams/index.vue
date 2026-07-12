@@ -362,7 +362,7 @@ const columns = getColumns();
           class="space-y-4"
           :schema="inviteSchema"
           :state="inviteState"
-          @submit="onInviteSubmit"
+          :on-submit="onInviteSubmit"
         >
           <UFormField
             v-slot="{ error }"

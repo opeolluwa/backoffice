@@ -56,7 +56,7 @@ async function onSubmit() {
     <UForm
       :state="{ password: '', confirmPassword: '' }"
       class="w-full mt-6"
-      @submit="onSubmit"
+      :on-submit="onSubmit"
     >
       <UFormField
         v-slot="{ error }"

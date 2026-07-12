@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "users")]
-#[serde(rename_all = "camelCase")]
 #[backoffice_macros::ts_rs_export_sea_orm_entity_name]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
@@ -29,6 +28,8 @@ pub enum Relation {
     Emails,
     #[sea_orm(has_many = "super::marketplaces::Entity")]
     Marketplaces,
+    #[sea_orm(has_many = "super::products::Entity")]
+    Products,
     #[sea_orm(
         belongs_to = "super::user_roles::Entity",
         from = "Column::RoleIdentifier",
@@ -57,6 +58,12 @@ impl Related<super::marketplaces::Entity> for Entity {
     }
 }
 
+impl Related<super::products::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Products.def()
+    }
+}
+
 impl Related<super::user_roles::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::UserRoles.def()
@@ -73,6 +80,8 @@ pub enum RelatedEntity {
     Emails,
     #[sea_orm(entity = "super::marketplaces::Entity")]
     Marketplaces,
+    #[sea_orm(entity = "super::products::Entity")]
+    Products,
     #[sea_orm(entity = "super::user_roles::Entity")]
     UserRoles,
 }
