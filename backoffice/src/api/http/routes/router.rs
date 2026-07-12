@@ -6,9 +6,8 @@ use tower_http::services::{ServeDir, ServeFile};
 use crate::api::{
     http::routes::{
         auth::authentication_routes, country::country_routes, email::email_routes,
-        invitation::invitation_routes, marketplace::marketplace_routes,
-        products::product_routes, public::public_routes, teams::team_routes,
-        users::user_routes,
+        invitation::invitation_routes, marketplace::marketplace_routes, products::product_routes,
+        public::public_routes, teams::team_routes, users::user_routes,
     },
     state::AppState,
 };
@@ -26,7 +25,6 @@ pub fn load_routes(app_state: AppState) -> Router {
                 .merge(authentication_routes(Arc::clone(&state)))
                 .merge(marketplace_routes(Arc::clone(&state)))
                 .merge(product_routes(Arc::clone(&state)))
-                .merge(country_routes(Arc::clone(&state)))
                 .merge(team_routes(Arc::clone(&state)))
                 .merge(email_routes(Arc::clone(&state)))
                 .merge(invitation_routes(Arc::clone(&state))),

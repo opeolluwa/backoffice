@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import * as v from "valibot";
 import type { FormSubmitEvent } from "@nuxt/ui";
-import api from "~/plugin/api";
-import { useTokenStore } from "~/stores/token";
-import { useRouter } from "vue-router";
 
 definePageMeta({
   breadcrumb: {
@@ -11,6 +8,7 @@ definePageMeta({
   },
   layout: "auth",
 });
+
 const schema = v.object({
   email: v.pipe(v.string(), v.email("Please enter a valid email address.")),
   password: v.pipe(
@@ -26,34 +24,19 @@ const formError = ref("");
 const loading = ref(false);
 const showPassword = ref(false);
 
-const router = useRouter();
-const tokenStore = useTokenStore();
+const { login } = useLogin();
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   loading.value = true;
   formError.value = "";
 
-  try {
-    const { status, data: respData } = await api.post("/login", data);
+  const result = await login(data);
 
-    console.log({
-      respData,
-    });
-
-    if (status !== 200) {
-      throw new Error(respData?.message || "Login failed");
-    }
-    tokenStore.persistAccessToken(respData.data.token);
-    const token = tokenStore.accessToken;
-    console.log("Access Token:", token);
-
-    await router.push("/home");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    formError.value = err.message || "An error occurred. Please try again.";
-  } finally {
-    loading.value = false;
+  if (!result.success) {
+    formError.value = result.error || "An error occurred. Please try again.";
   }
+
+  loading.value = false;
 }
 </script>
 
@@ -65,16 +48,16 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       Please enter your email and password
     </p>
 
-     <UAlert
-        v-if="formError"
-        color="error"
-        variant="subtle"
-        title="Request failed"
-        :description="formError"
-        class="mt-4"
-        icon="heroicons:information-circle"
-      />
-      
+    <UAlert
+      v-if="formError"
+      color="error"
+      variant="subtle"
+      title="Request failed"
+      :description="formError"
+      class="mt-4"
+      icon="heroicons:information-circle"
+    />
+
     <UForm
       :schema="schema"
       :state="state"
@@ -135,7 +118,11 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
               :aria-label="showPassword ? 'Hide password' : 'Show password'"
               :aria-pressed="showPassword"
               aria-controls="password"
-              @click.prevent="() => { showPassword = !showPassword }"
+              @click.prevent="
+                () => {
+                  showPassword = !showPassword;
+                }
+              "
             />
           </template>
         </UInput>
@@ -158,7 +145,6 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       >
         Login
       </UButton>
-     
     </UForm>
   </div>
 </template>

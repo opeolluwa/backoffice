@@ -1,5 +1,6 @@
 use std::sync::Arc;
-
+use axum::middleware;
+use crate::api::http::middlewares::auth::authenticate;
 use axum::routing::{delete, post, put};
 use axum::{Router, routing::get};
 
@@ -26,5 +27,6 @@ pub(super) fn marketplace_routes(state: Arc<AppState>) -> Router {
     Router::new()
         // .nest("/marketplaces/{identifier}/products", product_routes)
         .nest("/marketplaces", routes)
+                .layer(middleware::from_fn(authenticate))
         .with_state(state)
 }

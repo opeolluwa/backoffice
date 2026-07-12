@@ -13,7 +13,6 @@ definePageMeta({
   },
 });
 
-
 interface TeamMember {
   identifier: string;
   name: string;
@@ -24,9 +23,7 @@ interface TeamMember {
   blocked: boolean;
 }
 
-
-const mockTeamMembers: TeamMember[] = []
-
+const mockTeamMembers: TeamMember[] = [];
 
 const roleGroups = [
   {
@@ -47,7 +44,6 @@ const roleGroups = [
     description: "Viewers have read-only access to the workspace.",
   },
 ];
-
 
 const members = ref<TeamMember[]>(mockTeamMembers);
 
@@ -88,7 +84,8 @@ const avatarColors = [
 ];
 
 function avatarColor(identifier: string) {
-  const idx = identifier.charCodeAt(identifier.length - 1) % avatarColors.length;
+  const idx =
+    identifier.charCodeAt(identifier.length - 1) % avatarColors.length;
   return avatarColors[idx];
 }
 
@@ -115,11 +112,7 @@ function getColumns(): TableColumn<TeamMember>[] {
           ),
           h("div", { class: "flex flex-col" }, [
             h("span", { class: "font-medium text-sm" }, member.name),
-            h(
-              "span",
-              { class: "text-xs text-muted" },
-              member.email,
-            ),
+            h("span", { class: "text-xs text-muted" }, member.email),
           ]),
         ]);
       },
@@ -287,11 +280,7 @@ const columns = getColumns();
   <div class="space-y-2">
     <!-- Header: only shown when members exist -->
     <div v-if="hasMembers" class="flex items-start justify-between mb-8">
-      <UButton
-        icon="i-lucide-user-plus"
-        class="px-4 py-2 shrink-0"
-        @click="openInvite = true"
-      >
+      <UButton class="px-4 py-2 shrink-0" @click="openInvite = true">
         Add team member
       </UButton>
     </div>
@@ -301,8 +290,13 @@ const columns = getColumns();
       v-if="!hasMembers"
       class="flex flex-col items-center justify-center h-[60vh] gap-4 text-center"
     >
-      <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-        <UIcon name="heroicons:users" class="size-8 text-gray-300 dark:text-white/20" />
+      <div
+        class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center"
+      >
+        <UIcon
+          name="heroicons:users"
+          class="size-8 text-gray-300 dark:text-white/20"
+        />
       </div>
       <div>
         <p class="font-medium text-base">No team members yet</p>

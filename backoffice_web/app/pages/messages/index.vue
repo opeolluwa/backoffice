@@ -38,7 +38,8 @@ const filteredEmails = computed(() => {
   let list = emailStore.emails;
 
   if (activeTab.value === "unread") list = list.filter((e) => !e.isRead);
-  else if (activeTab.value === "starred") list = list.filter((e) => e.isStarred);
+  else if (activeTab.value === "starred")
+    list = list.filter((e) => e.isStarred);
 
   const q = search.value.trim().toLowerCase();
   if (!q) return list;
@@ -52,7 +53,9 @@ const filteredEmails = computed(() => {
   );
 });
 
-const unreadCount = computed(() => emailStore.emails.filter((e) => !e.isRead).length);
+const unreadCount = computed(
+  () => emailStore.emails.filter((e) => !e.isRead).length,
+);
 
 async function selectEmail(email: Email) {
   selectedEmail.value = email;
@@ -71,7 +74,11 @@ function formatDate(dateStr: string) {
   const now = new Date();
   const isToday = date.toDateString() === now.toDateString();
   if (isToday) {
-    return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
   }
   return date.toLocaleDateString("en-US", { day: "numeric", month: "short" });
 }
@@ -96,7 +103,9 @@ function formatFullDate(dateStr: string) {
       class="w-80 shrink-0 flex flex-col bg-white dark:bg-brand-dark-600 rounded-xl border border-gray-100 dark:border-white/5 overflow-hidden"
     >
       <!-- Search + tabs -->
-      <div class="px-4 pt-4 pb-3 border-b border-gray-100 dark:border-white/5 space-y-3">
+      <div
+        class="px-4 pt-4 pb-3 border-b border-gray-100 dark:border-white/5 space-y-3"
+      >
         <UInput
           v-model="search"
           placeholder="Search messages..."
@@ -135,12 +144,21 @@ function formatFullDate(dateStr: string) {
           v-else-if="filteredEmails.length === 0"
           class="flex flex-col items-center justify-center h-full gap-4 text-center px-6"
         >
-          <div class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-            <UIcon name="heroicons:envelope-open" class="size-7 text-gray-300 dark:text-white/20" />
+          <div
+            class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center"
+          >
+            <UIcon
+              name="heroicons:envelope-open"
+              class="size-7 text-gray-300 dark:text-white/20"
+            />
           </div>
           <div>
-            <p class="font-medium text-sm text-gray-700 dark:text-white/60">No messages found</p>
-            <p class="text-xs text-muted mt-1">Try adjusting your search or filter.</p>
+            <p class="font-medium text-sm text-gray-700 dark:text-white/60">
+              No messages found
+            </p>
+            <p class="text-xs text-muted mt-1">
+              Try adjusting your search or filter.
+            </p>
           </div>
         </div>
 
@@ -148,7 +166,11 @@ function formatFullDate(dateStr: string) {
           v-for="email in filteredEmails"
           :key="email.identifier"
           class="w-full text-left px-4 py-3 border-b border-gray-50 dark:border-white/[0.03] hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer"
-          :class="selectedEmail?.identifier === email.identifier ? 'bg-brand-50/60 dark:bg-brand/5' : ''"
+          :class="
+            selectedEmail?.identifier === email.identifier
+              ? 'bg-brand-50/60 dark:bg-brand/5'
+              : ''
+          "
           @click="selectEmail(email)"
         >
           <div class="flex items-start justify-between gap-2">
@@ -179,14 +201,18 @@ function formatFullDate(dateStr: string) {
                 >
                   {{ email.subject }}
                 </p>
-                <p class="text-[10px] text-gray-400 dark:text-white/20 truncate mt-0.5">
+                <p
+                  class="text-[10px] text-gray-400 dark:text-white/20 truncate mt-0.5"
+                >
                   To: {{ email.recipientEmail }}
                 </p>
               </div>
             </div>
 
             <div class="flex flex-col items-end gap-1.5 shrink-0">
-              <span class="text-[10px] text-gray-400 dark:text-white/25 whitespace-nowrap">
+              <span
+                class="text-[10px] text-gray-400 dark:text-white/25 whitespace-nowrap"
+              >
                 {{ formatDate(email.dateSent) }}
               </span>
               <button
@@ -199,7 +225,9 @@ function formatFullDate(dateStr: string) {
                 @click="toggleStar(email, $event)"
               >
                 <UIcon
-                  :name="email.isStarred ? 'heroicons:star-solid' : 'heroicons:star'"
+                  :name="
+                    email.isStarred ? 'heroicons:star-solid' : 'heroicons:star'
+                  "
                   class="size-3.5"
                 />
               </button>
@@ -224,12 +252,21 @@ function formatFullDate(dateStr: string) {
         v-if="!selectedEmail"
         class="flex-1 flex flex-col items-center justify-center gap-4 text-center px-8"
       >
-        <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-          <UIcon name="heroicons:envelope" class="size-8 text-gray-300 dark:text-white/20" />
+        <div
+          class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center"
+        >
+          <UIcon
+            name="heroicons:envelope"
+            class="size-8 text-gray-300 dark:text-white/20"
+          />
         </div>
         <div>
-          <p class="font-medium text-base text-gray-700 dark:text-white/50">No message selected</p>
-          <p class="text-sm text-muted mt-1">Select a message from the list to preview it here.</p>
+          <p class="font-medium text-base text-gray-700 dark:text-white/50">
+            No message selected
+          </p>
+          <p class="text-sm text-muted mt-1">
+            Select a message from the list to preview it here.
+          </p>
         </div>
       </div>
 
@@ -239,7 +276,9 @@ function formatFullDate(dateStr: string) {
         <div class="px-8 py-5 border-b border-gray-100 dark:border-white/5">
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
-              <h2 class="text-base font-semibold text-gray-900 dark:text-white leading-snug">
+              <h2
+                class="text-base font-semibold text-gray-900 dark:text-white leading-snug"
+              >
                 {{ selectedEmail.subject }}
               </h2>
               <p class="text-xs text-gray-400 dark:text-white/30 mt-1">
@@ -271,7 +310,11 @@ function formatFullDate(dateStr: string) {
                 @click="toggleStar(selectedEmail, $event)"
               >
                 <UIcon
-                  :name="selectedEmail.isStarred ? 'heroicons:star-solid' : 'heroicons:star'"
+                  :name="
+                    selectedEmail.isStarred
+                      ? 'heroicons:star-solid'
+                      : 'heroicons:star'
+                  "
                   class="size-4"
                 />
               </button>
@@ -306,7 +349,8 @@ function formatFullDate(dateStr: string) {
           <pre
             v-else
             class="whitespace-pre-wrap text-sm text-gray-700 dark:text-white/70 font-sans leading-relaxed"
-          >{{ selectedEmail.body }}</pre>
+            >{{ selectedEmail.body }}</pre
+          >
         </div>
       </template>
     </div>

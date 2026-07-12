@@ -2,7 +2,7 @@
 import * as v from "valibot";
 import useLogout from "~/composables/useLogout";
 
-const items = useBreadcrumbItems();
+// const items = useBreadcrumbItems();
 
 const searchInputRef = ref<HTMLInputElement | null>(null);
 
@@ -146,7 +146,7 @@ const getKey = (item: RouteItem) =>
       <!-- Sign out -->
       <div class="px-3 pb-4 pt-3 border-t border-gray-100 dark:border-white/5">
         <button
-          class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 dark:text-white/25 hover:text-red-500 dark:hover:text-red-400  transition-all cursor-pointer"
+          class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 dark:text-white/25 hover:text-red-500 dark:hover:text-red-400 transition-all cursor-pointer"
           @click="logout"
         >
           <UIcon
@@ -167,13 +167,19 @@ const getKey = (item: RouteItem) =>
         <UForm :schema="schema" :state="state" class="w-80">
           <UFormField name="query">
             <UInput
-              :ref="(el: any) => (searchInputRef = el?.$el?.querySelector('input') ?? null)"
+              :ref="
+                (el: any) =>
+                  (searchInputRef = el?.$el?.querySelector('input') ?? null)
+              "
               v-model="state.query"
               placeholder="Search..."
               icon="heroicons:magnifying-glass"
               variant="outline"
               class="w-full"
-              @keydown.escape="state.query = ''; ($event.target as HTMLInputElement).blur()"
+              @keydown.escape="
+                state.query = '';
+                ($event.target as HTMLInputElement).blur();
+              "
             >
               <template #trailing>
                 <kbd

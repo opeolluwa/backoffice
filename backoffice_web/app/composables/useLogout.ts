@@ -1,10 +1,6 @@
-import { useTokenStore } from "~/stores/token";
+import { useLogin } from "~/composables/useLogin";
 
-const composible = async () => {
-  const router = useRouter();
-  const tokenStore = useTokenStore();
-
-  tokenStore.$reset();
-  await router.push("/");
-};
-export default composible;
+export default async function useLogout() {
+  const { logout } = useLogin();
+  await logout();
+}

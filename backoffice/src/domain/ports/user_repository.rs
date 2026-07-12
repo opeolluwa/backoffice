@@ -1,5 +1,5 @@
 use crate::{
-    api::http::extractors::{auth::CreateUserRequest, user::UserDto},
+    api::http::extractors::{auth::CreateUserRequest, user::UserProfile},
     domain::models::users,
     errors::service_error::ServiceError,
 };
@@ -34,5 +34,5 @@ pub trait UserRepositoryTrait {
     fn retrieve_information(
         &self,
         identifier: &str,
-    ) -> impl std::future::Future<Output = Result<UserDto, ServiceError>> + Send;
+    ) -> impl std::future::Future<Output = Result<UserProfile, ServiceError>> + Send;
 }

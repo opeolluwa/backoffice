@@ -21,8 +21,7 @@ async function onSubmit() {
     await router.push(`/set-password?token=${respData.data.token}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    formError.value =
-      error.response?.data?.message || "Something went wrong";
+    formError.value = error.response?.data?.message || "Something went wrong";
   } finally {
     loading.value = false;
   }

@@ -1,4 +1,4 @@
-use crate::api::http::extractors::user::UserDto;
+use crate::api::http::extractors::user::UserProfile;
 use crate::domain::ports::user_repository::UserRepositoryTrait;
 use crate::errors::service_error::ServiceError;
 
@@ -13,23 +13,23 @@ impl<R: UserRepositoryTrait> UserService<R> {
 }
 
 pub(crate) trait UserServiceTrait {
-    async fn retrieve_information(&self, user_identifier: &str) -> Result<UserDto, ServiceError>;
+    async fn retrieve_information(&self, user_identifier: &str) -> Result<UserProfile, ServiceError>;
 
     #[allow(dead_code)]
-    async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, ServiceError>;
+    async fn find_user_by_email(&self, user_email: &str) -> Result<UserProfile, ServiceError>;
 }
 
 impl<R: UserRepositoryTrait + Send + Sync> UserServiceTrait for UserService<R> {
-    async fn retrieve_information(&self, user_identifier: &str) -> Result<UserDto, ServiceError> {
+    async fn retrieve_information(&self, user_identifier: &str) -> Result<UserProfile, ServiceError> {
         self.repo.retrieve_information(user_identifier).await
     }
 
-    async fn find_user_by_email(&self, user_email: &str) -> Result<UserDto, ServiceError> {
+    async fn find_user_by_email(&self, user_email: &str) -> Result<UserProfile, ServiceError> {
         self.repo
             .find_by_email(user_email)
             .await
             .ok_or(ServiceError::OperationFailed("user not found".to_string()))
-            .map(|user| UserDto {
+            .map(|user| UserProfile {
                 identifier: user.identifier,
                 email: user.email,
                 first_name: user.first_name.unwrap_or_default(),

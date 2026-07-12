@@ -3,6 +3,7 @@ use std::sync::Arc;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
+    Json,
 };
 
 use crate::{
@@ -13,6 +14,7 @@ use crate::{
     domain::services::invitation::InvitationServiceExt,
     errors::service_error::ServiceError,
 };
+use validator::Validate;
 
 pub async fn create_invitation(
     State(state): State<Arc<AppState>>,
@@ -64,12 +66,13 @@ pub async fn find_invitation_by_identifier(
 pub async fn accept_invitation(
     State(state): State<Arc<AppState>>,
     Path(identifier): Path<String>,
-    request: AuthenticatedRequest<AcceptInvitationRequest>,
+    Json(payload): Json<AcceptInvitationRequest>,
 ) -> Result<ApiResponse<invitation::Model>, ServiceError> {
+    payload.validate().map_err(ServiceError::from)?;
     let invitation = state
         .services
         .invitation_service
-        .accept_invitation(&identifier, &request.data.token)
+        .accept_invitation(&identifier, &payload.token)
         .await?;
     Ok(ApiResponse::builder()
         .message("Invitation accepted successfully")

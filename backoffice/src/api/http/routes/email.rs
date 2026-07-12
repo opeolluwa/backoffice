@@ -1,5 +1,6 @@
 use std::sync::Arc;
-
+use axum::middleware;
+use crate::api::http::middlewares::auth::authenticate;
 use axum::{
     Router,
     routing::{delete, get, post, put},
@@ -27,5 +28,8 @@ pub(super) fn email_routes(state: Arc<AppState>) -> Router {
         .route("/{identifier}", put(update_email))
         .route("/{identifier}", delete(delete_email));
 
-    Router::new().nest("/emails", routes).with_state(state)
+    Router::new()
+        .nest("/emails", routes)
+        .layer(middleware::from_fn(authenticate))
+        .with_state(state)
 }

@@ -43,7 +43,8 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
     state.role = "";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    formError.value = err.message || "Failed to send invitation. Please try again.";
+    formError.value =
+      err.message || "Failed to send invitation. Please try again.";
   } finally {
     loading.value = false;
   }

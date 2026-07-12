@@ -1,4 +1,10 @@
-use axum::{RequestPartsExt, extract::FromRequestParts, http::request::Parts};
+use axum::{
+    RequestPartsExt,
+    extract::{FromRequestParts, Request},
+    http::request::Parts,
+    middleware::Next,
+    response::Response,
+};
 use axum_extra::{
     TypedHeader,
     headers::{Authorization, authorization::Bearer},
@@ -31,4 +37,32 @@ where
 
         Ok(token_data.claims)
     }
+}
+
+pub async fn authenticate(
+    mut request: Request,
+    next: Next,
+) -> Result<Response, AuthenticationServiceError> {
+    let (mut parts, body) = request.into_parts();
+
+    let secret =
+        extract_env::<String>("JWT_SIGNING_KEY").map_err(AuthenticationServiceError::from)?;
+
+    let decoding_key = Keys::new(secret.as_bytes()).decoding;
+    // Extract the token from the authorization header
+    let TypedHeader(Authorization(bearer)) = parts
+        .extract::<TypedHeader<Authorization<Bearer>>>()
+        .await
+        .map_err(|_| AuthenticationServiceError::MissingCredentials)?;
+
+    dbg!("{}", &bearer.token());
+    // Decode the user data
+    let token_data = decode::<Claims>(bearer.token(), &decoding_key, &Validation::default())
+        .map_err(|_| AuthenticationServiceError::InvalidToken)?;
+
+    request = Request::from_parts(parts, body);
+
+    request.extensions_mut().insert(token_data.claims);
+
+    Ok(next.run(request).await)
 }

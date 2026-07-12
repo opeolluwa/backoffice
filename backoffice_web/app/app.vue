@@ -6,7 +6,6 @@ const { $viewport } = useNuxtApp();
 watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
   console.log("Breakpoint updated:", oldBreakpoint, "->", newBreakpoint);
 });
-
 </script>
 
 <template>
