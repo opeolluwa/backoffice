@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as v from "valibot";
-import { useUserInformationStore } from "~/stores/user";
+import { useUserInformationStore } from "~/stores/users";
 
 definePageMeta({
   layout: "dashboard",
@@ -272,6 +272,7 @@ function saveNotifications() {
               :on-submit="onProfileSubmit"
             >
               <div class="grid grid-cols-2 gap-4">
+
                 <UFormField label="First name" name="firstName" required>
                   <UInput
                     v-model="profileState.firstName"
@@ -279,6 +280,7 @@ function saveNotifications() {
                     class="w-full"
                   />
                 </UFormField>
+
                 <UFormField label="Last name" name="lastName" required>
                   <UInput
                     v-model="profileState.lastName"

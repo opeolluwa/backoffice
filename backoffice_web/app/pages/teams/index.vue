@@ -3,6 +3,7 @@ import type { FormSubmitEvent, TableColumn } from "@nuxt/ui";
 import * as v from "valibot";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
+import type { TeamsInterface } from "~/bindings/TeamsInterface";
 
 definePageMeta({
   layout: "dashboard",
@@ -13,17 +14,7 @@ definePageMeta({
   },
 });
 
-interface TeamMember {
-  identifier: string;
-  name: string;
-  email: string;
-  role: "admin" | "member" | "viewer";
-  dateAdded: string;
-  lastActive: string;
-  blocked: boolean;
-}
-
-const mockTeamMembers: TeamMember[] = [];
+const mockTeamsInterfaces: TeamsInterface[] = [];
 
 const roleGroups = [
   {
@@ -45,11 +36,11 @@ const roleGroups = [
   },
 ];
 
-const members = ref<TeamMember[]>(mockTeamMembers);
+const members = ref<TeamsInterface[]>(mockTeamsInterfaces);
 
 const hasMembers = computed(() => members.value.length > 0);
 
-function membersForRole(role: TeamMember["role"]) {
+function membersForRole(role: TeamsInterface["role"]) {
   return members.value.filter((m) => m.role === role);
 }
 
@@ -95,7 +86,7 @@ const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 const UBadge = resolveComponent("UBadge");
 
-function getColumns(): TableColumn<TeamMember>[] {
+function getColumns(): TableColumn<TeamsInterface>[] {
   return [
     {
       accessorKey: "name",
@@ -171,7 +162,7 @@ function getColumns(): TableColumn<TeamMember>[] {
   ];
 }
 
-function getRowItems(row: Row<TeamMember>) {
+function getRowItems(row: Row<TeamsInterface>) {
   const member = row.original;
 
   return [
@@ -248,7 +239,7 @@ async function onInviteSubmit({ data }: FormSubmitEvent<InviteSchema>) {
       identifier: `01HZTEAM${Date.now()}`,
       name: data.name,
       email: data.email,
-      role: data.role as TeamMember["role"],
+      role: data.role as TeamsInterface["role"],
       dateAdded: new Date().toISOString().slice(0, 10),
       lastActive: new Date().toISOString().slice(0, 10),
       blocked: false,
@@ -286,28 +277,13 @@ const columns = getColumns();
     </div>
 
     <!-- Empty State -->
-    <div
+    <AppEmptyState
       v-if="!hasMembers"
-      class="flex flex-col items-center justify-center h-[60vh] gap-4 text-center"
-    >
-      <div
-        class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center"
-      >
-        <UIcon
-          name="heroicons:users"
-          class="size-8 text-gray-300 dark:text-white/20"
-        />
-      </div>
-      <div>
-        <p class="font-medium text-base">No team members yet</p>
-        <p class="text-sm text-muted mt-1">
-          Invite your first team member to get started.
-        </p>
-      </div>
-      <UButton icon="i-lucide-user-plus" @click="openInvite = true">
-        Add team member
-      </UButton>
-    </div>
+      title="No team members yet"
+      description="Invite your first team member to get started."
+      action-label="Add team member"
+      @action="openInvite = true"
+    />
 
     <!-- Role Groups -->
     <template v-else>
@@ -358,80 +334,41 @@ const columns = getColumns();
           :state="inviteState"
           :on-submit="onInviteSubmit"
         >
-          <UFormField
-            v-slot="{ error }"
+          <AppInput
+            v-model="inviteState.name"
             label="Full name"
             name="name"
+            placeholder="John Doe"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <UInput
-              v-model="inviteState.name"
-              placeholder="Jane Doe"
-              :ui="{ base: 'py-4 px-6' }"
-              :class="[
-                'w-full transition-colors',
-                error ? 'border-red-500' : 'border-gray-300',
-              ]"
-            />
-          </UFormField>
+          />
 
-          <UFormField
-            v-slot="{ error }"
+          <AppInput
+            v-model="inviteState.email"
             label="Email address"
+            placeholder="colleague@example.com"
             name="email"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <UInput
-              v-model="inviteState.email"
-              placeholder="colleague@example.com"
-              :ui="{ base: 'py-4 px-6' }"
-              :class="[
-                'w-full transition-colors',
-                error ? 'border-red-500' : 'border-gray-300',
-              ]"
-            />
-          </UFormField>
+          />
 
-          <UFormField
-            v-slot="{ error }"
+          <AppSelect
+            v-model="inviteState.role"
             label="Role"
             name="role"
+            :items="roleOptions"
+            placeholder="Please select a role"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <USelect
-              v-model="inviteState.role"
-              :items="roleOptions"
-              value-key="value"
-              label-key="label"
-              placeholder="Select a role"
-              :class="[
-                'w-full transition-colors',
-                error ? 'border-red-500' : 'border-gray-300',
-              ]"
-            />
-          </UFormField>
+          />
 
-          <div class="flex items-center justify-between pt-2">
-            <UButton
-              type="submit"
-              :loading="inviteLoading"
-              :disabled="inviteLoading"
-              class="py-3 px-5 dark:text-white/90"
-            >
-              Send invitation
-            </UButton>
-            <UButton
-              type="button"
-              variant="ghost"
-              color="neutral"
-              @click="resetInviteForm"
-            >
-              Clear
-            </UButton>
-          </div>
+          <AppButton
+            type="submit"
+            :loading="inviteLoading"
+            :disabled="inviteLoading"
+          >
+            Send invitation
+          </AppButton>
         </UForm>
       </template>
     </UModal>

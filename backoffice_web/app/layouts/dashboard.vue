@@ -59,6 +59,11 @@ const routes: RouteItem[] = [
   //   path: "/marketplace",
   //   icon: "heroicons:building-storefront",
   // },
+  // {
+  //   label: "Invitations",
+  //   path: "/invitations",
+  //   icon: "heroicons:",
+  // },
   {
     label: "Uploads",
     path: "/uploads",
@@ -107,11 +112,11 @@ const getKey = (item: RouteItem) =>
   <div class="flex h-screen">
     <!-- Sidebar -->
     <aside
-      class="w-60 shrink-0 flex flex-col border-r border-gray-100 dark:border-white/5"
+      class="w-60 shrink-0 flex flex-col border-r border-gray-100 dark:border-white/5 bg-primary-100/20"
     >
       <!-- Brand mark -->
       <div class="px-5 py-5 border-b border-gray-100 dark:border-white/5">
-        <AppLogo />
+        <!-- <AppLogo /> -->
       </div>
 
       <!-- Navigation -->
@@ -146,7 +151,7 @@ const getKey = (item: RouteItem) =>
       <!-- Sign out -->
       <div class="px-3 pb-4 pt-3 border-t border-gray-100 dark:border-white/5">
         <button
-          class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 dark:text-white/25 hover:text-red-500 dark:hover:text-red-400 transition-all cursor-pointer"
+          class="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm  hover:text-red-500 dark:hover:text-red-400 transition-all cursor-pointer"
           @click="logout"
         >
           <UIcon
