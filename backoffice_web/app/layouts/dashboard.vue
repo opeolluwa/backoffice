@@ -2,17 +2,7 @@
 import * as v from "valibot";
 import useLogout from "~/composables/useLogout";
 
-const items = useBreadcrumbItems({
-  overrides:[
-    
-    undefined,
-    {
-      label: "Dashboard",
-      icon: "heroicons:squares-2x2",
-      path:'/home',
-    }
-  ]
-});
+const items = useBreadcrumbItems();
 
 const searchInputRef = ref<HTMLInputElement | null>(null);
 
@@ -59,16 +49,16 @@ const routes: RouteItem[] = [
     divider: true,
     label: "Operations",
   },
-  {
-    label: "Messages",
-    path: "/messages",
-    icon: "heroicons:envelope",
-  },
-  {
-    label: "Marketplace",
-    path: "/marketplace",
-    icon: "heroicons:building-storefront",
-  },
+  // {
+  //   label: "Messages",
+  //   path: "/messages",
+  //   icon: "heroicons:envelope",
+  // },
+  // {
+  //   label: "Marketplace",
+  //   path: "/marketplace",
+  //   icon: "heroicons:building-storefront",
+  // },
   {
     label: "Uploads",
     path: "/uploads",

@@ -7,9 +7,6 @@ watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
   console.log("Breakpoint updated:", oldBreakpoint, "->", newBreakpoint);
 });
 
-definePageMeta({
-  colorMode: "light",
-});
 </script>
 
 <template>

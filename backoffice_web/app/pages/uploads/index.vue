@@ -113,49 +113,16 @@ function fileIcon(type: string) {
 <template>
   <div class="space-y-6">
 
-    <!-- Drop zone / Upload trigger -->
-    <div
-      class="relative border-2 border-dashed rounded-xl transition-colors cursor-pointer"
-      :class="isDragging
-        ? 'border-primary bg-primary/5'
-        : 'border-default hover:border-primary/50 bg-gray-50 dark:bg-white/2'"
-      @dragover.prevent="isDragging = true"
-      @dragleave.prevent="isDragging = false"
-      @drop.prevent="onDrop"
-      @click="fileInputRef?.click()"
-    >
-      <input
-        ref="fileInputRef"
-        type="file"
-        multiple
-        class="hidden"
-        @change="onFileInputChange"
-      />
-      <div class="flex flex-col items-center justify-center gap-3 py-10 text-center pointer-events-none select-none">
-        <div class="size-12 rounded-full bg-white dark:bg-white/5 border border-default flex items-center justify-center shadow-sm">
-          <UIcon name="heroicons:arrow-up-tray" class="size-5 text-muted" />
-        </div>
-        <div>
-          <p class="text-sm font-medium">
-            <span class="text-primary">Click to upload</span>
-            <span class="text-muted"> or drag and drop</span>
-          </p>
-          <p class="text-xs text-muted mt-0.5">Any file type · No size limit</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Empty state -->
     <template v-if="!hasFiles">
       <div class="flex flex-col items-center justify-center py-16 gap-4 text-center">
-        <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center">
           <UIcon name="heroicons:arrow-up-tray" class="size-8 text-gray-300 dark:text-white/20" />
         </div>
         <div>
           <p class="font-medium text-base">No files uploaded yet</p>
           <p class="text-sm text-muted mt-1">Drag and drop files above or click to browse.</p>
         </div>
-        <UButton icon="heroicons:arrow-up-tray" variant="outline" color="neutral" @click="fileInputRef?.click()">
+        <UButton color="neutral" @click="fileInputRef?.click()">
           Browse files
         </UButton>
       </div>
@@ -176,7 +143,7 @@ function fileIcon(type: string) {
           class="group relative rounded-xl border border-default bg-white dark:bg-white/3 overflow-hidden flex flex-col"
         >
           <!-- Preview area -->
-          <div class="aspect-square bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+          <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
             <template v-if="loadedPreviews.has(file.id)">
               <img
                 v-if="isImage(file.type)"

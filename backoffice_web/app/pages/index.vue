@@ -35,7 +35,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 
   try {
     const { status, data: respData } = await api.post("/login", data);
-
+    alert("help")
     console.log({
       respData,
     });
@@ -58,7 +58,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="bg-[#080616]">
+  <div>
     <AppLeadingText> Welcome </AppLeadingText>
 
     <p class="text-center text-gray-500 leading-6 mt-2">
@@ -79,7 +79,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       :schema="schema"
       :state="state"
       class="space-y-4 w-full mt-6"
-      @submit="onSubmit"
+      @submit.prevent="onSubmit"
     >
       <!-- Email Field -->
       <UFormField

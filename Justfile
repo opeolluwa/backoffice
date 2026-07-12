@@ -6,14 +6,13 @@ alias install := install-dependencies
 alias r := restart
 alias cfg := copy-env
 
-set shell := ["bash.exe", "-c"]
 set dotenv-required := false
 set dotenv-load := true
 set dotenv-path := "./backoffice/.env"
 set export := true
 
 FRONTEND_DIR := 'backoffice_web'
-DOCKER_CMD := "podman compose -f docker-compose.yaml"
+DOCKER_CMD := "docker compose -f docker-compose.yaml"
 DEV_DB_URL := "postgres://backoffice:backoffice@localhost:6543/backoffice"
 
 @default:
@@ -54,15 +53,8 @@ build:
 
 
 @copy-env:
-    {{ if os_family() == "windows" { "Copy-Item -Path '.env.example' -Destination '.env' -Force" } else { "cp .env.example .env" } }}
-
-#set shell := if os_family() == "windows" {
-#  ["powershell.exe", "-NoProfile", "-Command", "-"]
-#} else {
-#  ["sh", "-cu"]
-# }
-
-
+    cp .env.example .env    
+    cp .env.example ./backoffice/.env
 
 
 
@@ -98,8 +90,10 @@ db:
     sqlx migrate run
     cargo sqlx prepare -- --bin cli
 
+    
+[working-directory: 'backoffice']
 run-cli:
-    cargo run --bin cli create-user
+    DATABASE_URL={{DEV_DB_URL}} cargo run --bin cli create-user
 
 run-init:
     cargo run --bin cli init

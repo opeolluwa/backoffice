@@ -7,7 +7,7 @@ use crate::api::http::handlers::marketplaces::{
     count_marketplaces, create_marketplace, delete_marketplace_by_identifier,
     find_all_marketplaces, find_marketplace_by_identifier, update_marketplace_by_identifier,
 };
-use crate::api::state::{AppState, ServicesState};
+use crate::api::state::AppState;
 
 pub(super) fn marketplace_routes(state: Arc<AppState>) -> Router {
     let routes = Router::new()
