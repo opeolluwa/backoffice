@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useUserInformationStore } from "~/stores/user";
+import { useUserInformationStore } from "~/stores/users";
 import { useMarketplaceStore } from "~/stores/marketplace";
 
 definePageMeta({
@@ -168,9 +168,7 @@ function formatDate(dt?: string | null) {
       </div>
 
       <!-- Activity chart (1/3 width) -->
-      <div
-        class="border border-gray-100 dark:border-white/5 rounded-2xl p-5"
-      >
+      <div class="border border-gray-100 dark:border-white/5 rounded-2xl p-5">
         <div class="flex items-center justify-between mb-4">
           <p class="text-sm font-semibold text-gray-700 dark:text-white/80">
             Activity
@@ -227,9 +225,7 @@ function formatDate(dt?: string | null) {
     <!-- Quick links + Recent marketplaces -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <!-- Quick links -->
-      <div
-        class="border border-gray-100 dark:border-white/5 rounded-2xl p-5"
-      >
+      <div class="border border-gray-100 dark:border-white/5 rounded-2xl p-5">
         <p class="text-sm font-semibold text-gray-700 dark:text-white/80 mb-4">
           Quick access
         </p>

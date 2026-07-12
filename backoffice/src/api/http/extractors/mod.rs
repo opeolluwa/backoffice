@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod email;
+pub mod invitation;
 pub mod marketplace;
 pub mod products;
 pub mod team;

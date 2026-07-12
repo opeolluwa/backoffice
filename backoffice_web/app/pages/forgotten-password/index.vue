@@ -21,8 +21,7 @@ async function onSubmit() {
     await router.push(`/set-password?token=${respData.data.token}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    formError.value =
-      error.response?.data?.message || "Something went wrong";
+    formError.value = error.response?.data?.message || "Something went wrong";
   } finally {
     loading.value = false;
   }
@@ -36,7 +35,7 @@ async function onSubmit() {
       Enter your email to receive a reset link
     </p>
 
-    <UForm :state="{ email: '' }" class="w-full mt-6" @submit="onSubmit">
+    <UForm :state="{ email: '' }" class="w-full mt-6" :on-submit="onSubmit">
       <UFormField
         v-slot="{ error }"
         label="Email"

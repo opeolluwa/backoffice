@@ -1,11 +1,14 @@
+use crate::api::http::middlewares::auth::authenticate;
+use crate::api::{http::handlers::user::retrieve_information, state::AppState};
+use axum::middleware;
+use axum::{Router, routing::get};
 use std::sync::Arc;
 
-use axum::{Router, routing::get};
-
-use crate::api::{http::handlers::user::retrieve_information, state::AppState};
-
 pub(super) fn user_routes(state: Arc<AppState>) -> Router {
+    let routes = Router::new().route("/profile", get(retrieve_information));
+
     Router::new()
-        .route("/profile", get(retrieve_information))
+        .nest("/users", routes)
+        .layer(middleware::from_fn(authenticate))
         .with_state(state)
 }

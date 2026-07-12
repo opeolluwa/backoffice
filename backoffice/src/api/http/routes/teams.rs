@@ -1,5 +1,6 @@
 use std::sync::Arc;
-
+use axum::middleware;
+use crate::api::http::middlewares::auth::authenticate;
 use axum::{
     Router,
     routing::{delete, get, post, put},
@@ -25,5 +26,7 @@ pub(super) fn team_routes(state: Arc<AppState>) -> Router {
         .route("/{identifier}/block", put(block_team_member))
         .route("/{identifier}/unblock", put(unblock_team_member));
 
-    Router::new().nest("/teams", routes).with_state(state)
+    Router::new().nest("/teams", routes)
+        .layer(middleware::from_fn(authenticate))
+        .with_state(state)
 }

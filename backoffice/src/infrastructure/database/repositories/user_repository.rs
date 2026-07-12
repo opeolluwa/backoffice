@@ -2,7 +2,7 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Qu
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::{auth::CreateUserRequest, user::UserDto},
+    api::http::extractors::{auth::CreateUserRequest, user::UserProfile},
     domain::models::users::{self, Entity as UserEntity},
     domain::ports::user_repository::UserRepositoryTrait,
     errors::service_error::ServiceError,
@@ -84,14 +84,14 @@ impl UserRepositoryTrait for UserRepository {
         Ok(())
     }
 
-    async fn retrieve_information(&self, identifier: &str) -> Result<UserDto, ServiceError> {
+    async fn retrieve_information(&self, identifier: &str) -> Result<UserProfile, ServiceError> {
         let user = UserEntity::find_by_id(identifier)
             .one(&self.db)
             .await
             .map_err(|err| ServiceError::OperationFailed(err.to_string()))?
             .ok_or_else(|| ServiceError::OperationFailed("user not found".to_string()))?;
 
-        Ok(UserDto {
+        Ok(UserProfile {
             identifier: user.identifier,
             email: user.email,
             first_name: user.first_name.unwrap_or_default(),

@@ -27,7 +27,9 @@ pub fn schema_builder(
 ) -> SchemaBuilder {
     let mut builder = Builder::new(context, database.clone());
     builder = register_entity_modules(builder);
-
+    builder = register_active_enums(builder);
+    builder = register_active_enums(builder);
+    
     seaography::register_custom_inputs!(
         builder,
         [super::types::newsletter::SubscribeToNewsletterInput]

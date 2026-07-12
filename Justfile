@@ -3,17 +3,17 @@ alias k := kill
 alias b := build
 alias l := logs
 alias install := install-dependencies
+alias run-fe := run-frontend
 alias r := restart
 alias cfg := copy-env
 
-set shell := ["bash.exe", "-c"]
 set dotenv-required := false
 set dotenv-load := true
 set dotenv-path := "./backoffice/.env"
 set export := true
 
 FRONTEND_DIR := 'backoffice_web'
-DOCKER_CMD := "podman compose -f docker-compose.yaml"
+DOCKER_CMD := "docker compose -f docker-compose.yaml"
 DEV_DB_URL := "postgres://backoffice:backoffice@localhost:6543/backoffice"
 
 @default:
@@ -54,15 +54,8 @@ build:
 
 
 @copy-env:
-    {{ if os_family() == "windows" { "Copy-Item -Path '.env.example' -Destination '.env' -Force" } else { "cp .env.example .env" } }}
-
-#set shell := if os_family() == "windows" {
-#  ["powershell.exe", "-NoProfile", "-Command", "-"]
-#} else {
-#  ["sh", "-cu"]
-# }
-
-
+    cp .env.example .env    
+    cp .env.example ./backoffice/.env
 
 
 
@@ -98,25 +91,27 @@ db:
     sqlx migrate run
     cargo sqlx prepare -- --bin cli
 
+    
+[working-directory: 'backoffice']
 run-cli:
-    cargo run --bin cli create-user
+    DATABASE_URL={{DEV_DB_URL}} cargo run --bin cli create-user
 
 run-init:
     cargo run --bin cli init
 
-
+[working-directory: 'backoffice']
 migrate-add target:
     sea-orm-cli migrate generate {{target}}
 
 @generate-entities:
-    sea-orm-cli generate entity \
+    RUST_BACKTRACE=full sea-orm-cli generate entity \
         --database-url {{DEV_DB_URL}} \
         --with-serde both \
         --enum-extra-derives 'ts_rs::TS' \
-        --model-extra-attributes 'serde(rename_all=\"camelCase\")' \
+        --model-extra-attributes 'serde(rename_all="camelCase")' \
         --model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
         --enum-extra-attributes 'ts(export)' \
-        --ignore-tables backoffice_server_migrations,products \
+        --ignore-tables backoffice_server_migrations \
         -o backoffice/src/domain/models --seaography
 
 

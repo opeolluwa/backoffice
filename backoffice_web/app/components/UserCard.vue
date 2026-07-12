@@ -1,17 +1,23 @@
 <template>
   <div class="flex items-center justify-center gap-x-3 cursor-pointer">
     <UAvatar
-      src="https://github.com/benjamincanac.png"
-      class="rounded-2xl squircle"
+      :alt="userStore.fullName"
+      :name="userStore.fullName"
+      color="primary"
     />
     <div class="flex flex-col">
-      <span>Alex Brown</span>
-      <small class="-mt-1.5">alexbrown@mailer.com</small>
+      <span>{{ userStore.fullName }}</span>
+      <small class="-mt-1.5">{{ userStore.email }}</small>
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useUserInformationStore } from "~/stores/users";
+
+const userStore = useUserInformationStore();
+const initials = computed(() => useGetInitials(userStore.user));
+</script>
 
 <style>
 .squircle {

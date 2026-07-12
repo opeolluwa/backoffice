@@ -5,3 +5,4 @@ pub mod database_error;
 pub mod filesystem_error;
 pub mod macro_error;
 pub mod service_error;
+pub mod email_service_error;

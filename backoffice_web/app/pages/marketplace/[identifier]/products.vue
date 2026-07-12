@@ -166,7 +166,7 @@ const countries = computed(() => countryStore.countries);
           class="space-y-4"
           :schema="schema"
           :state="state"
-          @submit.prevent="onSubmit"
+          :on-submit="onSubmit"
         >
           <UFileUpload v-model="state.picture" class="w-full min-h-48" />
 

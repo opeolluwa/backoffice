@@ -3,6 +3,10 @@ import type { FormSubmitEvent, TableColumn } from "@nuxt/ui";
 import * as v from "valibot";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
+import type { TeamsInterface } from "~/bindings/TeamsInterface";
+import type { Invitation } from "~/bindings/InvitationInterface";
+import { useTeamsStore } from "~/stores/teams";
+import { useInvitationsStore } from "~/stores/invitations";
 
 definePageMeta({
   layout: "dashboard",
@@ -13,20 +17,10 @@ definePageMeta({
   },
 });
 
+const teamsStore = useTeamsStore();
+const invitationsStore = useInvitationsStore();
 
-interface TeamMember {
-  identifier: string;
-  name: string;
-  email: string;
-  role: "admin" | "member" | "viewer";
-  dateAdded: string;
-  lastActive: string;
-  blocked: boolean;
-}
-
-
-const mockTeamMembers: TeamMember[] = []
-
+const loading = ref(true);
 
 const roleGroups = [
   {
@@ -48,16 +42,17 @@ const roleGroups = [
   },
 ];
 
-
-const members = ref<TeamMember[]>(mockTeamMembers);
-
+const members = computed(() => teamsStore.members);
+const invitations = computed(() => invitationsStore.invitations);
+const pendingInvitations = computed(() =>
+  invitations.value.filter((i) => i.status === "Pending"),
+);
 const hasMembers = computed(() => members.value.length > 0);
 
-function membersForRole(role: TeamMember["role"]) {
+function membersForRole(role: TeamsInterface["role"]) {
   return members.value.filter((m) => m.role === role);
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -88,17 +83,17 @@ const avatarColors = [
 ];
 
 function avatarColor(identifier: string) {
-  const idx = identifier.charCodeAt(identifier.length - 1) % avatarColors.length;
+  const idx =
+    identifier.charCodeAt(identifier.length - 1) % avatarColors.length;
   return avatarColors[idx];
 }
 
-// ─── Table Columns ────────────────────────────────────────────────────────────
 
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 const UBadge = resolveComponent("UBadge");
 
-function getColumns(): TableColumn<TeamMember>[] {
+function getColumns(): TableColumn<TeamsInterface>[] {
   return [
     {
       accessorKey: "name",
@@ -115,24 +110,23 @@ function getColumns(): TableColumn<TeamMember>[] {
           ),
           h("div", { class: "flex flex-col" }, [
             h("span", { class: "font-medium text-sm" }, member.name),
-            h(
-              "span",
-              { class: "text-xs text-muted" },
-              member.email,
-            ),
+            h("span", { class: "text-xs text-muted" }, member.email),
           ]),
         ]);
       },
     },
     {
-      accessorKey: "dateAdded",
+      accessorKey: "createdAt",
       header: "Date added",
-      cell: ({ row }) => formatDate(row.getValue("dateAdded")),
+      cell: ({ row }) => formatDate(row.getValue("createdAt")),
     },
     {
-      accessorKey: "lastActive",
+      accessorKey: "updatedAt",
       header: "Last active",
-      cell: ({ row }) => formatDate(row.getValue("lastActive")),
+      cell: ({ row }) => {
+        const val = row.getValue("updatedAt") as string | null;
+        return val ? formatDate(val) : "—";
+      },
     },
     {
       accessorKey: "blocked",
@@ -178,7 +172,7 @@ function getColumns(): TableColumn<TeamMember>[] {
   ];
 }
 
-function getRowItems(row: Row<TeamMember>) {
+function getRowItems(row: Row<TeamsInterface>) {
   const member = row.original;
 
   return [
@@ -194,29 +188,101 @@ function getRowItems(row: Row<TeamMember>) {
     {
       label: member.blocked ? "Unblock" : "Block",
       icon: member.blocked ? "i-lucide-shield-check" : "i-lucide-shield-off",
-      onSelect() {
-        const idx = members.value.findIndex(
-          (m) => m.identifier === member.identifier,
-        );
-        // if (idx !== -1) {
-        //   members.value[idx].blocked = !members.value[idx].blocked;
-        // }
+      async onSelect() {
+        if (member.blocked) {
+          await teamsStore.unblockMember(member.identifier);
+        } else {
+          await teamsStore.blockMember(member.identifier);
+        }
       },
     },
     {
       label: "Remove",
       icon: "i-lucide-trash",
       class: "text-red-500",
-      onSelect() {
-        members.value = members.value.filter(
-          (m) => m.identifier !== member.identifier,
-        );
+      async onSelect() {
+        await teamsStore.deleteMember(member.identifier);
       },
     },
   ];
 }
 
-// ─── Invite Modal ─────────────────────────────────────────────────────────────
+
+function getInvitationColumns(): TableColumn<Invitation>[] {
+  return [
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => {
+        const inv = row.original;
+        return h("div", { class: "flex items-center gap-3" }, [
+          h(
+            "div",
+            {
+              class: "size-8 rounded-full flex items-center justify-center bg-gray-200 dark:bg-white/10 text-xs font-semibold shrink-0",
+            },
+            getInitials(inv.email.split("@")[0]),
+          ),
+          h("div", { class: "flex flex-col" }, [
+            h("span", { class: "font-medium text-sm" }, inv.email),
+          ]),
+        ]);
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string | null;
+        const color =
+          status === "Pending"
+            ? "warning"
+            : status === "Accepted"
+              ? "success"
+              : status === "Rejected"
+                ? "error"
+                : "neutral";
+        return h(
+          UBadge,
+          { color, variant: "subtle", size: "sm" },
+          () => status ?? "Unknown",
+        );
+      },
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Sent",
+      cell: ({ row }) => formatDate(row.getValue("createdAt")),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const inv = row.original;
+        return h("div", { class: "text-right" }, [
+          h(UButton, {
+            icon: "i-lucide-trash",
+            color: "error",
+            variant: "ghost",
+            size: "sm",
+            "aria-label": "Revoke invitation",
+            onClick: () => revokeInvitation(inv.identifier),
+          }),
+        ]);
+      },
+    },
+  ];
+}
+
+async function revokeInvitation(identifier: string) {
+  try {
+    await invitationsStore.deleteInvitation(identifier);
+    toast.add({ title: "Invitation revoked", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to revoke invitation", color: "error" });
+  }
+}
+
+const invitationColumns = getInvitationColumns();
 
 const openInvite = ref(false);
 
@@ -247,19 +313,7 @@ function resetInviteForm() {
 async function onInviteSubmit({ data }: FormSubmitEvent<InviteSchema>) {
   inviteLoading.value = true;
   try {
-    // TODO: replace with actual API call
-    // await api.post("/invitations", data);
-
-    // Optimistically add to mock list
-    members.value.push({
-      identifier: `01HZTEAM${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      role: data.role as TeamMember["role"],
-      dateAdded: new Date().toISOString().slice(0, 10),
-      lastActive: new Date().toISOString().slice(0, 10),
-      blocked: false,
-    });
+    await invitationsStore.createInvitation(data.email);
 
     toast.add({
       title: "Invitation sent",
@@ -281,42 +335,63 @@ async function onInviteSubmit({ data }: FormSubmitEvent<InviteSchema>) {
 }
 
 const columns = getColumns();
+
+onMounted(async () => {
+  try {
+    await Promise.all([
+      teamsStore.fetchAllMembers(),
+      invitationsStore.fetchAllInvitations(),
+    ]);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
   <div class="space-y-2">
-    <!-- Header: only shown when members exist -->
-    <div v-if="hasMembers" class="flex items-start justify-between mb-8">
-      <UButton
-        icon="i-lucide-user-plus"
-        class="px-4 py-2 shrink-0"
-        @click="openInvite = true"
-      >
-        Add team member
-      </UButton>
+    <div v-if="loading" class="flex items-center justify-center h-[60vh]">
+      <p class="text-sm text-muted">Loading team members…</p>
     </div>
 
-    <!-- Empty State -->
-    <div
-      v-if="!hasMembers"
-      class="flex flex-col items-center justify-center h-[60vh] gap-4 text-center"
-    >
-      <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-        <UIcon name="heroicons:users" class="size-8 text-gray-300 dark:text-white/20" />
-      </div>
-      <div>
-        <p class="font-medium text-base">No team members yet</p>
-        <p class="text-sm text-muted mt-1">
-          Invite your first team member to get started.
-        </p>
-      </div>
-      <UButton icon="i-lucide-user-plus" @click="openInvite = true">
-        Add team member
-      </UButton>
-    </div>
-
-    <!-- Role Groups -->
     <template v-else>
+    <!-- Header -->
+    <div class="flex items-start justify-between mb-8" v-if="hasMembers || pendingInvitations.length > 0">
+      <div>
+        <h2 class="text-lg font-semibold">Team members</h2>
+        <p class="text-sm text-muted mt-1">Manage your team and invitations.</p>
+      </div>
+      <UButton class="px-4 py-2 shrink-0" @click="openInvite = true">
+        Add team member
+      </UButton>
+    </div>
+
+    <!-- Empty State (no members AND no invitations) -->
+    <AppEmptyState
+      v-if="!hasMembers && pendingInvitations.length === 0"
+      title="No team members yet"
+      description="Invite your first team member to get started."
+      action-label="Add team member"
+      @action="openInvite = true"
+    />
+
+    <template v-else>
+      <!-- Pending Invitations -->
+      <div v-if="pendingInvitations.length > 0" class="mb-8">
+        <div class="mb-4">
+          <p class="font-semibold text-sm">Pending invitations</p>
+          <p class="text-xs text-muted mt-1">
+            Invitations that have been sent but not yet accepted.
+          </p>
+        </div>
+        <UTable
+          :data="pendingInvitations"
+          :columns="invitationColumns"
+          class="rounded border border-default"
+        />
+      </div>
+
+      <!-- Role Groups -->
       <div
         v-for="group in roleGroups"
         :key="group.role"
@@ -362,85 +437,47 @@ const columns = getColumns();
           class="space-y-4"
           :schema="inviteSchema"
           :state="inviteState"
-          @submit="onInviteSubmit"
+          :on-submit="onInviteSubmit"
         >
-          <UFormField
-            v-slot="{ error }"
+          <AppInput
+            v-model="inviteState.name"
             label="Full name"
             name="name"
+            placeholder="John Doe"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <UInput
-              v-model="inviteState.name"
-              placeholder="Jane Doe"
-              :ui="{ base: 'py-4 px-6' }"
-              :class="[
-                'w-full transition-colors',
-                error ? 'border-red-500' : 'border-gray-300',
-              ]"
-            />
-          </UFormField>
+          />
 
-          <UFormField
-            v-slot="{ error }"
+          <AppInput
+            v-model="inviteState.email"
             label="Email address"
+            placeholder="colleague@example.com"
             name="email"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <UInput
-              v-model="inviteState.email"
-              placeholder="colleague@example.com"
-              :ui="{ base: 'py-4 px-6' }"
-              :class="[
-                'w-full transition-colors',
-                error ? 'border-red-500' : 'border-gray-300',
-              ]"
-            />
-          </UFormField>
+          />
 
-          <UFormField
-            v-slot="{ error }"
+          <AppSelect
+            v-model="inviteState.role"
             label="Role"
             name="role"
+            :items="roleOptions"
+            placeholder="Please select a role"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <USelect
-              v-model="inviteState.role"
-              :items="roleOptions"
-              value-key="value"
-              label-key="label"
-              placeholder="Select a role"
-              :class="[
-                'w-full transition-colors',
-                error ? 'border-red-500' : 'border-gray-300',
-              ]"
-            />
-          </UFormField>
+          />
 
-          <div class="flex items-center justify-between pt-2">
-            <UButton
-              type="submit"
-              :loading="inviteLoading"
-              :disabled="inviteLoading"
-              class="py-3 px-5 dark:text-white/90"
-            >
-              Send invitation
-            </UButton>
-            <UButton
-              type="button"
-              variant="ghost"
-              color="neutral"
-              @click="resetInviteForm"
-            >
-              Clear
-            </UButton>
-          </div>
+          <AppButton
+            type="submit"
+            :loading="inviteLoading"
+            :disabled="inviteLoading"
+          >
+            Send invitation
+          </AppButton>
         </UForm>
       </template>
     </UModal>
+    </template>
   </div>
 </template>
 

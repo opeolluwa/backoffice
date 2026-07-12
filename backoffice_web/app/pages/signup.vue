@@ -44,7 +44,7 @@ definePageMeta({
     :schema="schema"
     :state="state"
     class="space-y-4 px-36 w-full mt-6"
-    @submit="onSubmit"
+    :on-submit="onSubmit"
   >
     <UFormField label="First name" name="firstName" required>
       <UInput
