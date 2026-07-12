@@ -55,7 +55,6 @@ pub async fn authenticate(
         .await
         .map_err(|_| AuthenticationServiceError::MissingCredentials)?;
 
-    dbg!("{}", &bearer.token());
     // Decode the user data
     let token_data = decode::<Claims>(bearer.token(), &decoding_key, &Validation::default())
         .map_err(|_| AuthenticationServiceError::InvalidToken)?;

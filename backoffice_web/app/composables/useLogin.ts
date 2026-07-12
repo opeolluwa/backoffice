@@ -1,5 +1,5 @@
 import { useTokenStore } from "~/stores/token";
-import { useUserInformationStore } from "~/stores/user";
+import { useUserInformationStore } from "~/stores/users";
 import api from "~/plugin/api";
 
 interface LoginCredentials {
@@ -10,6 +10,15 @@ interface LoginCredentials {
 interface LoginResult {
   success: boolean;
   error?: string;
+}
+
+function decodeJwtExpiry(token: string): number {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp ?? 0;
+  } catch {
+    return 0;
+  }
 }
 
 export function useLogin() {
@@ -29,6 +38,7 @@ export function useLogin() {
       }
 
       tokenStore.persistAccessToken(respData.data.token);
+      tokenStore.setAccessTokenExpiry(decodeJwtExpiry(respData.data.token));
 
       try {
         await userStore.initialize(respData.data.token);

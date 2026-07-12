@@ -103,7 +103,18 @@ async fn init(db: &DatabaseConnection) -> Result<(), CliError> {
     Ok(())
 }
 
-async fn create_role(db: &DatabaseConnection) -> Result<String, CliError> {
+pub struct RoleIdentifier(String);
+impl RoleIdentifier {
+    pub fn new(identifier: String) -> Self {
+        Self(identifier)
+    }
+    
+    pub fn expose(&self) -> String {
+        self.0.to_string()
+    }
+}
+
+async fn create_role(db: &DatabaseConnection) -> Result<RoleIdentifier, CliError> {
     let name: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Role name")
         .default("super_admin".into())
@@ -118,6 +129,16 @@ async fn create_role(db: &DatabaseConnection) -> Result<String, CliError> {
 
     let identifier = Ulid::new().to_string();
 
+    let role = user_roles::Entity::find()
+        .filter(user_roles::Column::Name.eq(&name))
+        .one(db)
+        .await
+        .map_err(|err| CliError::ParseError(format!("Failed to check role existence: {}", err)))?;
+
+    if let Some(role) = role {
+        return Ok(RoleIdentifier(role.identifier));
+    };
+
     user_roles::ActiveModel {
         identifier: Set(identifier.clone()),
         name: Set(name.clone()),
@@ -130,11 +151,22 @@ async fn create_role(db: &DatabaseConnection) -> Result<String, CliError> {
         CliError::ParseError(format!("Failed to create role '{}' due to {}", name, err))
     })?;
 
-    Ok(identifier)
+    Ok(RoleIdentifier(identifier))
 }
 
 async fn create_user(db: &DatabaseConnection) -> Result<(), CliError> {
     let super_admin_role_id = create_role(db).await?;
+    
+
+    let first_name: String = Input::with_theme(&ColorfulTheme::default())
+        .with_prompt("First name")
+        .interact()
+        .map_err(|e| CliError::ParseError(e.to_string()))?;
+
+    let last_name: String = Input::with_theme(&ColorfulTheme::default())
+        .with_prompt("Last name")
+        .interact()
+        .map_err(|e| CliError::ParseError(e.to_string()))?;
 
     let admin_email: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("user email")
@@ -166,10 +198,13 @@ async fn create_user(db: &DatabaseConnection) -> Result<(), CliError> {
 
     users::ActiveModel {
         identifier: Set(new_admin_id),
-        role_identifier: Set(Some(super_admin_role_id)),
+        role_identifier: Set(Some(super_admin_role_id.expose())),
         email: Set(admin_email.clone()),
         password: Set(hashed_password),
         is_active: Set(true),
+        first_name: Set(first_name.into()),
+        last_name: Set(last_name.into()),
+
         ..Default::default()
     }
     .insert(db)

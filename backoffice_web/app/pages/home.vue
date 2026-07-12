@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useUserInformationStore } from "~/stores/user";
+import { useUserInformationStore } from "~/stores/users";
 import { useMarketplaceStore } from "~/stores/marketplace";
 
 definePageMeta({
