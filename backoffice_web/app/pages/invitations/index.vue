@@ -111,14 +111,14 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
         />
       </UFormField>
 
-      <UButton
+      <AppButton
         :loading="loading"
         :disabled="loading"
         type="submit"
         class="flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer"
       >
         Send Invitation
-      </UButton>
+      </AppButton>
     </UForm>
   </div>
 </template>
