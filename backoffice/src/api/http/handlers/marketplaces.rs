@@ -9,19 +9,29 @@ use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::marketplace::CreateMarketplaceRequest,
     api::state::AppState,
+    domain::dto::CreateMarketplaceCommand,
     domain::models::marketplaces,
     domain::services::marketplace::MarketplaceServiceExt,
     errors::service_error::ServiceError,
 };
 
+fn to_command(req: &CreateMarketplaceRequest) -> CreateMarketplaceCommand {
+    CreateMarketplaceCommand {
+        name: req.name.clone(),
+        description: req.description.clone(),
+        slug: req.slug.clone(),
+    }
+}
+
 pub async fn create_marketplace(
     State(state): State<Arc<AppState>>,
     request: AuthenticatedRequest<CreateMarketplaceRequest>,
 ) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
+    let command = to_command(&request.data);
     let marketplace = state
         .services
         .marketplace_service
-        .create_marketplace(&request.data, &request.claims.identifier)
+        .create_marketplace(&command, &request.claims.identifier)
         .await?;
 
     Ok(ApiResponse::builder()
@@ -85,10 +95,11 @@ pub async fn update_marketplace_by_identifier(
     Path(identifier): Path<String>,
     AuthenticatedRequest { data, claims }: AuthenticatedRequest<CreateMarketplaceRequest>,
 ) -> Result<ApiResponse<marketplaces::Model>, ServiceError> {
+    let command = to_command(&data);
     let updated_marketplace = state
         .services
         .marketplace_service
-        .update_marketplace_by_identifier(&identifier, &data, &claims.identifier)
+        .update_marketplace_by_identifier(&identifier, &command, &claims.identifier)
         .await?;
 
     Ok(ApiResponse::builder()

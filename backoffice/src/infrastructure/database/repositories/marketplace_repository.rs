@@ -8,9 +8,11 @@ use sea_orm::{
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::marketplace::CreateMarketplaceRequest,
-    domain::models::marketplaces::{self, Entity as MarketplaceEntity},
-    domain::ports::marketplace_repository::MarketplaceRepositoryExt,
+    domain::{
+        dto::CreateMarketplaceCommand,
+        models::marketplaces::{self, Entity as MarketplaceEntity},
+        ports::marketplace_repository::MarketplaceRepositoryExt,
+    },
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };
@@ -29,14 +31,14 @@ impl Repository for MarketplaceRepository {
 impl MarketplaceRepositoryExt for MarketplaceRepository {
     async fn create_marketplace(
         &self,
-        request: &CreateMarketplaceRequest,
+        command: &CreateMarketplaceCommand,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, DatabaseError> {
         let model = marketplaces::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
-            name: Set(request.name.clone()),
-            description: Set(request.description.clone()),
-            slug: Set(request.slug.clone()),
+            name: Set(command.name.clone()),
+            description: Set(command.description.clone()),
+            slug: Set(command.slug.clone()),
             user_identifier: Set(Some(user_identifier.to_string())),
             ..Default::default()
         };
@@ -86,7 +88,7 @@ impl MarketplaceRepositoryExt for MarketplaceRepository {
     async fn update_marketplace_by_identifier(
         &self,
         identifier: &str,
-        request: &CreateMarketplaceRequest,
+        command: &CreateMarketplaceCommand,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, DatabaseError> {
         let marketplace = MarketplaceEntity::find()
@@ -98,8 +100,8 @@ impl MarketplaceRepositoryExt for MarketplaceRepository {
             .ok_or_else(|| DatabaseError::NotFound("marketplace not found".to_string()))?;
 
         let mut active: marketplaces::ActiveModel = marketplace.into();
-        active.name = Set(request.name.clone());
-        active.description = Set(request.description.clone());
+        active.name = Set(command.name.clone());
+        active.description = Set(command.description.clone());
         active.updated_at = Set(Some(chrono::Utc::now().fixed_offset()));
 
         active.update(&self.db).await.map_err(DatabaseError::from)

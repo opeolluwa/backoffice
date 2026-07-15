@@ -5,15 +5,17 @@ use axum::http::StatusCode;
 
 use crate::api::http::dto::api_response::ApiResponseBuilder;
 use crate::api::http::dto::jwt::Claims;
-use crate::api::http::extractors::auth::VerifyAccountRequest;
-use crate::api::http::extractors::auth::{ForgottenPasswordResponse, RefreshTokenResponse};
 use crate::api::http::middlewares::validator::ValidatedRequest;
 use crate::api::state::AppState;
+use crate::domain::dto::{
+    CreateUserCommand, ForgottenPasswordCommand, LoginCommand, SetNewPasswordCommand,
+    TokenClaims, VerifyAccountCommand, RefreshTokenCommand,
+};
 use crate::{
     api::http::dto::api_response::ApiResponse,
     api::http::extractors::auth::{
-        CreateUserRequest, CreateUserResponse, ForgottenPasswordRequest, LoginRequest,
-        LoginResponse, SetNewPasswordRequest, VerifyAccountResponse,
+        CreateUserRequest, ForgottenPasswordRequest, LoginRequest,
+        SetNewPasswordRequest, VerifyAccountRequest,
     },
     domain::services::auth::AuthenticationServiceTrait,
     errors::auth_service_error::AuthenticationServiceError,
@@ -22,8 +24,14 @@ use crate::{
 pub async fn create_account(
     State(state): State<Arc<AppState>>,
     ValidatedRequest(request): ValidatedRequest<CreateUserRequest>,
-) -> Result<ApiResponse<CreateUserResponse>, AuthenticationServiceError> {
-    state.services.auth_service.create_user(&request).await?;
+) -> Result<ApiResponse<()>, AuthenticationServiceError> {
+    let command = CreateUserCommand {
+        email: request.email,
+        password: request.password,
+        first_name: request.first_name,
+        last_name: request.last_name,
+    };
+    state.services.auth_service.create_user(&command).await?;
 
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::CREATED)
@@ -34,8 +42,12 @@ pub async fn create_account(
 pub async fn login(
     State(state): State<Arc<AppState>>,
     ValidatedRequest(request): ValidatedRequest<LoginRequest>,
-) -> Result<ApiResponse<LoginResponse>, AuthenticationServiceError> {
-    let login_response = state.services.auth_service.login(&request).await?;
+) -> Result<ApiResponse<crate::domain::dto::LoginResult>, AuthenticationServiceError> {
+    let command = LoginCommand {
+        email: request.email,
+        password: request.password,
+    };
+    let login_response = state.services.auth_service.login(&command).await?;
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::OK)
         .data(login_response)
@@ -47,11 +59,16 @@ pub async fn verify_account(
     State(state): State<Arc<AppState>>,
     claims: Claims,
     ValidatedRequest(request): ValidatedRequest<VerifyAccountRequest>,
-) -> Result<ApiResponse<VerifyAccountResponse>, AuthenticationServiceError> {
+) -> Result<ApiResponse<crate::domain::dto::VerifyAccountResult>, AuthenticationServiceError> {
+    let token_claims = TokenClaims {
+        email: claims.email,
+        identifier: claims.identifier,
+    };
+    let command = VerifyAccountCommand { otp: request.otp };
     let verify_account_response = state
         .services
         .auth_service
-        .verify_account(&claims, &request)
+        .verify_account(&token_claims, &command)
         .await?;
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::OK)
@@ -62,11 +79,12 @@ pub async fn verify_account(
 pub async fn forgotten_password(
     State(state): State<Arc<AppState>>,
     ValidatedRequest(request): ValidatedRequest<ForgottenPasswordRequest>,
-) -> Result<ApiResponse<ForgottenPasswordResponse>, AuthenticationServiceError> {
+) -> Result<ApiResponse<crate::domain::dto::ForgottenPasswordResult>, AuthenticationServiceError> {
+    let command = ForgottenPasswordCommand { email: request.email };
     let forgotten_password_response = state
         .services
         .auth_service
-        .forgotten_password(&request)
+        .forgotten_password(&command)
         .await?;
 
     Ok(ApiResponseBuilder::new()
@@ -80,10 +98,18 @@ pub async fn set_new_password(
     claims: Claims,
     ValidatedRequest(request): ValidatedRequest<SetNewPasswordRequest>,
 ) -> Result<ApiResponse<()>, AuthenticationServiceError> {
+    let token_claims = TokenClaims {
+        email: claims.email,
+        identifier: claims.identifier,
+    };
+    let command = SetNewPasswordCommand {
+        password: request.password,
+        confirm_password: request.confirm_password,
+    };
     let _ = state
         .services
         .auth_service
-        .set_new_password(&request, &claims)
+        .set_new_password(&command, &token_claims)
         .await?;
 
     Ok(ApiResponseBuilder::new()
@@ -95,11 +121,15 @@ pub async fn set_new_password(
 pub async fn request_refresh_token(
     State(state): State<Arc<AppState>>,
     claims: Claims,
-) -> Result<ApiResponse<RefreshTokenResponse>, AuthenticationServiceError> {
+) -> Result<ApiResponse<crate::domain::dto::RefreshTokenResult>, AuthenticationServiceError> {
+    let command = RefreshTokenCommand {
+        email: claims.email,
+        identifier: claims.identifier,
+    };
     let refresh_token_response = state
         .services
         .auth_service
-        .request_refresh_token(&claims)
+        .request_refresh_token(&command)
         .await?;
 
     Ok(ApiResponseBuilder::new()

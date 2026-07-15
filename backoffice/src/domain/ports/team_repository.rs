@@ -1,13 +1,13 @@
 use crate::{
-    api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
-    domain::models::teams,
+    domain::{dto::{CreateTeamMemberCommand, UpdateTeamMemberCommand}, models::teams},
     errors::database_error::DatabaseError,
 };
 
-pub(crate) trait TeamRepositoryExt {
+#[allow(async_fn_in_trait)]
+pub trait TeamRepositoryExt {
     async fn create_team_member(
         &self,
-        request: &CreateTeamMemberRequest,
+        command: &CreateTeamMemberCommand,
     ) -> Result<teams::Model, DatabaseError>;
 
     async fn find_team_member_by_identifier(
@@ -20,7 +20,7 @@ pub(crate) trait TeamRepositoryExt {
     async fn update_team_member(
         &self,
         identifier: &str,
-        request: &UpdateTeamMemberRequest,
+        command: &UpdateTeamMemberCommand,
     ) -> Result<teams::Model, DatabaseError>;
 
     async fn delete_team_member(&self, identifier: &str) -> Result<(), DatabaseError>;

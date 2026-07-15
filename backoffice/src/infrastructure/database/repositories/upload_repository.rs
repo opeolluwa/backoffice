@@ -5,9 +5,12 @@ use sea_orm::{
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
     domain::{
-        models::uploads::{self, Entity as UploadEntity},
+        dto::UpdateUploadCommand,
+        models::{
+            uploads::{self, Entity as UploadEntity},
+            sea_orm_active_enums::FileType,
+        },
         ports::upload_repository::UploadRepositoryExt,
     },
     errors::database_error::DatabaseError,
@@ -28,16 +31,19 @@ impl Repository for UploadRepository {
 impl UploadRepositoryExt for UploadRepository {
     async fn create_upload(
         &self,
-        request: &CreateUploadRequest,
-        _user_identifier: &str,
+        name: &str,
+        url: &str,
+        file_type: Option<FileType>,
+        file_size: Option<i64>,
+        starred: bool,
     ) -> Result<uploads::Model, DatabaseError> {
         let model = uploads::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
-            name: Set(request.name.clone()),
-            url: Set(request.src.clone()),
-            file_type: Set(None), //TODO: Set the file_type to None initially
-            file_size: Set(request.size),
-            starred: Set(request.starred.unwrap_or(false)),
+            name: Set(name.to_string()),
+            url: Set(url.to_string()),
+            file_type: Set(file_type),
+            file_size: Set(file_size),
+            starred: Set(starred),
             ..Default::default()
         };
         model.insert(&self.db).await.map_err(DatabaseError::from)
@@ -75,7 +81,7 @@ impl UploadRepositoryExt for UploadRepository {
     async fn update_upload(
         &self,
         identifier: &str,
-        request: &UpdateUploadRequest,
+        command: &UpdateUploadCommand,
     ) -> Result<uploads::Model, DatabaseError> {
         let upload = UploadEntity::find()
             .filter(uploads::Column::Identifier.eq(identifier))
@@ -85,10 +91,10 @@ impl UploadRepositoryExt for UploadRepository {
             .ok_or_else(|| DatabaseError::NotFound("upload not found".to_string()))?;
 
         let mut active: uploads::ActiveModel = upload.into();
-        if let Some(name) = &request.name {
+        if let Some(name) = &command.name {
             active.name = Set(name.clone());
         }
-        if let Some(starred) = request.starred {
+        if let Some(starred) = command.starred {
             active.starred = Set(starred);
         }
         active.update(&self.db).await.map_err(DatabaseError::from)

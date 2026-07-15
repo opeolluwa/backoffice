@@ -11,7 +11,6 @@ export const useUserInformationStore = defineStore("user_information", {
     email: "",
     profilePicture: "",
     username: "",
-    fullName: "",
   }),
 
   getters: {

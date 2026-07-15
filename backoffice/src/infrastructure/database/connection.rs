@@ -3,7 +3,7 @@ use std::time::Duration;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, DatabaseConnection};
 
-use crate::{errors::app_error::AppError, utils::extract_env};
+use crate::{errors::app_error::AppError, shared::extract_env::extract_env};
 
 pub async fn init_db_pool() -> Result<DatabaseConnection, AppError> {
     let database_url = extract_env::<String>("DATABASE_URL")?;
@@ -19,12 +19,12 @@ pub async fn init_db_pool() -> Result<DatabaseConnection, AppError> {
         .sqlx_logging_level(log::LevelFilter::Info); // set default Postgres schema
 
     let db = sea_orm::Database::connect(opt).await.map_err(|err| {
-        log::error!("Failed to connect to the database: {}", err);
+        tracing::error!("Failed to connect to the database: {}", err);
         AppError::StartupError("Failed to connect to the database".to_string())
     })?;
 
     Migrator::up(&db, None).await.map_err(|err| {
-        log::error!(
+        tracing::error!(
             "failed to run database migration due to {}",
             err
         );

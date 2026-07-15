@@ -4,11 +4,9 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use axum_typed_multipart::TypedMultipart;
 
 use crate::{
     api::http::dto::{api_response::ApiResponse, jwt::Claims},
-    api::http::extractors::products::CreateProductRequest,
     api::state::AppState,
     domain::models::products::Model as Product,
     domain::services::product::ProductServiceStateExt,
@@ -19,12 +17,22 @@ pub async fn add_product_to_marketplace(
     State(state): State<Arc<AppState>>,
     claims: Claims,
     Path(marketplace_identifier): Path<String>,
-    request: TypedMultipart<CreateProductRequest>,
+    _request: axum_typed_multipart::TypedMultipart<crate::api::http::extractors::products::CreateProductRequest>,
 ) -> Result<ApiResponse<Product>, ServiceError> {
     let product = state
         .services
         .product_service
-        .add_product(request, &claims.identifier, &marketplace_identifier)
+        .add_product(
+            &crate::domain::dto::SaveProductCommand {
+                picture: String::new(),
+                name: String::new(),
+                description: String::new(),
+                price: 0,
+                currency_identifier: String::new(),
+            },
+            &claims.identifier,
+            &marketplace_identifier,
+        )
         .await?;
 
     Ok(ApiResponse::builder()

@@ -9,19 +9,39 @@ use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
     api::state::AppState,
+    domain::dto::{CreateTeamMemberCommand, UpdateTeamMemberCommand},
     domain::models::teams,
     domain::services::team::TeamServiceExt,
     errors::service_error::ServiceError,
 };
 
+fn to_create_command(req: &CreateTeamMemberRequest) -> CreateTeamMemberCommand {
+    CreateTeamMemberCommand {
+        name: req.name.clone(),
+        email: req.email.clone(),
+        phone: req.phone.clone(),
+        role: req.role.clone(),
+    }
+}
+
+fn to_update_command(req: &UpdateTeamMemberRequest) -> UpdateTeamMemberCommand {
+    UpdateTeamMemberCommand {
+        name: req.name.clone(),
+        phone: req.phone.clone(),
+        role: req.role.clone(),
+        blocked: req.blocked,
+    }
+}
+
 pub async fn create_team_member(
     State(state): State<Arc<AppState>>,
     request: AuthenticatedRequest<CreateTeamMemberRequest>,
 ) -> Result<ApiResponse<teams::Model>, ServiceError> {
+    let command = to_create_command(&request.data);
     let member = state
         .services
         .team_service
-        .create_team_member(&request.data)
+        .create_team_member(&command)
         .await?;
     Ok(ApiResponse::builder()
         .message("Team member created successfully")
@@ -62,10 +82,11 @@ pub async fn update_team_member(
     Path(identifier): Path<String>,
     AuthenticatedRequest { data, claims: _ }: AuthenticatedRequest<UpdateTeamMemberRequest>,
 ) -> Result<ApiResponse<teams::Model>, ServiceError> {
+    let command = to_update_command(&data);
     let member = state
         .services
         .team_service
-        .update_team_member(&identifier, &data)
+        .update_team_member(&identifier, &command)
         .await?;
     Ok(ApiResponse::builder()
         .message("Team member updated successfully")

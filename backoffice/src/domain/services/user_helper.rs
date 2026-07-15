@@ -18,10 +18,9 @@ pub trait UserHelperServiceTrait {
 
 impl UserHelperServiceTrait for UserHelperService {
     fn hash_password(&self, raw_password: &str) -> Result<String, ServiceError> {
-        hash(raw_password.trim(), DEFAULT_COST)
-            .map_err(|err| ServiceError::OperationFailed(err.to_string()))
+        Ok(hash(raw_password.trim(), DEFAULT_COST)?)
     }
     fn validate_password(&self, password: &str, hash: &str) -> Result<bool, ServiceError> {
-        verify(password, hash).map_err(|err| ServiceError::OperationFailed(err.to_string()))
+        Ok(verify(password, hash)?)
     }
 }

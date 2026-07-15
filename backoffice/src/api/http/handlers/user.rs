@@ -5,7 +5,6 @@ use axum::extract::State;
 use crate::{
     api::http::dto::api_response::{ApiResponse, ApiResponseBuilder},
     api::http::dto::jwt::Claims,
-    api::http::extractors::user::UserProfile,
     api::state::AppState,
     domain::services::user::UserServiceTrait,
     errors::service_error::ServiceError,
@@ -14,7 +13,7 @@ use crate::{
 pub async fn retrieve_information(
     State(state): State<Arc<AppState>>,
     claim: Claims,
-) -> Result<ApiResponse<UserProfile>, ServiceError> {
+) -> Result<ApiResponse<crate::domain::dto::UserProfile>, ServiceError> {
     let user_data = state
         .services
         .user_service

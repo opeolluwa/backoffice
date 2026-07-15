@@ -1,10 +1,14 @@
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryOrder, Set};
+use sea_orm::{
+    ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait, Set,
+};
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest},
-    domain::models::teams::{self, Entity as TeamEntity},
-    domain::ports::team_repository::TeamRepositoryExt,
+    domain::{
+        dto::{CreateTeamMemberCommand, UpdateTeamMemberCommand},
+        models::teams::{self, Entity as TeamEntity},
+        ports::team_repository::TeamRepositoryExt,
+    },
     errors::database_error::DatabaseError,
     infrastructure::database::repositories::base::Repository,
 };
@@ -23,14 +27,14 @@ impl Repository for TeamRepository {
 impl TeamRepositoryExt for TeamRepository {
     async fn create_team_member(
         &self,
-        request: &CreateTeamMemberRequest,
+        command: &CreateTeamMemberCommand,
     ) -> Result<teams::Model, DatabaseError> {
         let model = teams::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
-            name: Set(request.name.clone()),
-            email: Set(request.email.clone()),
-            phone: Set(request.phone.clone()),
-            role: Set(request.role.clone()),
+            name: Set(command.name.clone()),
+            email: Set(command.email.clone()),
+            phone: Set(command.phone.clone()),
+            role: Set(command.role.clone()),
             ..Default::default()
         };
         model.insert(&self.db).await.map_err(DatabaseError::from)
@@ -49,7 +53,6 @@ impl TeamRepositoryExt for TeamRepository {
 
     async fn find_all_team_members(&self) -> Result<Vec<teams::Model>, DatabaseError> {
         TeamEntity::find()
-            .order_by_desc(teams::Column::CreatedAt)
             .all(&self.db)
             .await
             .map_err(DatabaseError::from)
@@ -58,7 +61,7 @@ impl TeamRepositoryExt for TeamRepository {
     async fn update_team_member(
         &self,
         identifier: &str,
-        request: &UpdateTeamMemberRequest,
+        command: &UpdateTeamMemberCommand,
     ) -> Result<teams::Model, DatabaseError> {
         let member = TeamEntity::find_by_id(identifier)
             .one(&self.db)
@@ -67,18 +70,17 @@ impl TeamRepositoryExt for TeamRepository {
             .ok_or_else(|| DatabaseError::NotFound("team member not found".to_string()))?;
 
         let mut active: teams::ActiveModel = member.into();
-        if let Some(name) = &request.name {
+        if let Some(name) = &command.name {
             active.name = Set(name.clone());
         }
-        if let Some(phone) = &request.phone {
+        if let Some(phone) = &command.phone {
             active.phone = Set(Some(phone.clone()));
         }
-        if let Some(role) = &request.role {
+        if let Some(role) = &command.role {
             active.role = Set(Some(role.clone()));
         }
-        if let Some(blocked) = request.blocked {
-            active.blocked = Set(blocked);
-        }
+        active.updated_at = Set(Some(chrono::Utc::now().fixed_offset()));
+
         active.update(&self.db).await.map_err(DatabaseError::from)
     }
 
@@ -103,6 +105,8 @@ impl TeamRepositoryExt for TeamRepository {
 
         let mut active: teams::ActiveModel = member.into();
         active.blocked = Set(blocked);
+        active.updated_at = Set(Some(chrono::Utc::now().fixed_offset()));
+
         active.update(&self.db).await.map_err(DatabaseError::from)
     }
 

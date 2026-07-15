@@ -1,13 +1,13 @@
 use crate::{
-    api::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest},
-    domain::models::emails,
+    domain::{dto::{CreateEmailCommand, UpdateEmailCommand}, models::emails},
     errors::database_error::DatabaseError,
 };
 
-pub(crate) trait EmailRepositoryExt {
+#[allow(async_fn_in_trait)]
+pub trait EmailRepositoryExt {
     async fn create_email(
         &self,
-        request: &CreateEmailRequest,
+        command: &CreateEmailCommand,
         user_identifier: &str,
     ) -> Result<emails::Model, DatabaseError>;
 
@@ -41,7 +41,7 @@ pub(crate) trait EmailRepositoryExt {
     async fn update_email(
         &self,
         identifier: &str,
-        request: &UpdateEmailRequest,
+        command: &UpdateEmailCommand,
         user_identifier: &str,
     ) -> Result<emails::Model, DatabaseError>;
 
