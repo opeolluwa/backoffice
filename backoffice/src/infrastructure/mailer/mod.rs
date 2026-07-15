@@ -1,5 +1,4 @@
-pub mod error;
-
-pub use backoffice_email_client::auto_respond::AutoRespondTemplate;
-pub use backoffice_email_client::password_reset::PasswordResetTemplate;
-pub use backoffice_email_client::zepto_mailer::{EmailRequestBuilder, ZeptoMail};
+pub mod auto_respond;
+pub mod invitation_accepted;
+pub mod password_reset;
+pub mod zepto_mailer;
