@@ -3,8 +3,10 @@ use askama::Template;
 use crate::api::http::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
 use crate::errors::database_error::DatabaseError;
 use crate::errors::service_error::ServiceError;
+use crate::infrastructure::mailer::zepto_mailer::EmailRequestBuilder;
 use crate::infrastructure::mailer::{
-    AutoRespondTemplate, EmailRequestBuilder, PasswordResetTemplate, ZeptoMail,
+    auto_respond::AutoRespondTemplate, password_reset::PasswordResetTemplate,
+    zepto_mailer::ZeptoMail,
 };
 use crate::{
     api::http::extractors::auth::{

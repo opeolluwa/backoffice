@@ -4,7 +4,6 @@ use sea_orm::{
 };
 use ulid::Ulid;
 
-use crate::domain::models::sea_orm_active_enums::FileType;
 use crate::{
     api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
     domain::{
@@ -30,7 +29,7 @@ impl UploadRepositoryExt for UploadRepository {
     async fn create_upload(
         &self,
         request: &CreateUploadRequest,
-        user_identifier: &str,
+        _user_identifier: &str,
     ) -> Result<uploads::Model, DatabaseError> {
         let model = uploads::ActiveModel {
             identifier: Set(Ulid::new().to_string()),

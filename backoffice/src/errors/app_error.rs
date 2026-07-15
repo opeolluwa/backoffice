@@ -10,8 +10,8 @@ pub enum AppError {
     StartupError(String),
     #[error("Error parsing env due to {0}")]
     EnvError(String),
-    #[error(transparent)]
-    EnvExtractError(#[from] backoffice_utils::errors::Error),
+    #[error("Error extracting env: {0}")]
+    EnvExtractError(String),
     #[error(transparent)]
     AppFileSystemError(#[from] std::io::Error),
     #[error("Internal server error")]

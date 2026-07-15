@@ -68,6 +68,12 @@ pub struct EmailRequestBuilder {
     htmlbody: Option<String>,
 }
 
+impl Default for EmailRequestBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EmailRequestBuilder {
     pub fn new() -> Self {
         Self {

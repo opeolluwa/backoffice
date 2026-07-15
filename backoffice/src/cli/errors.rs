@@ -1,3 +1,5 @@
+use sea_orm::sqlx;
+
 #[derive(thiserror::Error, Debug)]
 pub enum CliError {
     #[error("Parse Error: {0}")]

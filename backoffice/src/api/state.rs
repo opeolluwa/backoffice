@@ -5,8 +5,6 @@ use axum::extract::FromRef;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
 
-use backoffice_email_client::zepto_mailer::ZeptoMail;
-
 use crate::{
     config::env::AppConfig,
     domain::services::{
@@ -15,11 +13,15 @@ use crate::{
         product::ProductService, root::RootService, team::TeamService, user::UserService,
     },
     errors::app_error::AppError,
-    infrastructure::database::repositories::{
-        base::Repository, country_repository::CountryRepository, email_repository::EmailRepository,
-        invitation_repository::InvitationRepository, marketplace_repository::MarketplaceRepository,
-        product_repository::ProductRepository, team_repository::TeamRepository,
-        upload_repository::UploadRepository, user_repository::UserRepository,
+    infrastructure::{
+        database::repositories::{
+            base::Repository, country_repository::CountryRepository,
+            email_repository::EmailRepository, invitation_repository::InvitationRepository,
+            marketplace_repository::MarketplaceRepository, product_repository::ProductRepository,
+            team_repository::TeamRepository, upload_repository::UploadRepository,
+            user_repository::UserRepository,
+        },
+        mailer::zepto_mailer::ZeptoMail,
     },
 };
 

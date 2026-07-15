@@ -1,11 +1,9 @@
 use std::time::Duration;
 
+use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, DatabaseConnection};
 
-use backoffice_utils::extract_env;
-use migration::{Migrator, MigratorTrait};
-
-use crate::errors::app_error::AppError;
+use crate::{errors::app_error::AppError, utils::extract_env};
 
 pub async fn init_db_pool() -> Result<DatabaseConnection, AppError> {
     let database_url = extract_env::<String>("DATABASE_URL")?;
@@ -28,7 +26,7 @@ pub async fn init_db_pool() -> Result<DatabaseConnection, AppError> {
     Migrator::up(&db, None).await.map_err(|err| {
         log::error!(
             "failed to run database migration due to {}",
-            err.to_string()
+            err
         );
         AppError::StartupError(err.to_string())
     })?;

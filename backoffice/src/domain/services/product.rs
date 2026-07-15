@@ -1,15 +1,12 @@
 use axum_typed_multipart::TypedMultipart;
 
-use backoffice_imagekit::ImagekitClient;
-use backoffice_utils::extract_env;
-
 use crate::{
-    api::http::extractors::products::{CreateProductRequest, SaveProductRequest},
+    api::http::extractors::products::CreateProductRequest,
     config::env::AppConfig,
-    domain::models::products::Model as Product,
-    domain::ports::product_repository::ProductRepositoryExt,
+    domain::{models::products::Model as Product, ports::product_repository::ProductRepositoryExt},
     errors::{app_error::AppError, service_error::ServiceError},
-    // infrastructure::fs::AppFileSystem,
+    infrastructure::imagekit::ImagekitClient,
+    shared::extract_env::extract_env,
 };
 
 pub struct ProductService<R: ProductRepositoryExt> {
@@ -41,24 +38,24 @@ impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductSe
     async fn add_product(
         &self,
         TypedMultipart(CreateProductRequest {
-            picture,
-            price,
-            name,
-            description,
-            currency_identifier,
+            picture: _,
+            price: _,
+            name: _,
+            description: _,
+            currency_identifier: _,
         }): TypedMultipart<CreateProductRequest>,
-        user_identifier: &str,
-        marketplace_identifier: &str,
+        _user_identifier: &str,
+        _marketplace_identifier: &str,
     ) -> Result<Product, ServiceError> {
         let private_key: String = extract_env("IMAGEKIT_PRIVATE_KEY")
             .map_err(|err| AppError::OperationFailed(err.to_string()))?;
         let public_key: String = extract_env("IMAGEKIT_PUBLIC_KEY")
             .map_err(|err| AppError::OperationFailed(err.to_string()))?;
 
-        let imagekit_client =
+        let _imagekit_client =
             ImagekitClient::new(&public_key, &private_key).map_err(ServiceError::from)?;
 
-        let config = AppConfig::from_env()?;
+        let _config = AppConfig::from_env()?;
         // let file_system = AppFileSystem::new(&config)?;
 
         // let file = file_system.save_file_to_disk(picture)?;
