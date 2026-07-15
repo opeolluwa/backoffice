@@ -1,10 +1,13 @@
 use crate::{
-    api::http::extractors::upload::UpdateUploadRequest,
-    domain::models::{uploads, sea_orm_active_enums::FileType},
+    domain::{
+        dto::UpdateUploadCommand,
+        models::{uploads, sea_orm_active_enums::FileType},
+    },
     errors::database_error::DatabaseError,
 };
 
-pub(crate) trait UploadRepositoryExt {
+#[allow(async_fn_in_trait)]
+pub trait UploadRepositoryExt {
     async fn create_upload(
         &self,
         name: &str,
@@ -26,7 +29,7 @@ pub(crate) trait UploadRepositoryExt {
     async fn update_upload(
         &self,
         identifier: &str,
-        request: &UpdateUploadRequest,
+        command: &UpdateUploadCommand,
     ) -> Result<uploads::Model, DatabaseError>;
 
     async fn delete_upload(&self, identifier: &str) -> Result<(), DatabaseError>;

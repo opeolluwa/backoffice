@@ -1,12 +1,13 @@
 use crate::{
-    api::http::extractors::marketplace::CreateMarketplaceRequest, domain::models::marketplaces,
+    domain::{dto::CreateMarketplaceCommand, models::marketplaces},
     errors::database_error::DatabaseError,
 };
 
-pub(crate) trait MarketplaceRepositoryExt {
+#[allow(async_fn_in_trait)]
+pub trait MarketplaceRepositoryExt {
     async fn create_marketplace(
         &self,
-        request: &CreateMarketplaceRequest,
+        command: &CreateMarketplaceCommand,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, DatabaseError>;
 
@@ -31,7 +32,7 @@ pub(crate) trait MarketplaceRepositoryExt {
     async fn update_marketplace_by_identifier(
         &self,
         identifier: &str,
-        request: &CreateMarketplaceRequest,
+        command: &CreateMarketplaceCommand,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, DatabaseError>;
 

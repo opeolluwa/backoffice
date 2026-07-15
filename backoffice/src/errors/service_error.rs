@@ -38,6 +38,8 @@ pub enum ServiceError {
     FileSystemError(#[from] std::io::Error),
     #[error(transparent)]
     ImagekitError(#[from] ImagekitError),
+    #[error(transparent)]
+    BcryptError(#[from] bcrypt::BcryptError),
 }
 
 impl ServiceError {

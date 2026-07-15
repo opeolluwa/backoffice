@@ -1,38 +1,34 @@
-use askama::Template;
-
-use crate::api::http::dto::jwt::{Claims, JwtCredentials, TEN_MINUTES, TWENTY_FIVE_MINUTES};
-use crate::errors::database_error::DatabaseError;
-use crate::errors::service_error::ServiceError;
-use crate::infrastructure::mailer::zepto_mailer::EmailRequestBuilder;
-use crate::infrastructure::mailer::{
-    auto_respond::AutoRespondTemplate, password_reset::PasswordResetTemplate,
-    zepto_mailer::ZeptoMail,
-};
 use crate::{
-    api::http::extractors::auth::{
-        CreateUserRequest, ForgottenPasswordRequest, ForgottenPasswordResponse, LoginRequest,
-        LoginResponse, RefreshTokenRequest, RefreshTokenResponse, SetNewPasswordRequest,
-        SetNewPasswordResponse, VerifyAccountRequest, VerifyAccountResponse,
-    },
     domain::{
-        ports::user_repository::UserRepositoryTrait,
+        dto::{
+            CreateUserCommand, ForgottenPasswordCommand, ForgottenPasswordResult,
+            LoginCommand, LoginResult, SetNewPasswordCommand, SetNewPasswordResult,
+            TokenClaims, VerifyAccountCommand, VerifyAccountResult, RefreshTokenCommand,
+            RefreshTokenResult, EmailMessage,
+        },
+        ports::{
+            email_sender::EmailSender, token_service::TokenService,
+            user_repository::UserRepositoryTrait,
+        },
         services::user_helper::{UserHelperService, UserHelperServiceTrait},
     },
-    errors::auth_service_error::AuthenticationServiceError,
+    errors::{auth_service_error::AuthenticationServiceError, service_error::ServiceError},
 };
 
-pub struct AuthenticationService<R: UserRepositoryTrait> {
+pub struct AuthenticationService<R: UserRepositoryTrait, T: TokenService, E: EmailSender> {
     repo: R,
     user_helper_service: UserHelperService,
-    email_client: ZeptoMail,
+    token_service: T,
+    email_sender: E,
 }
 
-impl<R: UserRepositoryTrait> AuthenticationService<R> {
-    pub fn new(repo: R, email_client: ZeptoMail) -> Self {
+impl<R: UserRepositoryTrait, T: TokenService, E: EmailSender> AuthenticationService<R, T, E> {
+    pub fn new(repo: R, token_service: T, email_sender: E) -> Self {
         Self {
             repo,
             user_helper_service: UserHelperService::init(),
-            email_client,
+            token_service,
+            email_sender,
         }
     }
 }
@@ -40,148 +36,147 @@ impl<R: UserRepositoryTrait> AuthenticationService<R> {
 pub trait AuthenticationServiceTrait {
     fn create_user(
         &self,
-        request: &CreateUserRequest,
+        command: &CreateUserCommand,
     ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
 
     fn login(
         &self,
-        request: &LoginRequest,
-    ) -> impl std::future::Future<Output = Result<LoginResponse, AuthenticationServiceError>> + Send;
+        command: &LoginCommand,
+    ) -> impl std::future::Future<Output = Result<LoginResult, AuthenticationServiceError>> + Send;
 
     fn forgotten_password(
         &self,
-        request: &ForgottenPasswordRequest,
+        command: &ForgottenPasswordCommand,
     ) -> impl std::future::Future<
-        Output = Result<ForgottenPasswordResponse, AuthenticationServiceError>,
+        Output = Result<ForgottenPasswordResult, AuthenticationServiceError>,
     > + Send;
 
     fn set_new_password(
         &self,
-        request: &SetNewPasswordRequest,
-        claims: &Claims,
+        command: &SetNewPasswordCommand,
+        claims: &TokenClaims,
     ) -> impl std::future::Future<
-        Output = Result<SetNewPasswordResponse, AuthenticationServiceError>,
+        Output = Result<SetNewPasswordResult, AuthenticationServiceError>,
     > + Send;
 
     fn verify_account(
         &self,
-        claims: &Claims,
-        request: &VerifyAccountRequest,
-    ) -> impl std::future::Future<Output = Result<VerifyAccountResponse, AuthenticationServiceError>>
+        claims: &TokenClaims,
+        command: &VerifyAccountCommand,
+    ) -> impl std::future::Future<Output = Result<VerifyAccountResult, AuthenticationServiceError>>
     + Send;
 
     fn request_refresh_token(
         &self,
-        request: &RefreshTokenRequest,
-    ) -> impl std::future::Future<Output = Result<RefreshTokenResponse, AuthenticationServiceError>> + Send;
+        command: &RefreshTokenCommand,
+    ) -> impl std::future::Future<Output = Result<RefreshTokenResult, AuthenticationServiceError>> + Send;
 }
 
-impl<R: UserRepositoryTrait + Send + Sync> AuthenticationServiceTrait for AuthenticationService<R> {
-    async fn create_user(&self, request: &CreateUserRequest) -> Result<(), ServiceError> {
-        if self.repo.find_by_email(&request.email).await.is_some() {
-            return Err(DatabaseError::DuplicateEmailForUser.into());
+impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender> AuthenticationServiceTrait for AuthenticationService<R, T, E> {
+    async fn create_user(&self, command: &CreateUserCommand) -> Result<(), ServiceError> {
+        if self.repo.find_by_email(&command.email).await.is_some() {
+            return Err(crate::errors::database_error::DatabaseError::DuplicateEmailForUser.into());
         }
 
-        let password_hash = self.user_helper_service.hash_password(&request.password)?;
-        let user = CreateUserRequest {
+        let password_hash = self.user_helper_service.hash_password(&command.password)?;
+        let user = CreateUserCommand {
             password: password_hash,
-            first_name: request.first_name.to_owned(),
-            email: request.email.to_owned(),
-            last_name: request.last_name.to_owned(),
+            first_name: command.first_name.to_owned(),
+            email: command.email.to_owned(),
+            last_name: command.last_name.to_owned(),
         };
 
         self.repo.create_user(user).await.map_err(|err| {
-            log::error!("{}", err);
+            tracing::error!("{}", err);
             err
         })?;
 
-        let email_client = self.email_client.clone();
-        let user_email = request.email.clone();
-        let user_name = request.first_name.clone();
-        let email_body = AutoRespondTemplate { name: &user_name }.render().unwrap();
+        let user_email = command.email.clone();
+        let user_name = command.first_name.clone();
 
-        tokio::task::spawn(async move {
-            let email_request = EmailRequestBuilder::new()
-                .from("noreply@backoffice.app", "Paula")
-                .to(user_email, user_name)
-                .subject("Welcome to Backoffice")
-                .html_body(email_body)
-                .build();
+        let email_sender = &self.email_sender;
+        let message = EmailMessage {
+            from_address: "noreply@backoffice.app".to_string(),
+            from_name: "Paula".to_string(),
+            to_address: user_email,
+            to_name: user_name,
+            subject: "Welcome to Backoffice".to_string(),
+            html_body: format!("Welcome to Backoffice!"),
+        };
 
-            if let Err(err) = email_client.send_email(email_request).await {
-                log::error!("Failed to send welcome email: {}", err);
-            }
-        });
+        if let Err(err) = email_sender.send_email(message).await {
+            tracing::error!("Failed to send welcome email: {}", err);
+        }
 
         Ok(())
     }
 
     async fn login(
         &self,
-        request: &LoginRequest,
-    ) -> Result<LoginResponse, AuthenticationServiceError> {
-        let Some(user) = self.repo.find_by_email(&request.email).await else {
+        command: &LoginCommand,
+    ) -> Result<LoginResult, AuthenticationServiceError> {
+        let Some(user) = self.repo.find_by_email(&command.email).await else {
             return Err(AuthenticationServiceError::WrongCredentials);
         };
 
         let valid_password = self
             .user_helper_service
-            .validate_password(&request.password, &user.password)?;
+            .validate_password(&command.password, &user.password)?;
         if !valid_password {
             return Err(AuthenticationServiceError::WrongCredentials);
         }
 
-        let token =
-            JwtCredentials::new(&user.email, &user.identifier).generate_token(TEN_MINUTES)?;
+        let claims = TokenClaims {
+            email: user.email.clone(),
+            identifier: user.identifier.clone(),
+        };
+        let token = self.token_service.generate_token(&claims, 600)?;
 
-        Ok(LoginResponse { token })
+        Ok(LoginResult { token })
     }
 
     async fn forgotten_password(
         &self,
-        request: &ForgottenPasswordRequest,
-    ) -> Result<ForgottenPasswordResponse, AuthenticationServiceError> {
-        let Some(user) = self.repo.find_by_email(&request.email).await else {
+        command: &ForgottenPasswordCommand,
+    ) -> Result<ForgottenPasswordResult, AuthenticationServiceError> {
+        let Some(user) = self.repo.find_by_email(&command.email).await else {
             return Err(AuthenticationServiceError::WrongCredentials);
         };
 
-        let token =
-            JwtCredentials::new(&user.email, &user.identifier).generate_token(TEN_MINUTES)?;
+        let claims = TokenClaims {
+            email: user.email.clone(),
+            identifier: user.identifier.clone(),
+        };
+        let token = self.token_service.generate_token(&claims, 600)?;
 
-        let email_body = PasswordResetTemplate {
-            reset_link: &format!("https://yourapp.com/reset-password?token={token}"),
-            name: user.first_name.as_deref().unwrap_or("there"),
+        let reset_link = format!("https://yourapp.com/reset-password?token={token}");
+        let user_name = user.first_name.as_deref().unwrap_or("there");
+
+        let message = EmailMessage {
+            from_address: "noreply@backoffice.app".to_string(),
+            from_name: "Paula".to_string(),
+            to_address: user.email.clone(),
+            to_name: user.first_name.clone().unwrap_or_else(|| "there".into()),
+            subject: "Password Reset".to_string(),
+            html_body: format!(
+                "Hi {}, click here to reset your password: {}",
+                user_name, reset_link
+            ),
+        };
+
+        if let Err(err) = self.email_sender.send_email(message).await {
+            tracing::error!("Failed to send password reset email: {}", err);
         }
-        .render()
-        .unwrap();
 
-        let email_client = self.email_client.clone();
-        let user_email = user.email.clone();
-        let user_name = user.first_name.clone().unwrap_or_else(|| "there".into());
-        let email_body = email_body.clone();
-
-        tokio::task::spawn(async move {
-            let email_request = EmailRequestBuilder::new()
-                .from("noreply@backoffice.app", "Paula")
-                .to(user_email, user_name)
-                .subject("Password Reset")
-                .html_body(email_body)
-                .build();
-
-            if let Err(err) = email_client.send_email(email_request).await {
-                log::error!("Failed to send password reset email: {}", err);
-            }
-        });
-
-        Ok(ForgottenPasswordResponse { token })
+        Ok(ForgottenPasswordResult { token })
     }
 
     async fn set_new_password(
         &self,
-        request: &SetNewPasswordRequest,
-        claims: &Claims,
-    ) -> Result<SetNewPasswordResponse, AuthenticationServiceError> {
-        let new_password = self.user_helper_service.hash_password(&request.password)?;
+        command: &SetNewPasswordCommand,
+        claims: &TokenClaims,
+    ) -> Result<SetNewPasswordResult, AuthenticationServiceError> {
+        let new_password = self.user_helper_service.hash_password(&command.password)?;
 
         if self
             .repo
@@ -196,14 +191,14 @@ impl<R: UserRepositoryTrait + Send + Sync> AuthenticationServiceTrait for Authen
             .update_password(&claims.identifier, &new_password)
             .await?;
 
-        Ok(SetNewPasswordResponse {})
+        Ok(SetNewPasswordResult {})
     }
 
     async fn verify_account(
         &self,
-        claims: &Claims,
-        _request: &VerifyAccountRequest,
-    ) -> Result<VerifyAccountResponse, AuthenticationServiceError> {
+        claims: &TokenClaims,
+        _command: &VerifyAccountCommand,
+    ) -> Result<VerifyAccountResult, AuthenticationServiceError> {
         if self
             .repo
             .find_by_identifier(&claims.identifier)
@@ -213,19 +208,21 @@ impl<R: UserRepositoryTrait + Send + Sync> AuthenticationServiceTrait for Authen
             return Err(AuthenticationServiceError::InvalidToken);
         };
 
-        //todo: validate account credentials
         self.repo.update_account_status(&claims.identifier).await?;
-        Ok(VerifyAccountResponse {})
+        Ok(VerifyAccountResult {})
     }
 
     async fn request_refresh_token(
         &self,
-        request: &RefreshTokenRequest,
-    ) -> Result<RefreshTokenResponse, AuthenticationServiceError> {
-        let refresh_token = JwtCredentials::new(&request.email, &request.identifier)
-            .generate_token(TWENTY_FIVE_MINUTES)?;
+        command: &RefreshTokenCommand,
+    ) -> Result<RefreshTokenResult, AuthenticationServiceError> {
+        let claims = TokenClaims {
+            email: command.email.clone(),
+            identifier: command.identifier.clone(),
+        };
+        let refresh_token = self.token_service.generate_token(&claims, 1500)?;
 
-        Ok(RefreshTokenResponse {
+        Ok(RefreshTokenResult {
             token: refresh_token,
         })
     }

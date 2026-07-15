@@ -5,8 +5,8 @@ use sea_orm::{
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::upload::UpdateUploadRequest,
     domain::{
+        dto::UpdateUploadCommand,
         models::{
             uploads::{self, Entity as UploadEntity},
             sea_orm_active_enums::FileType,
@@ -81,7 +81,7 @@ impl UploadRepositoryExt for UploadRepository {
     async fn update_upload(
         &self,
         identifier: &str,
-        request: &UpdateUploadRequest,
+        command: &UpdateUploadCommand,
     ) -> Result<uploads::Model, DatabaseError> {
         let upload = UploadEntity::find()
             .filter(uploads::Column::Identifier.eq(identifier))
@@ -91,10 +91,10 @@ impl UploadRepositoryExt for UploadRepository {
             .ok_or_else(|| DatabaseError::NotFound("upload not found".to_string()))?;
 
         let mut active: uploads::ActiveModel = upload.into();
-        if let Some(name) = &request.name {
+        if let Some(name) = &command.name {
             active.name = Set(name.clone());
         }
-        if let Some(starred) = request.starred {
+        if let Some(starred) = command.starred {
             active.starred = Set(starred);
         }
         active.update(&self.db).await.map_err(DatabaseError::from)

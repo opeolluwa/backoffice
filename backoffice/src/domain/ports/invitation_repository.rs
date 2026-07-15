@@ -3,7 +3,8 @@ use crate::{
     errors::database_error::DatabaseError,
 };
 
-pub(crate) trait InvitationRepositoryExt {
+#[allow(async_fn_in_trait)]
+pub trait InvitationRepositoryExt {
     async fn create_invitation(
         &self,
         email: &str,

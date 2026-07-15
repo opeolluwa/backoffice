@@ -1,5 +1,7 @@
-use crate::api::http::extractors::user::UserProfile;
-use crate::domain::ports::user_repository::UserRepositoryTrait;
+use crate::domain::{
+    dto::UserProfile,
+    ports::user_repository::UserRepositoryTrait,
+};
 use crate::errors::service_error::ServiceError;
 
 pub struct UserService<R: UserRepositoryTrait> {
@@ -25,15 +27,16 @@ impl<R: UserRepositoryTrait + Send + Sync> UserServiceTrait for UserService<R> {
     }
 
     async fn find_user_by_email(&self, user_email: &str) -> Result<UserProfile, ServiceError> {
-        self.repo
+        let user = self.repo
             .find_by_email(user_email)
             .await
-            .ok_or(ServiceError::OperationFailed("user not found".to_string()))
-            .map(|user| UserProfile {
-                identifier: user.identifier,
-                email: user.email,
-                first_name: user.first_name.unwrap_or_default(),
-                last_name: user.last_name.unwrap_or_default(),
-            })
+            .ok_or(ServiceError::OperationFailed("user not found".to_string()))?;
+
+        Ok(UserProfile {
+            identifier: user.identifier,
+            email: user.email,
+            first_name: user.first_name.unwrap_or_default(),
+            last_name: user.last_name.unwrap_or_default(),
+        })
     }
 }

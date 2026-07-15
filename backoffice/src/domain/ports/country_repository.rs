@@ -1,6 +1,7 @@
 use crate::{domain::models::countries, errors::database_error::DatabaseError};
 
-pub(crate) trait CountryRepositoryExt {
+#[allow(async_fn_in_trait)]
+pub trait CountryRepositoryExt {
     async fn fetch_all_countries(&self) -> Result<Vec<countries::Model>, DatabaseError>;
 
     async fn fetch_country_by_identifier(

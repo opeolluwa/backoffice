@@ -1,12 +1,13 @@
 use crate::{
-    api::http::extractors::products::SaveProductRequest, domain::models::products,
+    domain::{dto::SaveProductCommand, models::products},
     errors::database_error::DatabaseError,
 };
 
-pub(crate) trait ProductRepositoryExt {
+#[allow(async_fn_in_trait)]
+pub trait ProductRepositoryExt {
     async fn create_product(
         &self,
-        request: &SaveProductRequest,
+        command: &SaveProductCommand,
         user_identifier: &str,
         marketplace_identifier: &str,
     ) -> Result<products::Model, DatabaseError>;

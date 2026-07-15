@@ -1,10 +1,10 @@
-pub mod activity_repository;
 pub mod country_repository;
 pub mod email_repository;
+pub mod email_sender;
 pub mod invitation_repository;
 pub mod marketplace_repository;
 pub mod product_repository;
 pub mod team_repository;
+pub mod token_service;
 pub mod upload_repository;
 pub mod user_repository;
-pub mod email_service;

@@ -1,7 +1,9 @@
 use crate::{
-    api::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest},
-    domain::models::emails,
-    domain::ports::email_repository::EmailRepositoryExt,
+    domain::{
+        dto::{CreateEmailCommand, UpdateEmailCommand},
+        models::emails,
+        ports::email_repository::EmailRepositoryExt,
+    },
     errors::service_error::ServiceError,
 };
 
@@ -18,7 +20,7 @@ impl<R: EmailRepositoryExt> EmailsService<R> {
 pub(crate) trait EmailsServiceExt {
     async fn create_email(
         &self,
-        request: &CreateEmailRequest,
+        command: &CreateEmailCommand,
         user_identifier: &str,
     ) -> Result<emails::Model, ServiceError>;
 
@@ -52,7 +54,7 @@ pub(crate) trait EmailsServiceExt {
     async fn update_email(
         &self,
         identifier: &str,
-        request: &UpdateEmailRequest,
+        command: &UpdateEmailCommand,
         user_identifier: &str,
     ) -> Result<emails::Model, ServiceError>;
 
@@ -70,13 +72,10 @@ pub(crate) trait EmailsServiceExt {
 impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> {
     async fn create_email(
         &self,
-        request: &CreateEmailRequest,
+        command: &CreateEmailCommand,
         user_identifier: &str,
     ) -> Result<emails::Model, ServiceError> {
-        self.repo
-            .create_email(request, user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.create_email(command, user_identifier).await?)
     }
 
     async fn find_email_by_identifier(
@@ -84,20 +83,17 @@ impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> 
         identifier: &str,
         user_identifier: &str,
     ) -> Result<emails::Model, ServiceError> {
-        self.repo
+        Ok(self
+            .repo
             .find_email_by_identifier(identifier, user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+            .await?)
     }
 
     async fn find_all_emails(
         &self,
         user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        self.repo
-            .find_all_emails(user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.find_all_emails(user_identifier).await?)
     }
 
     async fn find_emails_by_tag(
@@ -105,42 +101,33 @@ impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> 
         tag: &str,
         user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        self.repo
-            .find_emails_by_tag(tag, user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.find_emails_by_tag(tag, user_identifier).await?)
     }
 
     async fn find_starred_emails(
         &self,
         user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        self.repo
-            .find_starred_emails(user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.find_starred_emails(user_identifier).await?)
     }
 
     async fn find_unread_emails(
         &self,
         user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        self.repo
-            .find_unread_emails(user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.find_unread_emails(user_identifier).await?)
     }
 
     async fn update_email(
         &self,
         identifier: &str,
-        request: &UpdateEmailRequest,
+        command: &UpdateEmailCommand,
         user_identifier: &str,
     ) -> Result<emails::Model, ServiceError> {
-        self.repo
-            .update_email(identifier, request, user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self
+            .repo
+            .update_email(identifier, command, user_identifier)
+            .await?)
     }
 
     async fn delete_email(
@@ -148,23 +135,17 @@ impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> 
         identifier: &str,
         user_identifier: &str,
     ) -> Result<(), ServiceError> {
-        self.repo
+        Ok(self
+            .repo
             .delete_email(identifier, user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+            .await?)
     }
 
     async fn count_emails(&self, user_identifier: &str) -> Result<i64, ServiceError> {
-        self.repo
-            .count_emails(user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.count_emails(user_identifier).await?)
     }
 
     async fn count_unread_emails(&self, user_identifier: &str) -> Result<i64, ServiceError> {
-        self.repo
-            .count_unread_emails(user_identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.count_unread_emails(user_identifier).await?)
     }
 }

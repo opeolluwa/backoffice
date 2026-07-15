@@ -8,7 +8,7 @@ use seaography::async_graphql;
 use crate::{
     config::env::AppConfig,
     domain::services::{
-        admin::AdminService, auth::AuthenticationService, country::CountryService,
+        auth::AuthenticationService, country::CountryService,
         emails::EmailsService, invitation::InvitationService, marketplace::MarketplaceService,
         product::ProductService, root::RootService, team::TeamService,
         upload::UploadsService, user::UserService,
@@ -22,6 +22,7 @@ use crate::{
             team_repository::TeamRepository, upload_repository::UploadRepository,
             user_repository::UserRepository,
         },
+        jwt::JwtTokenService,
         mailer::zepto_mailer::ZeptoMail,
     },
 };
@@ -30,7 +31,7 @@ use crate::{
 pub struct ServicesState {
     pub user_service: Arc<UserService<UserRepository>>,
     pub root_service: Arc<RootService>,
-    pub auth_service: Arc<AuthenticationService<UserRepository>>,
+    pub auth_service: Arc<AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>>,
     pub marketplace_service: Arc<MarketplaceService<MarketplaceRepository>>,
     pub product_service: Arc<ProductService<ProductRepository>>,
     pub country_service: Arc<CountryService<CountryRepository>>,
@@ -52,7 +53,7 @@ impl FromRef<ServicesState> for Arc<RootService> {
     }
 }
 
-impl FromRef<ServicesState> for Arc<AuthenticationService<UserRepository>> {
+impl FromRef<ServicesState> for Arc<AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>> {
     fn from_ref(input: &ServicesState) -> Self {
         Arc::clone(&input.auth_service)
     }
@@ -112,10 +113,13 @@ impl ServicesState {
         upload_repository: UploadRepository,
         email_client: ZeptoMail,
     ) -> Self {
+        let token_service = JwtTokenService::new();
         let user_service = Arc::new(UserService::new(user_repository.clone()));
-        let auth_service = Arc::new(AuthenticationService::new(user_repository, email_client));
-        let _admin_service =
-            AdminService::new(Arc::clone(&user_service), Arc::clone(&auth_service));
+        let auth_service = Arc::new(AuthenticationService::new(
+            user_repository,
+            token_service,
+            email_client,
+        ));
         let country_service = Arc::new(CountryService::new(country_repository));
         let marketplace_service = Arc::new(MarketplaceService::new(marketplace_repository));
         let product_service = Arc::new(ProductService::new(product_repository));

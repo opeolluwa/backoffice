@@ -10,20 +10,39 @@ use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
     api::state::AppState,
+    domain::dto::UpdateUploadCommand,
     domain::models::uploads,
     domain::services::upload::UploadsServiceExt,
     errors::service_error::ServiceError,
 };
 
+fn to_update_command(req: &UpdateUploadRequest) -> UpdateUploadCommand {
+    UpdateUploadCommand {
+        name: req.name.clone(),
+        starred: req.starred,
+    }
+}
+
 pub async fn create_upload(
     State(state): State<Arc<AppState>>,
     _claims: Claims,
-    request: TypedMultipart<CreateUploadRequest>,
+    TypedMultipart(CreateUploadRequest { file, name, file_type: _, starred }): TypedMultipart<CreateUploadRequest>,
 ) -> Result<ApiResponse<uploads::Model>, ServiceError> {
+    let file_name = file
+        .metadata
+        .file_name
+        .clone()
+        .unwrap_or_else(|| "upload".to_string());
+
+    let file_path = file
+        .contents
+        .path()
+        .to_path_buf();
+
     let upload = state
         .services
         .upload_service
-        .create_upload(request)
+        .create_upload(file_path, &file_name, &name, starred.unwrap_or(false))
         .await?;
     Ok(ApiResponse::builder()
         .message("Upload created successfully")
@@ -76,10 +95,11 @@ pub async fn update_upload(
     Path(identifier): Path<String>,
     AuthenticatedRequest { data, .. }: AuthenticatedRequest<UpdateUploadRequest>,
 ) -> Result<ApiResponse<uploads::Model>, ServiceError> {
+    let command = to_update_command(&data);
     let upload = state
         .services
         .upload_service
-        .update_upload(&identifier, &data)
+        .update_upload(&identifier, &command)
         .await?;
     Ok(ApiResponse::builder()
         .message("Upload updated successfully")

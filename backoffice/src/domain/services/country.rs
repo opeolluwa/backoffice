@@ -24,19 +24,13 @@ pub(crate) trait CountryServiceExt {
 
 impl<R: CountryRepositoryExt + Send + Sync> CountryServiceExt for CountryService<R> {
     async fn get_all_countries(&self) -> Result<Vec<countries::Model>, ServiceError> {
-        self.repo
-            .fetch_all_countries()
-            .await
-            .map_err(ServiceError::from)
+        Ok(self.repo.fetch_all_countries().await?)
     }
 
     async fn get_country_by_identifier(
         &self,
         identifier: &str,
     ) -> Result<Option<countries::Model>, ServiceError> {
-        self.repo
-            .fetch_country_by_identifier(identifier)
-            .await
-            .map_err(ServiceError::from)
+        Ok(self.repo.fetch_country_by_identifier(identifier).await?)
     }
 }

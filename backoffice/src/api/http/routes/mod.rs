@@ -1,4 +1,3 @@
-pub mod activities;
 pub mod auth;
 pub mod collections;
 pub mod country;

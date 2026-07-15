@@ -2,9 +2,11 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Qu
 use ulid::Ulid;
 
 use crate::{
-    api::http::extractors::{auth::CreateUserRequest, user::UserProfile},
-    domain::models::users::{self, Entity as UserEntity},
-    domain::ports::user_repository::UserRepositoryTrait,
+    domain::{
+        dto::{CreateUserCommand, UserProfile},
+        models::users::{self, Entity as UserEntity},
+        ports::user_repository::UserRepositoryTrait,
+    },
     errors::service_error::ServiceError,
     infrastructure::database::repositories::base::Repository,
 };
@@ -47,7 +49,7 @@ impl UserRepositoryTrait for UserRepository {
         UserEntity::update(model)
             .exec(&self.db)
             .await
-            .map_err(|err| ServiceError::OperationFailed(err.to_string()))?;
+            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?;
         Ok(())
     }
 
@@ -64,11 +66,11 @@ impl UserRepositoryTrait for UserRepository {
         UserEntity::update(model)
             .exec(&self.db)
             .await
-            .map_err(|err| ServiceError::OperationFailed(err.to_string()))?;
+            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?;
         Ok(())
     }
 
-    async fn create_user(&self, user: CreateUserRequest) -> Result<(), ServiceError> {
+    async fn create_user(&self, user: CreateUserCommand) -> Result<(), ServiceError> {
         let model = users::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
             first_name: Set(Some(user.first_name)),
@@ -80,7 +82,7 @@ impl UserRepositoryTrait for UserRepository {
         model
             .insert(&self.db)
             .await
-            .map_err(|err| ServiceError::OperationFailed(err.to_string()))?;
+            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?;
         Ok(())
     }
 
@@ -88,7 +90,7 @@ impl UserRepositoryTrait for UserRepository {
         let user = UserEntity::find_by_id(identifier)
             .one(&self.db)
             .await
-            .map_err(|err| ServiceError::OperationFailed(err.to_string()))?
+            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?
             .ok_or_else(|| ServiceError::OperationFailed("user not found".to_string()))?;
 
         Ok(UserProfile {

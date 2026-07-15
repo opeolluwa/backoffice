@@ -13,7 +13,7 @@ pub trait RootServiceTrait {
 
 impl RootServiceTrait for RootService {
     fn health_check(&self) -> Result<(), AppError> {
-        log::info!("application is healthy ...");
+        tracing::info!("application is healthy ...");
         Ok(())
     }
 }

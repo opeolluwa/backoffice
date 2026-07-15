@@ -9,19 +9,41 @@ use crate::{
     api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest},
     api::state::AppState,
+    domain::dto::{CreateEmailCommand, UpdateEmailCommand},
     domain::models::emails,
     domain::services::emails::EmailsServiceExt,
     errors::service_error::ServiceError,
 };
 
+fn to_create_command(req: &CreateEmailRequest) -> CreateEmailCommand {
+    CreateEmailCommand {
+        subject: req.subject.clone(),
+        body: req.body.clone(),
+        sender_email: req.sender_email.clone(),
+        recipient_email: req.recipient_email.clone(),
+        tag: req.tag.clone(),
+        has_attachments: req.has_attachments,
+        data: req.data.clone(),
+    }
+}
+
+fn to_update_command(req: &UpdateEmailRequest) -> UpdateEmailCommand {
+    UpdateEmailCommand {
+        tag: req.tag.clone(),
+        is_read: req.is_read,
+        is_starred: req.is_starred,
+    }
+}
+
 pub async fn create_email(
     State(state): State<Arc<AppState>>,
     request: AuthenticatedRequest<CreateEmailRequest>,
 ) -> Result<ApiResponse<emails::Model>, ServiceError> {
+    let command = to_create_command(&request.data);
     let email = state
         .services
         .emails_service
-        .create_email(&request.data, &request.claims.identifier)
+        .create_email(&command, &request.claims.identifier)
         .await?;
     Ok(ApiResponse::builder()
         .message("Email created successfully")
@@ -112,10 +134,11 @@ pub async fn update_email(
     Path(identifier): Path<String>,
     AuthenticatedRequest { data, claims }: AuthenticatedRequest<UpdateEmailRequest>,
 ) -> Result<ApiResponse<emails::Model>, ServiceError> {
+    let command = to_update_command(&data);
     let email = state
         .services
         .emails_service
-        .update_email(&identifier, &data, &claims.identifier)
+        .update_email(&identifier, &command, &claims.identifier)
         .await?;
     Ok(ApiResponse::builder()
         .message("Email updated successfully")

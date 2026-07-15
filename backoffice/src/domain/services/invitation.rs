@@ -52,8 +52,7 @@ impl<R: InvitationRepositoryExt + Send + Sync> InvitationServiceExt for Invitati
         let invitation = self
             .repo
             .create_invitation(email, &token)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?;
+            .await?;
 
         mock_send_invitation_email(email, &token).await;
 
@@ -64,17 +63,11 @@ impl<R: InvitationRepositoryExt + Send + Sync> InvitationServiceExt for Invitati
         &self,
         identifier: &str,
     ) -> Result<invitation::Model, ServiceError> {
-        self.repo
-            .find_invitation_by_identifier(identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.find_invitation_by_identifier(identifier).await?)
     }
 
     async fn find_all_invitations(&self) -> Result<Vec<invitation::Model>, ServiceError> {
-        self.repo
-            .find_all_invitations()
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.find_all_invitations().await?)
     }
 
     async fn accept_invitation(
@@ -85,8 +78,7 @@ impl<R: InvitationRepositoryExt + Send + Sync> InvitationServiceExt for Invitati
         let invitation = self
             .repo
             .find_invitation_by_identifier(identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?;
+            .await?;
 
         if invitation.token != token {
             return Err(ServiceError::OperationFailed(
@@ -94,34 +86,22 @@ impl<R: InvitationRepositoryExt + Send + Sync> InvitationServiceExt for Invitati
             ));
         }
 
-        self.repo
-            .accept_invitation(identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.accept_invitation(identifier).await?)
     }
 
     async fn block_invitation(
         &self,
         identifier: &str,
     ) -> Result<invitation::Model, ServiceError> {
-        self.repo
-            .block_invitation(identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.block_invitation(identifier).await?)
     }
 
     async fn delete_invitation(&self, identifier: &str) -> Result<(), ServiceError> {
-        self.repo
-            .delete_invitation(identifier)
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.delete_invitation(identifier).await?)
     }
 
     async fn count_invitations(&self) -> Result<i64, ServiceError> {
-        self.repo
-            .count_invitations()
-            .await
-            .map_err(|e| ServiceError::OperationFailed(e.to_string()))
+        Ok(self.repo.count_invitations().await?)
     }
 }
 
