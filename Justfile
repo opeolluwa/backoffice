@@ -105,7 +105,6 @@ migrate-add target:
 
 @generate-entities:
     RUST_BACKTRACE=full sea-orm-cli generate entity \
-        --lib \
         --database-url {{DEV_DB_URL}} \
         --with-serde both \
         --enum-extra-derives 'ts_rs::TS' \
@@ -113,7 +112,7 @@ migrate-add target:
         --model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
         --enum-extra-attributes 'ts(export)' \
         --ignore-tables backoffice_server_migrations \
-        -o backoffice/models/src --seaography
+        -o backoffice/src/domain/models --seaography
 
 
 

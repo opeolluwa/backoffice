@@ -54,11 +54,11 @@ const routes: RouteItem[] = [
   //   path: "/messages",
   //   icon: "heroicons:envelope",
   // },
-  // {
-  //   label: "Marketplace",
-  //   path: "/marketplace",
-  //   icon: "heroicons:building-storefront",
-  // },
+  {
+    label: "Marketplace",
+    path: "/marketplace",
+    icon: "heroicons:building-storefront",
+  },
   // {
   //   label: "Invitations",
   //   path: "/invitations",
