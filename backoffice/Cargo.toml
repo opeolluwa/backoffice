@@ -5,7 +5,7 @@ name = "backoffice"
 version = "0.1.0"
 
 [workspace]
-members = ["api","domain", "helpers","infrastructure","migration"]
+members = ["config","domain", "graphql", "helpers", "http","infrastructure","migration"]
 
 [workspace.package]
 authors = ["Adefemi Adeoye"]

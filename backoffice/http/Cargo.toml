@@ -1,5 +1,5 @@
 [package]
-name = "api"
+name = "http"
 authors.workspace = true
 description.workspace = true
 version.workspace = true
