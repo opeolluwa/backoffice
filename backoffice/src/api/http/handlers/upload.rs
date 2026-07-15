@@ -4,9 +4,10 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use axum_typed_multipart::TypedMultipart;
 
 use crate::{
-    api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse},
+    api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
     api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
     api::state::AppState,
     domain::models::uploads,
@@ -16,12 +17,13 @@ use crate::{
 
 pub async fn create_upload(
     State(state): State<Arc<AppState>>,
-    request: AuthenticatedRequest<CreateUploadRequest>,
+    _claims: Claims,
+    request: TypedMultipart<CreateUploadRequest>,
 ) -> Result<ApiResponse<uploads::Model>, ServiceError> {
     let upload = state
         .services
         .upload_service
-        .create_upload(&request.data)
+        .create_upload(request)
         .await?;
     Ok(ApiResponse::builder()
         .message("Upload created successfully")

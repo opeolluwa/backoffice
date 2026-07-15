@@ -1,14 +1,17 @@
 use crate::{
-    api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
-    domain::models::uploads,
+    api::http::extractors::upload::UpdateUploadRequest,
+    domain::models::{uploads, sea_orm_active_enums::FileType},
     errors::database_error::DatabaseError,
 };
 
 pub(crate) trait UploadRepositoryExt {
     async fn create_upload(
         &self,
-        request: &CreateUploadRequest,
-        user_identifier: &str,
+        name: &str,
+        url: &str,
+        file_type: Option<FileType>,
+        file_size: Option<i64>,
+        starred: bool,
     ) -> Result<uploads::Model, DatabaseError>;
 
     async fn find_upload_by_identifier(
