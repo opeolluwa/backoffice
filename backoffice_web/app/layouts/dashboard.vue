@@ -74,11 +74,11 @@ const routes: RouteItem[] = [
     path: "/metrics",
     icon: "heroicons:chart-bar-square",
   },
-  {
-    label: "Revenue",
-    path: "/revenue",
-    icon: "heroicons:banknotes",
-  },
+  // {
+  //   label: "Revenue",
+  //   path: "/revenue",
+  //   icon: "heroicons:banknotes",
+  // },
   {
     divider: true,
     label: "Workspace",
