@@ -10,7 +10,8 @@ use crate::{
     domain::services::{
         admin::AdminService, auth::AuthenticationService, country::CountryService,
         emails::EmailsService, invitation::InvitationService, marketplace::MarketplaceService,
-        product::ProductService, root::RootService, team::TeamService, user::UserService,
+        product::ProductService, root::RootService, team::TeamService,
+        upload::UploadsService, user::UserService,
     },
     errors::app_error::AppError,
     infrastructure::{
@@ -36,6 +37,7 @@ pub struct ServicesState {
     pub team_service: Arc<TeamService<TeamRepository>>,
     pub emails_service: Arc<EmailsService<EmailRepository>>,
     pub invitation_service: Arc<InvitationService<InvitationRepository>>,
+    pub upload_service: Arc<UploadsService<UploadRepository>>,
 }
 
 impl FromRef<ServicesState> for Arc<UserService<UserRepository>> {
@@ -92,6 +94,12 @@ impl FromRef<ServicesState> for Arc<InvitationService<InvitationRepository>> {
     }
 }
 
+impl FromRef<ServicesState> for Arc<UploadsService<UploadRepository>> {
+    fn from_ref(input: &ServicesState) -> Self {
+        Arc::clone(&input.upload_service)
+    }
+}
+
 impl ServicesState {
     pub fn new(
         user_repository: UserRepository,
@@ -101,6 +109,7 @@ impl ServicesState {
         team_repository: TeamRepository,
         email_repository: EmailRepository,
         invitation_repository: InvitationRepository,
+        upload_repository: UploadRepository,
         email_client: ZeptoMail,
     ) -> Self {
         let user_service = Arc::new(UserService::new(user_repository.clone()));
@@ -114,6 +123,7 @@ impl ServicesState {
         let root_service = Arc::new(RootService::init());
         let emails_service = Arc::new(EmailsService::new(email_repository));
         let invitation_service = Arc::new(InvitationService::new(invitation_repository));
+        let upload_service = Arc::new(UploadsService::new(upload_repository));
 
         Self {
             user_service,
@@ -125,6 +135,7 @@ impl ServicesState {
             marketplace_service,
             emails_service,
             invitation_service,
+            upload_service,
         }
     }
 }
@@ -151,7 +162,7 @@ impl AppState {
         let email_repository = EmailRepository::init(db_conn);
         let marketplace_repository = MarketplaceRepository::init(db_conn);
         let team_repository = TeamRepository::init(db_conn);
-        let _upload_repository = UploadRepository::init(db_conn);
+        let upload_repository = UploadRepository::init(db_conn);
         let user_repository = UserRepository::init(db_conn);
         let product_repository = ProductRepository::init(db_conn);
         let invitation_repository = InvitationRepository::init(db_conn);
@@ -168,6 +179,7 @@ impl AppState {
             team_repository,
             email_repository,
             invitation_repository,
+            upload_repository,
             email_client,
         );
 
