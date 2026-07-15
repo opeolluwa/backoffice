@@ -5,7 +5,7 @@ name = "backoffice"
 version = "0.1.0"
 
 [workspace]
-members = ["migration"]
+members = ["api","domain", "helpers","infrastructure","migration"]
 
 [workspace.package]
 authors = ["Adefemi Adeoye"]
@@ -30,7 +30,6 @@ async-graphql-axum = { version = "7.0" }
 axum = { version = "0.8.3", features = ["tracing"] }
 axum-extra = { version = "0.12.1", features = ["typed-header"] }
 axum_typed_multipart = { version = "0.16.3", features = ["tempfile_3"] }
-# backoffice_email_client = { version = "0.1.0", path = "crates/backoffice_email_client" }
 backoffice_macros = { path = "../backoffice_macros" }
 bcrypt = "0.17.0"
 chrono = { version = "0.4.41", features = ["serde"] }

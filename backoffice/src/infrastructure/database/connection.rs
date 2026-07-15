@@ -26,7 +26,7 @@ pub async fn init_db_pool() -> Result<DatabaseConnection, AppError> {
     Migrator::up(&db, None).await.map_err(|err| {
         log::error!(
             "failed to run database migration due to {}",
-            err.to_string()
+            err
         );
         AppError::StartupError(err.to_string())
     })?;

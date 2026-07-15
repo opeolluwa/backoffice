@@ -1,0 +1,8 @@
+[package]
+name = "domain"
+authors.workspace = true
+description.workspace = true
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
