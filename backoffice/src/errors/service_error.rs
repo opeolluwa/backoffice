@@ -1,14 +1,14 @@
 use axum::extract::rejection::{FormRejection, JsonRejection};
 use axum::response::Response;
 use axum::{http::StatusCode, response::IntoResponse};
-
-use backoffice_imagekit::ImagekitError;
+use sea_orm::sqlx;
 
 use crate::api::http::dto::api_response::ApiResponseBuilder;
 use crate::errors::app_error::AppError;
 use crate::errors::authentication_error::AuthenticationError;
 use crate::errors::database_error::DatabaseError;
 use crate::errors::filesystem_error::AppFileSystemError;
+use crate::infrastructure::imagekit::ImagekitError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ServiceError {

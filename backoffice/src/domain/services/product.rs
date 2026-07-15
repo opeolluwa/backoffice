@@ -1,15 +1,12 @@
 use axum_typed_multipart::TypedMultipart;
 
-use backoffice_imagekit::ImagekitClient;
-use backoffice_utils::extract_env;
-
 use crate::{
-    api::http::extractors::products::{CreateProductRequest, SaveProductRequest},
+    api::http::extractors::products::CreateProductRequest,
     config::env::AppConfig,
-    domain::models::products::Model as Product,
-    domain::ports::product_repository::ProductRepositoryExt,
+    domain::{models::products::Model as Product, ports::product_repository::ProductRepositoryExt},
     errors::{app_error::AppError, service_error::ServiceError},
-    // infrastructure::fs::AppFileSystem,
+    infrastructure::imagekit::ImagekitClient,
+    shared::extract_env::extract_env,
 };
 
 pub struct ProductService<R: ProductRepositoryExt> {
