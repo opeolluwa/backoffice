@@ -7,7 +7,7 @@ use axum::{
 use axum_typed_multipart::TypedMultipart;
 
 use crate::{
-    api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse, jwt::Claims},
+    api::http::dto::{api_request::AuthenticatedRequest, api_response::ApiResponse},
     api::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest},
     api::state::AppState,
     domain::dto::UpdateUploadCommand,
@@ -25,8 +25,12 @@ fn to_update_command(req: &UpdateUploadRequest) -> UpdateUploadCommand {
 
 pub async fn create_upload(
     State(state): State<Arc<AppState>>,
-    _claims: Claims,
-    TypedMultipart(CreateUploadRequest { file, name, file_type: _, starred }): TypedMultipart<CreateUploadRequest>,
+    TypedMultipart(CreateUploadRequest {
+        file,
+        name,
+        file_type: _,
+        starred,
+    }): TypedMultipart<CreateUploadRequest>,
 ) -> Result<ApiResponse<uploads::Model>, ServiceError> {
     let file_name = file
         .metadata
@@ -34,10 +38,7 @@ pub async fn create_upload(
         .clone()
         .unwrap_or_else(|| "upload".to_string());
 
-    let file_path = file
-        .contents
-        .path()
-        .to_path_buf();
+    let file_path = file.contents.path().to_path_buf();
 
     let upload = state
         .services
@@ -64,11 +65,7 @@ pub async fn find_all_uploads(
 pub async fn find_starred_uploads(
     State(state): State<Arc<AppState>>,
 ) -> Result<ApiResponse<Vec<uploads::Model>>, ServiceError> {
-    let uploads = state
-        .services
-        .upload_service
-        .find_starred_uploads()
-        .await?;
+    let uploads = state.services.upload_service.find_starred_uploads().await?;
     Ok(ApiResponse::builder()
         .message("Starred uploads fetched successfully")
         .data(uploads)

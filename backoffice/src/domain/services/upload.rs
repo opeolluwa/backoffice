@@ -77,7 +77,7 @@ impl<R: UploadRepositoryExt + Send + Sync> UploadsServiceExt for UploadsService<
             .create_upload(
                 name,
                 &upload_response.url,
-                None,
+                None, //TODO; use mime type to map file type  
                 file_size,
                 starred,
             )
