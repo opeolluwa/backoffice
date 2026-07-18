@@ -1,15 +1,12 @@
 use std::net::{Ipv4Addr, SocketAddrV4};
 
 use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
-use errors::app_error::AppError;
+use backoffice_domain::errors::app_error::AppError;
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
-use crate::{
-    api::{load_graphql_router, load_http_routes, state::AppState},
-    config::{cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal},
-    errors,
-    infrastructure::database::connection::init_db_pool,
-};
+use backoffice_api::{load_graphql_router, load_http_routes, state::AppState};
+use backoffice_config::{cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal};
+use backoffice_infra::database::connection::init_db_pool;
 
 pub async fn run() -> Result<(), AppError> {
     let app_config = load_config()?;

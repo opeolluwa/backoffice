@@ -1,0 +1,19 @@
+use crate::errors::app_error::AppError;
+
+pub struct RootService {}
+
+impl RootService {
+    pub fn init() -> Self {
+        Self {}
+    }
+}
+pub trait RootServiceTrait {
+    fn health_check(&self) -> Result<(), AppError>;
+}
+
+impl RootServiceTrait for RootService {
+    fn health_check(&self) -> Result<(), AppError> {
+        tracing::info!("application is healthy ...");
+        Ok(())
+    }
+}

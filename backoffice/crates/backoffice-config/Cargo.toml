@@ -1,0 +1,17 @@
+[package]
+name = "backoffice-config"
+edition = "2024"
+version.workspace = true
+authors.workspace = true
+description = "Configuration: environment, CORS, logging, and shutdown"
+
+[dependencies]
+axum.workspace = true
+backoffice-domain.workspace = true
+dotenv.workspace = true
+secrecy.workspace = true
+serde.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
