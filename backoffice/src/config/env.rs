@@ -66,7 +66,8 @@ impl AppConfig {
         Ok(Self {
             // Server
             port: extract_env("PORT").unwrap_or_else(|_| default_port()),
-            environment: extract_env("ENVIRONMENT").unwrap_or_else(|_| default_environment()),
+            environment: extract_env::<Environment>("ENVIRONMENT")
+                .unwrap_or_else(|_| default_environment()),
             body_limit_bytes: extract_env("BODY_LIMIT_BYTES")
                 .unwrap_or_else(|_| default_body_limit_bytes()),
 
@@ -99,6 +100,32 @@ impl AppConfig {
             requests_time_out: Duration::from_secs(requests_time_out),
         })
     }
+
+    pub fn current_env() -> Environment {
+        match std::env::var("ENVIRONMENT")
+            .unwrap_or_default()
+            .to_lowercase()
+            .as_str()
+        {
+            "development" | "dev" => Environment::Development,
+            "production" | "prod" => Environment::Production,
+            "test" | "testing" => Environment::Test,
+            _ => Environment::Development,
+        }
+    }
+
+    pub fn is_production(&self) -> bool {
+        matches!(self.environment, Environment::Production)
+    }
+
+    pub fn is_test(&self) -> bool {
+        matches!(self.environment, Environment::Test)
+    }
+
+    pub fn is_development(&self) -> bool {
+        matches!(self.environment, Environment::Development)
+    }
+    
 }
 
 pub fn load_config() -> Result<AppConfig, AppError> {
@@ -118,9 +145,9 @@ impl FromStr for Environment {
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value.to_lowercase().as_str() {
-            "development" => Ok(Self::Development),
-            "production" => Ok(Self::Production),
-            "test" => Ok(Self::Test),
+            "development" | "dev" => Ok(Self::Development),
+            "production" | "prod" => Ok(Self::Production),
+            "test" | "testing" => Ok(Self::Test),
             _ => Err(format!("Invalid environment: {value}")),
         }
     }

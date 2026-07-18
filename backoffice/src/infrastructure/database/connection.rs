@@ -2,21 +2,26 @@ use std::time::Duration;
 
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, DatabaseConnection};
+use secrecy::ExposeSecret;
 
-use crate::{errors::app_error::AppError, shared::extract_env::extract_env};
+use crate::{
+    config::env::{AppConfig, Environment},
+    errors::app_error::AppError,
+    shared::extract_env::extract_env,
+};
 
-pub async fn init_db_pool() -> Result<DatabaseConnection, AppError> {
-    let database_url = extract_env::<String>("DATABASE_URL")?;
+pub async fn init_db_pool(app_config: &AppConfig) -> Result<DatabaseConnection, AppError> {
+    let database_url = app_config.database_url.to_owned();
 
-    let mut opt = ConnectOptions::new(database_url);
+    let mut opt = ConnectOptions::new(database_url.expose_secret());
     opt.max_connections(100)
         .min_connections(5)
         .connect_timeout(Duration::from_secs(8))
         .acquire_timeout(Duration::from_secs(8))
         .idle_timeout(Duration::from_secs(8))
         .max_lifetime(Duration::from_secs(8))
-        .sqlx_logging(false) // disable SQLx logging
-        .sqlx_logging_level(log::LevelFilter::Info); // set default Postgres schema
+        .sqlx_logging(app_config.is_development())
+        .sqlx_logging_level(log::LevelFilter::Info); 
 
     let db = sea_orm::Database::connect(opt).await.map_err(|err| {
         tracing::error!("Failed to connect to the database: {}", err);
@@ -24,10 +29,7 @@ pub async fn init_db_pool() -> Result<DatabaseConnection, AppError> {
     })?;
 
     Migrator::up(&db, None).await.map_err(|err| {
-        tracing::error!(
-            "failed to run database migration due to {}",
-            err
-        );
+        tracing::error!("failed to run database migration due to {}", err);
         AppError::StartupError(err.to_string())
     })?;
 

@@ -1,5 +1,6 @@
 use backoffice_lib::cli::LogMessage;
 use backoffice_lib::cli::errors::CliError;
+use backoffice_lib::config::env::AppConfig;
 use backoffice_lib::domain::models::{app_config, user_roles, users};
 use backoffice_lib::infrastructure::database::connection::init_db_pool;
 use bcrypt::{DEFAULT_COST, hash};
@@ -35,7 +36,9 @@ enum Commands {
 
 #[tokio::main]
 async fn main() -> Result<(), CliError> {
-    let db = init_db_pool()
+    let app_config = AppConfig::from_env().map_err(|err|CliError::ConfigError(err.to_string()))?;
+    
+    let db = init_db_pool(&app_config)
         .await
         .map_err(|err| CliError::DatabaseError(err.to_string()))?;
 
