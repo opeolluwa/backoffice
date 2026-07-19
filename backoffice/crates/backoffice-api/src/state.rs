@@ -2,6 +2,7 @@ use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
+use secrecy::ExposeSecret;
 
 use backoffice_config::env::AppConfig;
 use backoffice_domain::{
@@ -59,11 +60,7 @@ impl ServicesState {
     ) -> Self {
         let token_service = JwtTokenService::new();
         let user_service = UserService::new(user_repository.clone());
-        let auth_service = AuthenticationService::new(
-            user_repository,
-            token_service,
-            email_client,
-        );
+        let auth_service = AuthenticationService::new(user_repository, token_service, email_client);
         let country_service = CountryService::new(country_repository);
         let marketplace_service = MarketplaceService::new(marketplace_repository);
         let product_service = ProductService::new(product_repository);

@@ -1,10 +1,12 @@
 use std::{fs, path::Path};
 
+use backoffice_domain::shared::extract_env::extract_env;
 use reqwest::{
     Client, Method,
     header::{HeaderMap, HeaderValue},
     multipart,
 };
+use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
 
 use super::error::ImagekitError;
@@ -34,17 +36,17 @@ pub struct VersionInfo {
 pub struct ImagekitClient {
     client: Client,
     upload_url: String,
-    // public_key: String,
-    private_key: String,
+    public_key: SecretString,
+    private_key: SecretString,
 }
 
 impl ImagekitClient {
-    pub fn new(public_key: &str, private_key: &str) -> Result<Self, ImagekitError> {
+    pub fn new(public_key: &SecretString, private_key: &SecretString) -> Result<Self, ImagekitError> {
         Ok(Self {
             client: Client::builder().build()?,
             upload_url: "https://upload.imagekit.io/api/v1/files/upload".to_string(),
-            // public_key: public_key.to_string(),
-            private_key: private_key.to_string(),
+            public_key: public_key.to_owned(),  
+            private_key: private_key.to_owned(),
         })
     }
 
@@ -56,9 +58,10 @@ impl ImagekitClient {
         let file_bytes = fs::read(&path)?;
         let mut headers = HeaderMap::new();
 
+
         headers.insert(
              "Authorization",
-             HeaderValue::from_str(&format!("Basic {}", self.private_key))?,
+             HeaderValue::from_str(&format!("Basic {}", self.private_key.expose_secret()))?,
          );
 
         let form = multipart::Form::new()

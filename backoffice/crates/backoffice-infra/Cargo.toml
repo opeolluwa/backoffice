@@ -18,7 +18,7 @@ migration.workspace = true
 reqwest.workspace = true
 rust_decimal.workspace = true
 sea-orm.workspace = true
-secrecy.workspace = true
+secrecy = { workspace = true, features = ["serde"] }
 serde.workspace = true
 serde_json.workspace = true
 sqlx.workspace = true
