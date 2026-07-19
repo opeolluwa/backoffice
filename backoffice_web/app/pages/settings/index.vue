@@ -14,18 +14,42 @@ type TabKey = "profile" | "security" | "locale" | "app";
 const activeTab = ref<TabKey>("profile");
 
 const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
-  { key: "profile", label: "Profile", icon: "heroicons:user-circle", desc: "Your personal info" },
-  { key: "security", label: "Security", icon: "heroicons:lock-closed", desc: "Password & access" },
-  { key: "locale", label: "Locale", icon: "heroicons:computer-desktop", desc: "Device preferences" },
-  { key: "app", label: "App", icon: "heroicons:cog-6-tooth", desc: "Application settings" },
+  {
+    key: "profile",
+    label: "Profile",
+    icon: "heroicons:user-circle",
+    desc: "Your personal info",
+  },
+  {
+    key: "security",
+    label: "Security",
+    icon: "heroicons:lock-closed",
+    desc: "Password & access",
+  },
+  {
+    key: "locale",
+    label: "Locale",
+    icon: "heroicons:computer-desktop",
+    desc: "Device preferences",
+  },
+  {
+    key: "app",
+    label: "App",
+    icon: "heroicons:cog-6-tooth",
+    desc: "Application settings",
+  },
 ];
 </script>
 
 <template>
   <div class="flex gap-6 items-start">
     <aside class="w-52 shrink-0">
-      <div class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-2 sticky top-0">
-        <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-white/25 px-3 py-2">
+      <div
+        class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-2 sticky top-0"
+      >
+        <p
+          class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-white/25 px-3 py-2"
+        >
           Settings
         </p>
         <nav class="space-y-0.5">
@@ -45,7 +69,11 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
               <p class="leading-tight">{{ tab.label }}</p>
               <p
                 class="text-[10px] leading-tight mt-0.5 truncate"
-                :class="activeTab === tab.key ? 'text-accent/60' : 'text-gray-400 dark:text-white/25'"
+                :class="
+                  activeTab === tab.key
+                    ? 'text-accent/60'
+                    : 'text-gray-400 dark:text-white/25'
+                "
               >
                 {{ tab.desc }}
               </p>

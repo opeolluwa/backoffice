@@ -13,9 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const schema = v.object({
-  file: v.pipe(
-    v.instance(File, "Please select a file."),
-  ),
+  file: v.pipe(v.instance(File, "Please select a file.")),
   name: v.pipe(v.string(), v.minLength(1, "File name is required.")),
   file_type: v.nullable(v.string()),
 });

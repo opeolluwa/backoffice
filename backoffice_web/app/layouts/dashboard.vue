@@ -45,7 +45,7 @@ const routes = [
   },
   {
     label: "Revenue",
-    icon: "heroicons:chart-bar-square",
+    icon: "heroicons:banknotes",
     to: "/revenue",
   },
   // {
@@ -141,8 +141,27 @@ const logout = async () => useLogout();
             item: 'text-white/50 hover:text-white data-active:text-white',
             link: 'text-white/50 hover:text-white data-active:text-white data-active:bg-white/15 rounded-lg',
             label: 'text-sm text-white/50 group-hover:text-white',
+            linkLeadingIcon: 'text-white/50',
           }"
-        />
+        >
+          <template #item="{ item }">
+            <template v-if="!item.to">
+              <div class="my-2 uppercase text-sm text-white/20">
+                {{ item.label }}
+              </div>
+            </template>
+            <template v-else>
+              <UButton
+                :to="item.to"
+                :icon="item.icon"
+                variant="link"
+                class="text-white/60 -py-1.5"
+              >
+                <span>{{ item.label }}</span>
+              </UButton>
+            </template>
+          </template>
+        </UNavigationMenu>
       </template>
 
       <template #footer="{ collapsed }">
@@ -198,7 +217,6 @@ const logout = async () => useLogout();
               </template>
             </UInput>
           </UFormField>
-          
         </UForm>
 
         <div class="flex items-center gap-4">

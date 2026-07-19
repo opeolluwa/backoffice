@@ -37,9 +37,7 @@ function barHeight(val: number, max: number) {
             "
             :style="{ height: `${barHeight(val, Math.max(...values, 1))}%` }"
           />
-          <span
-            class="text-[9px] text-gray-400 dark:text-white/25 font-medium"
-          >
+          <span class="text-[9px] text-gray-400 dark:text-white/25 font-medium">
             {{ months[i] }}
           </span>
         </div>

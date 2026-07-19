@@ -35,7 +35,7 @@ defineEmits<{
 
       <div class="flex gap-1">
         <button
-          v-for="tab in (['all', 'unread', 'starred'] as const)"
+          v-for="tab in ['all', 'unread', 'starred'] as const"
           :key="tab"
           class="flex-1 py-1.5 text-xs font-medium rounded-lg capitalize transition-colors cursor-pointer"
           :class="

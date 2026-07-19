@@ -35,9 +35,7 @@ function formatSize(bytes: number) {
       />
     </div>
 
-    <div
-      class="px-2.5 py-2 flex items-center justify-between gap-2"
-    >
+    <div class="px-2.5 py-2 flex items-center justify-between gap-2">
       <div class="min-w-0 flex flex-col gap-0.5">
         <p class="text-xs font-medium truncate leading-tight">
           {{ file.name }}
@@ -47,7 +45,9 @@ function formatSize(bytes: number) {
         </p>
       </div>
 
-      <div class="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div
+        class="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
         <button
           class="size-6 rounded-full bg-black/50 text-white flex items-center justify-center"
           aria-label="Edit file"

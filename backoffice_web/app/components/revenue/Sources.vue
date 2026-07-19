@@ -25,17 +25,14 @@ defineProps<{
       <div v-for="source in sources" :key="source.label">
         <div class="flex items-center justify-between mb-1.5">
           <div class="flex items-center gap-2">
-            <span
-              class="w-2 h-2 rounded-full shrink-0"
-              :class="source.color"
-            />
+            <span class="w-2 h-2 rounded-full shrink-0" :class="source.color" />
             <span class="text-xs text-gray-600 dark:text-white/50">{{
               source.label
             }}</span>
           </div>
-          <span
-            class="text-xs font-medium text-gray-700 dark:text-white/60"
-          >{{ source.pct }}%</span>
+          <span class="text-xs font-medium text-gray-700 dark:text-white/60"
+            >{{ source.pct }}%</span
+          >
         </div>
         <div
           class="h-1.5 rounded-full bg-gray-100 dark:bg-white/5 overflow-hidden"

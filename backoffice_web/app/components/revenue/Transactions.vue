@@ -73,7 +73,8 @@ defineProps<{
         <div class="flex items-center gap-3 shrink-0">
           <span
             class="text-sm font-semibold text-gray-800 dark:text-white/80"
-          >{{ tx.amount }}</span>
+            >{{ tx.amount }}</span
+          >
           <span
             class="text-xs rounded-full px-2.5 py-0.5 font-medium"
             :class="{

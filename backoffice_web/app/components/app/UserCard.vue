@@ -1,5 +1,5 @@
 <template>
-  <div class="flex  gap-x-3 cursor-pointer">
+  <div class="flex gap-x-3 cursor-pointer">
     <UAvatar
       :alt="userStore.fullName"
       :name="userStore.fullName"

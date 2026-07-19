@@ -87,9 +87,6 @@ async function toggleStar(email: EmailsInterface, event: MouseEvent) {
       @toggle-star="toggleStar"
     />
 
-    <EmailsPreview
-      :email="selectedEmail"
-      @toggle-star="toggleStar"
-    />
+    <EmailsPreview :email="selectedEmail" @toggle-star="toggleStar" />
   </div>
 </template>
