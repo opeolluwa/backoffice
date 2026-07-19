@@ -1,7 +1,10 @@
+pub mod cli;
+pub mod commands;
 pub mod config;
 pub mod errors;
 pub mod generator;
 pub mod handler;
 pub mod http;
+pub mod logging;
 pub mod router;
-pub mod shell;
+pub mod templates;

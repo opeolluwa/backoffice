@@ -5,6 +5,43 @@ use axum::{
 use serde::Serialize;
 
 #[derive(Debug, thiserror::Error)]
+pub enum CliError {
+    #[error("Parse error: {0}")]
+    ParseError(String),
+
+    #[error("IO error: {0}")]
+    IoError(String),
+
+    #[error("Generator error: {0}")]
+    GeneratorError(String),
+
+    #[error("Config error: {0}")]
+    ConfigError(String),
+
+    #[error("Operation failed: {0}")]
+    OperationFailed(String),
+}
+
+impl IntoResponse for CliError {
+    fn into_response(self) -> Response {
+        let (status, message) = match &self {
+            CliError::ParseError(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
+            CliError::IoError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg.clone()),
+            CliError::GeneratorError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg.clone()),
+            CliError::ConfigError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg.clone()),
+            CliError::OperationFailed(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
+        };
+
+        #[derive(Serialize)]
+        struct ErrorResponse {
+            message: String,
+        }
+
+        (status, axum::Json(ErrorResponse { message })).into_response()
+    }
+}
+
+#[derive(Debug, thiserror::Error)]
 pub enum StartupError {
     #[error("Failed to start server: {0}")]
     ServerFailed(String),

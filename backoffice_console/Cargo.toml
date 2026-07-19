@@ -7,8 +7,20 @@ edition = "2024"
 name = "backoffice_console_lib"
 path = "src/lib.rs"
 
+[[bin]]
+name = "cli"
+path = "bin/cli.rs"
+
+[[bin]]
+name = "ui"
+path = "bin/ui.rs"
+
 [dependencies]
 axum = { version = "0.8.9", features = ["macros", "tracing"] }
+clap = { version = "4.5", features = ["derive"] }
+console = "0.15"
+convert_case = "0.8"
+dialoguer = "0.11"
 serde = { version = "1.0.228", features = ["derive"] }
 validators = { version = "0.25.3", features = ["serde"] }
 tokio = { version = "1", features = ["full", "macros", "rt", "rt-multi-thread"] }

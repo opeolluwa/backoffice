@@ -1,4 +1,4 @@
-use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
+use std::net::{Ipv4Addr, SocketAddrV4};
 
 use axum::{extract::DefaultBodyLimit, http::StatusCode};
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
@@ -23,7 +23,7 @@ pub async fn run() -> Result<(), StartupError> {
         ))
         .layer(init_cors());
 
-    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, cfg.port));
+    let addr = SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, cfg.port);
     tracing::info!("Server listening on http://{}/health", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
