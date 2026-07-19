@@ -1,5 +1,6 @@
 use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
+use backoffice_payment_provider::paystack::PaystackClient;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
 
@@ -113,6 +114,10 @@ impl AppState {
 
         // externals
         let email_client = ZeptoMail::new(app_config.email_api_key.clone());
+        // let paystack_client = PaystackClient::new(
+        //     app_config.paystack_api_key.clone(),
+        //     app_config.paystack_base_url.clone(),
+        // );
 
         let imagekit_client = ImagekitClient::new(
             &app_config.imagekit_public_key,
