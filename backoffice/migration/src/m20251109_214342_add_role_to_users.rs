@@ -1,4 +1,5 @@
-use sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::sea_orm::DatabaseBackend;
+use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -6,16 +7,38 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        let query = include_str!("sqlx/20251109214342_add_role_to_users.sql");
-        manager.get_connection().execute_unprepared(query).await?;
+        manager
+            .alter_table(
+                Table::alter()
+                    .table("users")
+                    .add_column(string_len("role_identifier", 26).null())
+                    .to_owned(),
+            )
+            .await?;
+
+        if manager.get_database_backend() == DatabaseBackend::Postgres {
+            manager
+                .create_foreign_key(
+                    ForeignKey::create()
+                        .name("fk_users_role_identifier")
+                        .from("users", "role_identifier")
+                        .to("user_roles", "identifier")
+                        .to_owned(),
+                )
+                .await?;
+        }
+
         Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .get_connection()
-            .execute_unprepared("ALTER TABLE users DROP COLUMN role_identifier")
-            .await?;
-        Ok(())
+            .alter_table(
+                Table::alter()
+                    .table("users")
+                    .drop_column("role_identifier")
+                    .to_owned(),
+            )
+            .await
     }
 }

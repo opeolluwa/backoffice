@@ -1,6 +1,9 @@
-use backoffice_lib::errors::app_error::AppError;
+use backoffice_lib::app;
 
 #[tokio::main]
-async fn main() -> Result<(), AppError> {
-    backoffice_lib::app::run().await
+async fn main() {
+    if let Err(e) = app::run().await {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
+    }
 }

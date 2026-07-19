@@ -15,6 +15,13 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: "slide-left", mode: "out-in" },
   },
+
+  image: {
+    imagekit: {
+      baseURL: "https://ik.imagekit.io/vkqa6un9v",
+    },
+  },
+
   colorMode: {
     preference: "light",
     fallback: "light",
@@ -63,6 +70,19 @@ export default defineNuxtConfig({
       },
     ],
   ],
+  routeRules: {
+    "/api/**": {
+      proxy: { to: "http://localhost:8000/api/**", bodyLimit: 26214400 },
+    },
+  },
+  nitro: {
+    devProxy: {
+      "/api": {
+        target: "http://localhost:8000/api",
+        changeOrigin: true,
+      },
+    },
+  },
   pinia: {
     storesDirs: ["./stores/**"],
   },

@@ -6,46 +6,67 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .create_type(
-                Type::create()
-                    .as_enum(InvitationStatus::Type)
-                    .values(vec![
-                        InvitationStatus::Pending,
-                        InvitationStatus::Accepted,
-                        InvitationStatus::Rejected,
-                        InvitationStatus::Expired,
-                    ])
-                    .to_owned(),
-            )
-            .await?;
+        let backend = manager.get_database_backend();
 
-        manager
-            .create_table(
-                Table::create()
-                    .table(Invitation::Table)
-                    .if_not_exists()
-                    .col(pk_uuid(Invitation::Identifier))
-                    .col(string(Invitation::Email))
-                    .col(
-                        ColumnDef::new(Invitation::Status)
-                            .enumeration(
-                                InvitationStatus::Type,
-                                vec![
-                                    InvitationStatus::Pending,
-                                    InvitationStatus::Accepted,
-                                    InvitationStatus::Rejected,
-                                    InvitationStatus::Expired,
-                                ],
-                            )
-                            // .default(InvitationStatus::Pending.to_string()),
-                    )
-                    .col(string(Invitation::Token))
-                    .col(date_time(Invitation::CreatedAt).default(Expr::current_timestamp()))
-                    .col(date_time_null(Invitation::UpdatedAt))
-                    .to_owned(),
-            )
-            .await
+        if backend == sea_orm::DatabaseBackend::Postgres {
+            manager
+                .create_type(
+                    Type::create()
+                        .as_enum(InvitationStatus::Type)
+                        .values(vec![
+                            InvitationStatus::Pending,
+                            InvitationStatus::Accepted,
+                            InvitationStatus::Rejected,
+                            InvitationStatus::Expired,
+                        ])
+                        .to_owned(),
+                )
+                .await?;
+        }
+
+        if backend == sea_orm::DatabaseBackend::Postgres {
+            manager
+                .create_table(
+                    Table::create()
+                        .table(Invitation::Table)
+                        .if_not_exists()
+                        .col(string_len("identifier", 26).primary_key())
+                        .col(string(Invitation::Email))
+                        .col(
+                            ColumnDef::new(Invitation::Status)
+                                .enumeration(
+                                    InvitationStatus::Type,
+                                    vec![
+                                        InvitationStatus::Pending,
+                                        InvitationStatus::Accepted,
+                                        InvitationStatus::Rejected,
+                                        InvitationStatus::Expired,
+                                    ],
+                                )
+                                .null(),
+                        )
+                        .col(string(Invitation::Token))
+                        .col(date_time(Invitation::CreatedAt).default(Expr::current_timestamp()))
+                        .col(date_time_null(Invitation::UpdatedAt))
+                        .to_owned(),
+                )
+                .await
+        } else {
+            manager
+                .create_table(
+                    Table::create()
+                        .table(Invitation::Table)
+                        .if_not_exists()
+                        .col(string_len(Invitation::Identifier, 26).primary_key())
+                        .col(string(Invitation::Email))
+                        .col(ColumnDef::new(Invitation::Status).text().null())
+                        .col(string(Invitation::Token))
+                        .col(date_time(Invitation::CreatedAt).default(Expr::current_timestamp()))
+                        .col(date_time_null(Invitation::UpdatedAt))
+                        .to_owned(),
+                )
+                .await
+        }
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
@@ -58,6 +79,7 @@ impl MigrationTrait for Migration {
 #[derive(DeriveIden)]
 enum Invitation {
     Table,
+    #[allow(dead_code)]
     Identifier,
     Email,
     CreatedAt,

@@ -6,7 +6,7 @@ import { useMarketplaceStore } from "~/stores/marketplace";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
 import { getPaginationRowModel } from "@tanstack/vue-table";
-import type { MarketPlace } from "@bindings/Marketplace";
+import type { MarketplaceInterface as MarketPlace } from "@bindings/Marketplace";
 
 definePageMeta({
   layout: "dashboard",
@@ -286,31 +286,14 @@ function clearFilters() {
   <div>
     <PageLoader v-if="fetchingMarketplaces" />
 
-    <div
+    <AppEmptyState
       v-if="nullMarketplaces"
-      class="flex flex-col justify-center items-center h-[70vh]"
-    >
-      <div
-        class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-6"
-      >
-        <UIcon
-          name="heroicons:users"
-          class="size-8 text-gray-300 dark:text-white/20"
-        />
-      </div>
-
-      <h1>You currently don&apos;t have any product</h1>
-
-      <UButton
-        color="neutral"
-        variant="outline"
-        class="px-5 py-4 rounded mt-3 cursor-pointer flex items-center justify-center gap-x-2"
-        @click="openForm = true"
-      >
-        <UIcon name="heroicons:plus-circle" class="size-5" />
-        Add product
-      </UButton>
-    </div>
+      icon="heroicons:archive-box"
+      title="No products yet"
+      description="Create your first product to get started."
+      action-label="Create first product"
+      @action="console.log()"
+    />
 
     <div v-else>
       <div

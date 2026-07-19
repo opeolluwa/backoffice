@@ -1,0 +1,38 @@
+[package]
+name = "backoffice-domain"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description = "Domain layer: models, ports, services, and errors"
+
+[features]
+default = []
+http = ["dep:axum", "dep:axum-extra"]
+
+[dependencies]
+
+# Optional: for http feature (error IntoResponse impls)
+axum = { workspace = true, optional = true }
+axum-extra = { workspace = true, optional = true }
+backoffice_macros.workspace = true
+bcrypt.workspace = true
+chrono.workspace = true
+jsonwebtoken.workspace = true
+rust_decimal.workspace = true
+sea-orm.workspace = true
+seaography.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_with.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+ts-rs.workspace = true
+ulid.workspace = true
+uuid = { version = "1.24.0", features = ["v4"] }
+validator.workspace = true
+
+[dev-dependencies]
+mockall.workspace = true
+tokio.workspace = true

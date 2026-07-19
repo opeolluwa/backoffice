@@ -41,7 +41,6 @@ export function useLogin() {
       tokenStore.setAccessTokenExpiry(decodeJwtExpiry(respData.data.token));
       await userStore.initialize(respData.data.token);
 
-
       await router.push("/home");
       return { success: true };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

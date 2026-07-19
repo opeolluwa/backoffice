@@ -6,22 +6,24 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
+        let backend = manager.get_database_backend();
 
-        manager
-            .create_type(
-                Type::create()
-                    .as_enum(FileType::Type)
-                    .values(vec![
-                        FileType::Image,
-                        FileType::Video,
-                        FileType::Audio,
-                        FileType::Document,
-                        FileType::Others,
-                    ])
-                    .to_owned(),
-            )
-            .await?;
+        if backend == sea_orm::DatabaseBackend::Postgres {
+            manager
+                .create_type(
+                    Type::create()
+                        .as_enum(FileType::Type)
+                        .values(vec![
+                            FileType::Image,
+                            FileType::Video,
+                            FileType::Audio,
+                            FileType::Document,
+                            FileType::Others,
+                        ])
+                        .to_owned(),
+                )
+                .await?;
+        }
 
         manager
             .alter_table(
@@ -32,36 +34,49 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-        manager
-            .alter_table(
-                Table::alter()
-                    .table("uploads")
-                    .add_column(
-                        ColumnDef::new("file_type")
-                            .enumeration(
-                                FileType::Type,
-                                [
-                                    FileType::Image,
-                                    FileType::Video,
-                                    FileType::Audio,
-                                    FileType::Document,
-                                    FileType::Others,
-                                ],
-                            )
-                            .null(),
-                    )
-                    .to_owned(),
-            )
-            .await?;
+        if backend == sea_orm::DatabaseBackend::Postgres {
+            manager
+                .alter_table(
+                    Table::alter()
+                        .table("uploads")
+                        .add_column(
+                            ColumnDef::new("file_type")
+                                .enumeration(
+                                    FileType::Type,
+                                    [
+                                        FileType::Image,
+                                        FileType::Video,
+                                        FileType::Audio,
+                                        FileType::Document,
+                                        FileType::Others,
+                                    ],
+                                )
+                                .null(),
+                        )
+                        .to_owned(),
+                )
+                .await?;
+        } else {
+            manager
+                .alter_table(
+                    Table::alter()
+                        .table("uploads")
+                        .add_column(ColumnDef::new("file_type").text().null())
+                        .to_owned(),
+                )
+                .await?;
+        }
 
-        manager
-            .alter_table(
-                Table::alter()
-                    .table("uploads")
-                    .drop_column("user_identifier")
-                    .to_owned(),
-            )
-            .await?;
+        if backend == sea_orm::DatabaseBackend::Postgres {
+            manager
+                .alter_table(
+                    Table::alter()
+                        .table("uploads")
+                        .drop_column("user_identifier")
+                        .to_owned(),
+                )
+                .await?;
+        }
 
         manager
             .alter_table(
@@ -95,9 +110,14 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-        manager
-            .drop_type(Type::drop().name(FileType::Type).to_owned())
-            .await
+        let backend = manager.get_database_backend();
+        if backend == sea_orm::DatabaseBackend::Postgres {
+            manager
+                .drop_type(Type::drop().name(FileType::Type).to_owned())
+                .await
+        } else {
+            Ok(())
+        }
     }
 }
 
