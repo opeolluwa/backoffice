@@ -53,6 +53,11 @@ pub struct AppConfig {
     // imagekit
     pub imagekit_public_key: SecretString,
     pub imagekit_private_key: SecretString,
+
+    // payment providers
+    pub paystack_api_key: String,
+    pub paystack_api_secret: SecretString,
+    pub paystack_base_url: String,
 }
 
 impl AppConfig {
@@ -64,6 +69,10 @@ impl AppConfig {
         let database_url = extract_env::<String>("DATABASE_URL")?;
         let database_url = database_url.into_boxed_str();
 
+        let paystack_api_key = extract_env::<String>("PAYSTACK_API_KEY")?;
+        let paystack_api_secret = extract_env::<String>("PAYSTACK_API_SECRET")?;
+        let paystack_base_url = extract_env::<String>("PAYSTACK_BASE_URL")?;
+        
         let requests_time_out = extract_env::<u64>("REQUESTS_TIME_OUT_SECS")
             .unwrap_or_else(|_| default_requests_time_out().as_secs());
 
@@ -79,6 +88,12 @@ impl AppConfig {
             upload_path: extract_env("UPLOAD_PATH").unwrap_or_else(|_| default_upload_path()),
             export_path: extract_env("EXPORT_PATH").unwrap_or_else(|_| default_export_path()),
 
+            // payment providers
+            paystack_api_key,
+            paystack_api_secret: SecretString::from(paystack_api_secret),
+            paystack_base_url,
+
+            
             // CORS
             allowed_origins: extract_env::<String>("ALLOWED_ORIGINS")
                 .unwrap_or_else(|_| "*".into())
