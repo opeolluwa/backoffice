@@ -10,7 +10,7 @@ members = [
     "crates/backoffice-cli",
     "crates/backoffice-config",
     "crates/backoffice-domain",
-    "crates/backoffice-infra",
+    "crates/backoffice-infra", "crates/backoffice-payment-provider",
     "migration",
 ]
 resolver = "2"
