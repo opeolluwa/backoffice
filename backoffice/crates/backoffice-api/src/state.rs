@@ -4,7 +4,6 @@ use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
 
 use backoffice_config::env::AppConfig;
-use backoffice_domain::shared::extract_env::extract_env;
 use backoffice_domain::{
     errors::app_error::AppError,
     services::{
@@ -119,9 +118,9 @@ impl AppState {
         // externals
         let email_client = ZeptoMail::new(app_config.email_api_key.clone());
 
-        let imagekit_private_key: String = extract_env("IMAGEKIT_PRIVATE_KEY")?;
         let imagekit_client = ImagekitClient::new(
-            &imagekit_private_key,
+            &app_config.imagekit_public_key,
+            &app_config.imagekit_private_key,
         )
         .map_err(|e| AppError::OperationFailed(e.to_string()))?;
 

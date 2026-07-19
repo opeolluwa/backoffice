@@ -9,6 +9,7 @@ description = "Infrastructure layer: database repositories, JWT, mailer, ImageKi
 askama.workspace = true
 backoffice-domain = { workspace = true, features = ["http"] }
 backoffice-config.workspace = true
+base64.workspace = true
 bcrypt.workspace = true
 chrono.workspace = true
 jsonwebtoken.workspace = true

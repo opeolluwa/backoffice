@@ -34,14 +34,16 @@ pub struct VersionInfo {
 pub struct ImagekitClient {
     client: Client,
     upload_url: String,
+    // public_key: String,
     private_key: String,
 }
 
 impl ImagekitClient {
-    pub fn new(private_key: &str) -> Result<Self, ImagekitError> {
+    pub fn new(public_key: &str, private_key: &str) -> Result<Self, ImagekitError> {
         Ok(Self {
             client: Client::builder().build()?,
             upload_url: "https://upload.imagekit.io/api/v1/files/upload".to_string(),
+            // public_key: public_key.to_string(),
             private_key: private_key.to_string(),
         })
     }
@@ -55,9 +57,9 @@ impl ImagekitClient {
         let mut headers = HeaderMap::new();
 
         headers.insert(
-            "Authorization",
-            HeaderValue::from_str(&format!("Basic {}", self.private_key))?,
-        );
+             "Authorization",
+             HeaderValue::from_str(&format!("Basic {}", self.private_key))?,
+         );
 
         let form = multipart::Form::new()
             .part(
@@ -72,12 +74,13 @@ impl ImagekitClient {
             .headers(headers)
             .multipart(form)
             .send()
-            .await?;
+            .await
+            .unwrap();
 
         if !response.status().is_success() {
             return Err(ImagekitError::UploadFailed(format!(
-                "Upload failed with status: {}",
-                response.status()
+                "{}",
+                response.text().await.unwrap_or_default()
             )));
         }
 
