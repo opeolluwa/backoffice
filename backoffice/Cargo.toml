@@ -46,6 +46,7 @@ rust_decimal = { version = "1.39.0", features = ["macros", "serde"] }
 sea-orm = { version = "=2.0.0-rc.37", features = [
     "runtime-tokio-rustls",
     "sqlx-postgres",
+    "sqlx-sqlite",
     "macros",
     "debug-print",
     "seaography",
@@ -54,7 +55,7 @@ sea-orm = { version = "=2.0.0-rc.37", features = [
     "with-rust_decimal",
     "with-uuid",
 ] }
-sea-orm-migration = { version = "=2.0.0-rc.37", features = ["runtime-tokio-rustls", "sqlx-postgres"] }
+sea-orm-migration = { version = "=2.0.0-rc.37", features = ["runtime-tokio-rustls", "sqlx-postgres", "sqlx-sqlite"] }
 seaography = { version = "=2.0.0-rc.8", features = [
     "graphql-playground",
     "with-decimal",
@@ -69,6 +70,7 @@ serde_with = "3.16.0"
 sqlx = { version = "=0.8", features = [
     "runtime-tokio",
     "postgres",
+    "sqlite",
     "macros",
     "migrate",
     "chrono",
@@ -117,6 +119,9 @@ fs_extra.workspace = true
 [dev-dependencies]
 axum = { workspace = true, features = ["macros"] }
 axum-test.workspace = true
+sea-orm.workspace = true
+secrecy.workspace = true
+serde_json.workspace = true
 
 [profile.release]
 codegen-units = 1

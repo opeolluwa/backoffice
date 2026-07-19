@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import * as v from "valibot";
+import type { CreateUploadRequest } from "~/bindings/CreateUploadRequest";
+import type { UploadsInterface } from "~/bindings/UploadsInterface";
+import { useUploadStore } from "~/stores/uploads";
 
 definePageMeta({
   layout: "dashboard",
@@ -9,28 +11,31 @@ definePageMeta({
   },
 });
 
+const FileType = [
+  { label: "Image", value: "image" },
+  { label: "Video", value: "video" },
+  { label: "Audio", value: "audio" },
+  { label: "PDF", value: "pdf" },
+  { label: "Zip", value: "zip" },
+];
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  url: string;
-  uploadedAt: string;
-}
 
-const fileUplaodSchema = v.object({
-  file: v.file('Please select an image file.'),
-  fileName: v.pipe(v.string(), v.minLength(1, "Please enter a file name.")),
-  name: v.pipe(v.string(), v.minLength(1, "Name is required.")),
-});
 
-type InviteSchema = v.InferOutput<typeof inviteSchema>;
+const fileUploadState = reactive<CreateUploadRequest>({ file: null, fileName: "", fileType: "" });
 
-const inviteState = reactive<InviteSchema>({ email: "", role: "", name: "" });
+const uploadStore = useUploadStore(); 
+const onUploadSubmit = async () => {
+  isUploading.value = true;
 
-const files = ref<UploadedFile[]>([]);
-const isDragging = ref(false);
+  try {
+    await uploadStore.createUpload(fileUploadState);
+    openUploadDialog.value = false;
+  } finally {
+    isUploading.value = false;
+  }
+};
+
+const files = ref<UploadsInterface[]>([]);
 const openUploadDialog = ref(false);
 const isUploading = ref(false);
 const hasFiles = computed(() => files.value.length > 0);
@@ -45,40 +50,6 @@ function formatSize(bytes: number) {
 function isImage(type: string) {
   return type.startsWith("image/");
 }
-
-function processFiles(incoming: FileList | File[]) {
-  const list = Array.from(incoming);
-  for (const file of list) {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const url = URL.createObjectURL(file);
-    files.value.push({
-      id,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      url,
-      uploadedAt: new Date().toISOString(),
-    });
-  }
-}
-
-function onFileInputChange(e: Event) {
-  const input = e.target as HTMLInputElement;
-  if (input.files?.length) processFiles(input.files);
-  input.value = "";
-}
-
-function onDrop(e: DragEvent) {
-  isDragging.value = false;
-  if (e.dataTransfer?.files?.length) processFiles(e.dataTransfer.files);
-}
-
-function removeFile(id: string) {
-  const file = files.value.find((f) => f.id === id);
-  if (file) URL.revokeObjectURL(file.url);
-  files.value = files.value.filter((f) => f.id !== id);
-}
-
 
 const loadedPreviews = ref<Set<string>>(new Set());
 
@@ -124,8 +95,9 @@ function fileIcon(type: string) {
       title="No files uploaded yet"
       description="Drag and drop files above or click to browse."
       action-label="Browse files"
-      @action="openUploadDialog"
+      @action="() => openUploadDialog = true"
     />
+    
     <!-- File grid -->
     <template v-else>
       <div class="flex items-center justify-between">
@@ -197,34 +169,27 @@ function fileIcon(type: string) {
       <template #body>
         <UForm
           class="space-y-4"
-          :schema="inviteSchema"
-          :state="inviteState"
-          :on-submit="onInviteSubmit"
+          :state="fileUploadState"
+          @submit="onUploadSubmit"
         >
+          <UFileUpload v-model="fileUploadState.file" class="w-full min-h-48" />
           <AppInput
-            v-model="inviteState.name"
-            label="Full name"
-            name="name"
-            placeholder="John Doe"
+            v-model="fileUploadState.name"
+            label="File name"
+            name="fileName"
+            placeholder="example.jpg"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
           />
 
-          <AppInput
-            v-model="inviteState.email"
-            label="Email address"
-            placeholder="colleague@example.com"
-            name="email"
-            required
-            :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          />
 
+ 
           <AppSelect
-            v-model="inviteState.role"
-            label="Role"
-            name="role"
-            :items="roleOptions"
-            placeholder="Please select a role"
+            v-model="fileUploadState.file_type"
+            label="File type"
+            name="fileType"
+            :items="FileType"
+            placeholder="Please select a file type"
             required
             :ui="{ error: 'text-red-500 text-sm mt-1' }"
           />
@@ -233,8 +198,9 @@ function fileIcon(type: string) {
             type="submit"
             :loading="isUploading"
             :disabled="isUploading"
+            @click="onUploadSubmit"
           >
-            Send invitation
+            Upload
           </AppButton>
         </UForm>
       </template>

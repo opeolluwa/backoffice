@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useTokenStore } from "~/stores/token";
 const NETWORK_REQUEST_TIMEOUT = 7500; // 7.5 seconds
-
+const UPLOADS_TIMEOUT = 300000; // 300 seconds
 const api = axios.create({
   baseURL: "http://localhost:8000/api",
   headers: {
@@ -36,3 +36,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+export { UPLOADS_TIMEOUT };

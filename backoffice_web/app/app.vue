@@ -17,7 +17,7 @@ watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
       <NuxtImg
         alt="unsupported media viewport"
         src="/error-icon.png"
-        class="w-[100px]"
+        class="w-25"
       />
       <h1 class="text-2xl mt-4 font-medium">Unsupported media viewport!</h1>
       <p class="text-gray-500 leading-5 mt-1 text-sm">

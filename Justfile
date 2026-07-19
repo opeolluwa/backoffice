@@ -122,7 +122,7 @@ migrate-add target:
 
 [working-directory: 'backoffice']
 export-bindings:
-    cargo test
+    cargo test --workspace
 
 db-pull:
     just run-migrations

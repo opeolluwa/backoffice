@@ -1,4 +1,5 @@
-use sea_orm_migration::prelude::*;
+use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::prelude::sea_orm::DatabaseBackend;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -6,16 +7,38 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        let query = include_str!("sqlx/20251125134721_add_currency_to_product.sql");
-        manager.get_connection().execute_unprepared(query).await?;
+        manager
+            .alter_table(
+                Table::alter()
+                    .table("products")
+                    .add_column(string_len("currency_identifier", 26).null())
+                    .to_owned(),
+            )
+            .await?;
+
+        if manager.get_database_backend() == DatabaseBackend::Postgres {
+            manager
+                .create_foreign_key(
+                    ForeignKey::create()
+                        .name("fk_products_currency")
+                        .from("products", "currency_identifier")
+                        .to("countries", "identifier")
+                        .to_owned(),
+                )
+                .await?;
+        }
+
         Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .get_connection()
-            .execute_unprepared("ALTER TABLE products DROP COLUMN currency_identifier")
-            .await?;
-        Ok(())
+            .alter_table(
+                Table::alter()
+                    .table("products")
+                    .drop_column("currency_identifier")
+                    .to_owned(),
+            )
+            .await
     }
 }
