@@ -1,5 +1,8 @@
 use std::time::Duration;
 
+use sea_orm::DatabaseConnection;
+use secrecy::SecretString;
+
 use backoffice_api::state::{AppState, ServicesState};
 use backoffice_config::env::{AppConfig, Environment};
 use backoffice_infra::database::repositories::base::Repository;
@@ -13,8 +16,6 @@ use backoffice_infra::imagekit::ImagekitClient;
 use backoffice_infra::jwt::JwtTokenService;
 use backoffice_infra::mailer::zepto_mailer::ZeptoMail;
 use migration::{Migrator, MigratorTrait};
-use secrecy::SecretString;
-use sea_orm::DatabaseConnection;
 
 const TEST_JWT_SECRET: &str = "test-secret-key-for-integration-tests-12345";
 
@@ -68,8 +69,11 @@ pub fn build_test_state(db: &DatabaseConnection) -> AppState {
     let upload_repository = UploadRepository::init(db);
 
     let email_client = ZeptoMail::new("test-api-key");
-    let imagekit_client = ImagekitClient::new("test-private-key")
-        .expect("Failed to create ImagekitClient");
+    let imagekit_client = ImagekitClient::new(
+        &SecretString::from("test-public-key"),
+        &SecretString::from("test-private-key"),
+    )
+    .expect("Failed to create ImagekitClient");
 
     let token_service = JwtTokenService::new();
     let user_service = backoffice_domain::services::user::UserService::new(user_repository.clone());
@@ -84,15 +88,15 @@ pub fn build_test_state(db: &DatabaseConnection) -> AppState {
         backoffice_domain::services::marketplace::MarketplaceService::new(marketplace_repository);
     let product_service =
         backoffice_domain::services::product::ProductService::new(product_repository);
-    let team_service =
-        backoffice_domain::services::team::TeamService::new(team_repository);
+    let team_service = backoffice_domain::services::team::TeamService::new(team_repository);
     let root_service = backoffice_domain::services::root::RootService::init();
-    let emails_service =
-        backoffice_domain::services::emails::EmailsService::new(email_repository);
+    let emails_service = backoffice_domain::services::emails::EmailsService::new(email_repository);
     let invitation_service =
         backoffice_domain::services::invitation::InvitationService::new(invitation_repository);
-    let upload_service =
-        backoffice_domain::services::upload::UploadsService::new(upload_repository, imagekit_client);
+    let upload_service = backoffice_domain::services::upload::UploadsService::new(
+        upload_repository,
+        imagekit_client,
+    );
 
     let services = ServicesState {
         user_service,

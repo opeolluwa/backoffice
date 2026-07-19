@@ -1,7 +1,6 @@
 use crate::{
-    models::invitation,
+    errors::service_error::ServiceError, models::invitation,
     ports::invitation_repository::InvitationRepositoryExt,
-    errors::service_error::ServiceError,
 };
 
 #[derive(Clone)]
@@ -16,10 +15,7 @@ impl<R: InvitationRepositoryExt> InvitationService<R> {
 }
 
 pub trait InvitationServiceExt {
-    async fn create_invitation(
-        &self,
-        email: &str,
-    ) -> Result<invitation::Model, ServiceError>;
+    async fn create_invitation(&self, email: &str) -> Result<invitation::Model, ServiceError>;
 
     async fn find_invitation_by_identifier(
         &self,
@@ -34,10 +30,7 @@ pub trait InvitationServiceExt {
         token: &str,
     ) -> Result<invitation::Model, ServiceError>;
 
-    async fn block_invitation(
-        &self,
-        identifier: &str,
-    ) -> Result<invitation::Model, ServiceError>;
+    async fn block_invitation(&self, identifier: &str) -> Result<invitation::Model, ServiceError>;
 
     async fn delete_invitation(&self, identifier: &str) -> Result<(), ServiceError>;
 
@@ -45,15 +38,9 @@ pub trait InvitationServiceExt {
 }
 
 impl<R: InvitationRepositoryExt + Send + Sync> InvitationServiceExt for InvitationService<R> {
-    async fn create_invitation(
-        &self,
-        email: &str,
-    ) -> Result<invitation::Model, ServiceError> {
+    async fn create_invitation(&self, email: &str) -> Result<invitation::Model, ServiceError> {
         let token = generate_invitation_token();
-        let invitation = self
-            .repo
-            .create_invitation(email, &token)
-            .await?;
+        let invitation = self.repo.create_invitation(email, &token).await?;
 
         mock_send_invitation_email(email, &token).await;
 
@@ -76,10 +63,7 @@ impl<R: InvitationRepositoryExt + Send + Sync> InvitationServiceExt for Invitati
         identifier: &str,
         token: &str,
     ) -> Result<invitation::Model, ServiceError> {
-        let invitation = self
-            .repo
-            .find_invitation_by_identifier(identifier)
-            .await?;
+        let invitation = self.repo.find_invitation_by_identifier(identifier).await?;
 
         if invitation.token != token {
             return Err(ServiceError::OperationFailed(
@@ -90,10 +74,7 @@ impl<R: InvitationRepositoryExt + Send + Sync> InvitationServiceExt for Invitati
         Ok(self.repo.accept_invitation(identifier).await?)
     }
 
-    async fn block_invitation(
-        &self,
-        identifier: &str,
-    ) -> Result<invitation::Model, ServiceError> {
+    async fn block_invitation(&self, identifier: &str) -> Result<invitation::Model, ServiceError> {
         Ok(self.repo.block_invitation(identifier).await?)
     }
 
@@ -124,11 +105,10 @@ mod tests {
     use super::*;
     use crate::ports::invitation_repository::MockInvitationRepositoryExt;
     use sea_orm::sqlx::types::chrono::Utc;
-    use sea_orm::sqlx::types::uuid::Uuid;
 
     fn test_invitation(token: &str) -> crate::models::invitation::Model {
         crate::models::invitation::Model {
-            identifier: Uuid::new_v4(),
+            identifier: uuid::Uuid::new_v4().to_string(),
             email: "invite@example.com".to_string(),
             status: Some(crate::models::sea_orm_active_enums::InvitationStatus::Pending),
             token: token.to_string(),
@@ -160,7 +140,9 @@ mod tests {
             .returning(move |_| Ok(test_invitation(token)));
         let service = InvitationService::new(repo);
 
-        let result = service.accept_invitation("inv-001", "valid-token-123").await;
+        let result = service
+            .accept_invitation("inv-001", "valid-token-123")
+            .await;
         assert!(result.is_ok());
     }
 

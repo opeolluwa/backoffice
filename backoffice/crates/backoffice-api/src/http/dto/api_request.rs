@@ -7,10 +7,11 @@ use axum::{
 use serde::{Serialize, de::DeserializeOwned};
 use validator::Validate;
 
-use crate::http::dto::jwt::Claims;
 use backoffice_domain::errors::{
     authentication_error::AuthenticationError, service_error::ServiceError,
 };
+
+use crate::http::dto::jwt::Claims;
 
 pub struct AuthenticatedRequest<T>
 where

@@ -1,8 +1,9 @@
+use std::sync::Arc;
+
 use axum::{
     Router, middleware,
     routing::{delete, get, post, put},
 };
-use std::sync::Arc;
 
 use crate::http::{
     handlers::invitation::{

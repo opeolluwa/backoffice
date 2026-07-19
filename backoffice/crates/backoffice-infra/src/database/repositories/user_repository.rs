@@ -1,12 +1,13 @@
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use ulid::Ulid;
 
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::{
     dto::{CreateUserCommand, UserProfile},
     models::users::{self, Entity as UserEntity},
     ports::user_repository::UserRepositoryTrait,
 };
-use backoffice_domain::errors::service_error::ServiceError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Clone)]

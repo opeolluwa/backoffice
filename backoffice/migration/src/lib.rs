@@ -17,6 +17,7 @@ mod m20260330_012735_xreate_admin_table;
 mod m20260330_013623_create_newsletter_table;
 mod m20260706_222817_update_uploads_table;
 mod m20260712_090843_creat_invitations_table;
+mod m20260719_094541_add_file_path_and_thumbname_to_uploads;
 
 pub use sea_orm_migration::prelude::*;
 
@@ -48,6 +49,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260330_013623_create_newsletter_table::Migration),
             Box::new(m20260706_222817_update_uploads_table::Migration),
             Box::new(m20260712_090843_creat_invitations_table::Migration),
+            Box::new(m20260719_094541_add_file_path_and_thumbname_to_uploads::Migration),
         ]
     }
 }

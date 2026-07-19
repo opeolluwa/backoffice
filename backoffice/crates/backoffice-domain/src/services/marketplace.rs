@@ -1,9 +1,8 @@
+use crate::errors::service_error::ServiceError;
 use crate::{
-    dto::CreateMarketplaceCommand,
-    models::marketplaces,
+    dto::CreateMarketplaceCommand, models::marketplaces,
     ports::marketplace_repository::MarketplaceRepositoryExt,
 };
-use crate::errors::service_error::ServiceError;
 
 #[derive(Clone)]
 pub struct MarketplaceService<R: MarketplaceRepositoryExt> {
@@ -56,7 +55,10 @@ impl<R: MarketplaceRepositoryExt + Send + Sync> MarketplaceServiceExt for Market
         command: &CreateMarketplaceCommand,
         user_identifier: &str,
     ) -> Result<marketplaces::Model, ServiceError> {
-        Ok(self.repo.create_marketplace(command, user_identifier).await?)
+        Ok(self
+            .repo
+            .create_marketplace(command, user_identifier)
+            .await?)
     }
 
     async fn find_marketplace_by_identifier(
@@ -149,7 +151,9 @@ mod tests {
             .returning(move |_, _| Ok(mp.clone()));
         let service = MarketplaceService::new(repo);
 
-        let result = service.find_marketplace_by_identifier("mp-001", "user-001").await;
+        let result = service
+            .find_marketplace_by_identifier("mp-001", "user-001")
+            .await;
         assert!(result.is_ok());
     }
 
@@ -180,6 +184,11 @@ mod tests {
             .returning(|_, _| Ok(()));
         let service = MarketplaceService::new(repo);
 
-        assert!(service.delete_marketplace_by_identifier("mp-001", "user-001").await.is_ok());
+        assert!(
+            service
+                .delete_marketplace_by_identifier("mp-001", "user-001")
+                .await
+                .is_ok()
+        );
     }
 }

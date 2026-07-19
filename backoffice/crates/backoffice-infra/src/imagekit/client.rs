@@ -1,6 +1,6 @@
 use std::{fs, path::Path};
 
-use backoffice_domain::shared::extract_env::extract_env;
+use base64::Engine;
 use reqwest::{
     Client, Method,
     header::{HeaderMap, HeaderValue},
@@ -23,6 +23,7 @@ pub struct ImagekitUploadResponse {
     pub file_type: String,
     pub ai_tags: Option<serde_json::Value>,
     pub description: Option<String>,
+    pub thumbnail_url: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -36,16 +37,20 @@ pub struct VersionInfo {
 pub struct ImagekitClient {
     client: Client,
     upload_url: String,
+    #[allow(dead_code)]
     public_key: SecretString,
     private_key: SecretString,
 }
 
 impl ImagekitClient {
-    pub fn new(public_key: &SecretString, private_key: &SecretString) -> Result<Self, ImagekitError> {
+    pub fn new(
+        public_key: &SecretString,
+        private_key: &SecretString,
+    ) -> Result<Self, ImagekitError> {
         Ok(Self {
             client: Client::builder().build()?,
             upload_url: "https://upload.imagekit.io/api/v1/files/upload".to_string(),
-            public_key: public_key.to_owned(),  
+            public_key: public_key.to_owned(),
             private_key: private_key.to_owned(),
         })
     }
@@ -58,11 +63,12 @@ impl ImagekitClient {
         let file_bytes = fs::read(&path)?;
         let mut headers = HeaderMap::new();
 
-
+        let credentials = base64::engine::general_purpose::STANDARD
+            .encode(format!("{}:", self.private_key.expose_secret()));
         headers.insert(
-             "Authorization",
-             HeaderValue::from_str(&format!("Basic {}", self.private_key.expose_secret()))?,
-         );
+            "Authorization",
+            HeaderValue::from_str(&format!("Basic {}", credentials))?,
+        );
 
         let form = multipart::Form::new()
             .part(

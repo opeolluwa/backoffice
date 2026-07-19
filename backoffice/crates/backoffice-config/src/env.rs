@@ -103,7 +103,9 @@ impl AppConfig {
 
             requests_time_out: Duration::from_secs(requests_time_out),
 
-            imagekit_private_key: SecretString::from(extract_env::<String>("IMAGEKIT_PRIVATE_KEY")?),
+            imagekit_private_key: SecretString::from(extract_env::<String>(
+                "IMAGEKIT_PRIVATE_KEY",
+            )?),
 
             imagekit_public_key: SecretString::from(extract_env::<String>("IMAGEKIT_PUBLIC_KEY")?),
         })

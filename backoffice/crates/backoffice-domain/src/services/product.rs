@@ -1,8 +1,6 @@
 use crate::{
-    dto::SaveProductCommand,
-    models::products::Model as Product,
-    ports::product_repository::ProductRepositoryExt,
-    errors::service_error::ServiceError,
+    dto::SaveProductCommand, errors::service_error::ServiceError,
+    models::products::Model as Product, ports::product_repository::ProductRepositoryExt,
 };
 
 #[derive(Clone)]
@@ -59,8 +57,8 @@ impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductSe
 mod tests {
     use super::*;
     use crate::ports::product_repository::MockProductRepositoryExt;
-    use sea_orm::sqlx::types::chrono::Utc;
     use rust_decimal::dec;
+    use sea_orm::sqlx::types::chrono::Utc;
 
     fn test_product() -> crate::models::products::Model {
         crate::models::products::Model {
@@ -93,8 +91,11 @@ mod tests {
     #[tokio::test]
     async fn fetch_product_not_found() {
         let mut repo = MockProductRepositoryExt::new();
-        repo.expect_retrieve_product()
-            .returning(|_, _| Err(crate::errors::database_error::DatabaseError::NotFound("not found".into())));
+        repo.expect_retrieve_product().returning(|_, _| {
+            Err(crate::errors::database_error::DatabaseError::NotFound(
+                "not found".into(),
+            ))
+        });
         let service = ProductService::new(repo);
 
         let result = service.fetch_product("nonexistent", "user-001").await;

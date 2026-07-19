@@ -1,9 +1,8 @@
 use crate::{
     dto::{
-        CreateUserCommand, ForgottenPasswordCommand, ForgottenPasswordResult,
-        LoginCommand, LoginResult, SetNewPasswordCommand, SetNewPasswordResult,
-        TokenClaims, VerifyAccountCommand, VerifyAccountResult, RefreshTokenCommand,
-        RefreshTokenResult, EmailMessage,
+        CreateUserCommand, EmailMessage, ForgottenPasswordCommand, ForgottenPasswordResult,
+        LoginCommand, LoginResult, RefreshTokenCommand, RefreshTokenResult, SetNewPasswordCommand,
+        SetNewPasswordResult, TokenClaims, VerifyAccountCommand, VerifyAccountResult,
     },
     errors::{auth_service_error::AuthenticationServiceError, service_error::ServiceError},
     ports::{
@@ -54,16 +53,13 @@ pub trait AuthenticationServiceTrait {
         &self,
         command: &SetNewPasswordCommand,
         claims: &TokenClaims,
-    ) -> impl std::future::Future<
-        Output = Result<SetNewPasswordResult, AuthenticationServiceError>,
-    > + Send;
+    ) -> impl std::future::Future<Output = Result<SetNewPasswordResult, AuthenticationServiceError>> + Send;
 
     fn verify_account(
         &self,
         claims: &TokenClaims,
         command: &VerifyAccountCommand,
-    ) -> impl std::future::Future<Output = Result<VerifyAccountResult, AuthenticationServiceError>>
-    + Send;
+    ) -> impl std::future::Future<Output = Result<VerifyAccountResult, AuthenticationServiceError>> + Send;
 
     fn request_refresh_token(
         &self,
@@ -71,7 +67,9 @@ pub trait AuthenticationServiceTrait {
     ) -> impl std::future::Future<Output = Result<RefreshTokenResult, AuthenticationServiceError>> + Send;
 }
 
-impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender> AuthenticationServiceTrait for AuthenticationService<R, T, E> {
+impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender>
+    AuthenticationServiceTrait for AuthenticationService<R, T, E>
+{
     async fn create_user(&self, command: &CreateUserCommand) -> Result<(), ServiceError> {
         if self.repo.find_by_email(&command.email).await.is_some() {
             return Err(crate::errors::database_error::DatabaseError::DuplicateEmailForUser.into());
@@ -231,8 +229,7 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender> Auth
 mod tests {
     use super::*;
     use crate::ports::{
-        email_sender::MockEmailSender,
-        token_service::MockTokenService,
+        email_sender::MockEmailSender, token_service::MockTokenService,
         user_repository::MockUserRepositoryTrait,
     };
     use sea_orm::sqlx::types::chrono::Utc;
@@ -283,12 +280,13 @@ mod tests {
         let token_service = MockTokenService::new();
         let mut email_sender = MockEmailSender::new();
 
-        repo.expect_find_by_email().returning(|_| Box::pin(async { None }));
+        repo.expect_find_by_email()
+            .returning(|_| Box::pin(async { None }));
         repo.expect_create_user()
             .returning(|_| Box::pin(async { Ok(()) }));
-        email_sender.expect_send_email().returning(|_| {
-            Box::pin(async { Ok(()) })
-        });
+        email_sender
+            .expect_send_email()
+            .returning(|_| Box::pin(async { Ok(()) }));
 
         let service = setup_auth_service(repo, token_service, email_sender);
         let cmd = test_create_command();
@@ -304,11 +302,10 @@ mod tests {
         let email_sender = MockEmailSender::new();
 
         let existing_user = test_user_model("hashed");
-        repo.expect_find_by_email()
-            .returning(move |_| {
-                let u = existing_user.clone();
-                Box::pin(async move { Some(u) })
-            });
+        repo.expect_find_by_email().returning(move |_| {
+            let u = existing_user.clone();
+            Box::pin(async move { Some(u) })
+        });
 
         let service = setup_auth_service(repo, token_service, email_sender);
         let cmd = test_create_command();
@@ -327,11 +324,10 @@ mod tests {
 
         let hashed_password = bcrypt::hash("Password123!", bcrypt::DEFAULT_COST).unwrap();
         let user = test_user_model(&hashed_password);
-        repo.expect_find_by_email()
-            .returning(move |_| {
-                let u = user.clone();
-                Box::pin(async move { Some(u) })
-            });
+        repo.expect_find_by_email().returning(move |_| {
+            let u = user.clone();
+            Box::pin(async move { Some(u) })
+        });
         token_service
             .expect_generate_token()
             .returning(|_, _| Ok("jwt-token-abc".to_string()));
@@ -353,7 +349,8 @@ mod tests {
         let token_service = MockTokenService::new();
         let email_sender = MockEmailSender::new();
 
-        repo.expect_find_by_email().returning(|_| Box::pin(async { None }));
+        repo.expect_find_by_email()
+            .returning(|_| Box::pin(async { None }));
 
         let service = setup_auth_service(repo, token_service, email_sender);
         let cmd = LoginCommand {
@@ -377,11 +374,10 @@ mod tests {
 
         let hashed_password = bcrypt::hash("CorrectPassword", bcrypt::DEFAULT_COST).unwrap();
         let user = test_user_model(&hashed_password);
-        repo.expect_find_by_email()
-            .returning(move |_| {
-                let u = user.clone();
-                Box::pin(async move { Some(u) })
-            });
+        repo.expect_find_by_email().returning(move |_| {
+            let u = user.clone();
+            Box::pin(async move { Some(u) })
+        });
 
         let service = setup_auth_service(repo, token_service, email_sender);
         let cmd = LoginCommand {
@@ -406,17 +402,16 @@ mod tests {
         let mut email_sender = MockEmailSender::new();
 
         let user = test_user_model("hashed");
-        repo.expect_find_by_email()
-            .returning(move |_| {
-                let u = user.clone();
-                Box::pin(async move { Some(u) })
-            });
+        repo.expect_find_by_email().returning(move |_| {
+            let u = user.clone();
+            Box::pin(async move { Some(u) })
+        });
         token_service
             .expect_generate_token()
             .returning(|_, _| Ok("reset-token-xyz".to_string()));
-        email_sender.expect_send_email().returning(|_| {
-            Box::pin(async { Ok(()) })
-        });
+        email_sender
+            .expect_send_email()
+            .returning(|_| Box::pin(async { Ok(()) }));
 
         let service = setup_auth_service(repo, token_service, email_sender);
         let cmd = ForgottenPasswordCommand {
@@ -434,7 +429,8 @@ mod tests {
         let token_service = MockTokenService::new();
         let email_sender = MockEmailSender::new();
 
-        repo.expect_find_by_email().returning(|_| Box::pin(async { None }));
+        repo.expect_find_by_email()
+            .returning(|_| Box::pin(async { None }));
 
         let service = setup_auth_service(repo, token_service, email_sender);
         let cmd = ForgottenPasswordCommand {
@@ -454,11 +450,10 @@ mod tests {
         let email_sender = MockEmailSender::new();
 
         let user = test_user_model("old-hash");
-        repo.expect_find_by_identifier()
-            .returning(move |_| {
-                let u = user.clone();
-                Box::pin(async move { Some(u) })
-            });
+        repo.expect_find_by_identifier().returning(move |_| {
+            let u = user.clone();
+            Box::pin(async move { Some(u) })
+        });
         repo.expect_update_password()
             .returning(|_, _| Box::pin(async { Ok(()) }));
 
@@ -506,11 +501,10 @@ mod tests {
         let email_sender = MockEmailSender::new();
 
         let user = test_user_model("hashed");
-        repo.expect_find_by_identifier()
-            .returning(move |_| {
-                let u = user.clone();
-                Box::pin(async move { Some(u) })
-            });
+        repo.expect_find_by_identifier().returning(move |_| {
+            let u = user.clone();
+            Box::pin(async move { Some(u) })
+        });
         repo.expect_update_account_status()
             .returning(|_| Box::pin(async { Ok(()) }));
 

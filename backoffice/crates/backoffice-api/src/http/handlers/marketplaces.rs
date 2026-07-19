@@ -5,14 +5,15 @@ use axum::{
     http::StatusCode,
 };
 
-use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
-use backoffice_domain::errors::api_response::ApiResponse;
-use crate::http::extractors::marketplace::CreateMarketplaceRequest;
-use crate::state::AppState;
 use backoffice_domain::dto::CreateMarketplaceCommand;
+use backoffice_domain::errors::api_response::ApiResponse;
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::marketplaces;
 use backoffice_domain::services::marketplace::MarketplaceServiceExt;
-use backoffice_domain::errors::service_error::ServiceError;
+
+use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
+use crate::http::extractors::marketplace::CreateMarketplaceRequest;
+use crate::state::AppState;
 
 fn to_command(req: &CreateMarketplaceRequest) -> CreateMarketplaceCommand {
     CreateMarketplaceCommand {

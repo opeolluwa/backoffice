@@ -1,8 +1,9 @@
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
+use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::models::countries::{self, Entity as CountryEntity};
 use backoffice_domain::ports::country_repository::CountryRepositoryExt;
-use backoffice_domain::errors::database_error::DatabaseError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Clone)]

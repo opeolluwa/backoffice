@@ -2,7 +2,6 @@ use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
-use secrecy::ExposeSecret;
 
 use backoffice_config::env::AppConfig;
 use backoffice_domain::{

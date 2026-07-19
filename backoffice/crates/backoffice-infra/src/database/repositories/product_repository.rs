@@ -2,12 +2,13 @@ use rust_decimal::Decimal;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use ulid::Ulid;
 
+use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::{
     dto::SaveProductCommand,
     models::products::{self, Entity as ProductEntity},
     ports::product_repository::ProductRepositoryExt,
 };
-use backoffice_domain::errors::database_error::DatabaseError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Debug, Clone)]

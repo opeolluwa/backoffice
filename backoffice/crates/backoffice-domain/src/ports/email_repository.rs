@@ -1,7 +1,7 @@
 use crate::{
     dto::{CreateEmailCommand, UpdateEmailCommand},
-    models::emails,
     errors::database_error::DatabaseError,
+    models::emails,
 };
 
 #[cfg_attr(test, mockall::automock)]

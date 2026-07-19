@@ -4,12 +4,13 @@ use sea_orm::{
 };
 use ulid::Ulid;
 
+use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::{
     dto::{CreateEmailCommand, UpdateEmailCommand},
     models::emails::{self, Entity as EmailEntity},
     ports::email_repository::EmailRepositoryExt,
 };
-use backoffice_domain::errors::database_error::DatabaseError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Debug, Clone)]

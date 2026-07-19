@@ -1,19 +1,20 @@
 use std::sync::Arc;
 
 use axum::{
+    Json,
     extract::{Path, State},
     http::StatusCode,
-    Json,
 };
+use validator::Validate;
 
-use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
 use backoffice_domain::errors::api_response::ApiResponse;
-use crate::http::extractors::invitation::{AcceptInvitationRequest, CreateInvitationRequest};
-use crate::state::AppState;
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::invitation;
 use backoffice_domain::services::invitation::InvitationServiceExt;
-use backoffice_domain::errors::service_error::ServiceError;
-use validator::Validate;
+
+use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
+use crate::http::extractors::invitation::{AcceptInvitationRequest, CreateInvitationRequest};
+use crate::state::AppState;
 
 pub async fn create_invitation(
     State(state): State<Arc<AppState>>,

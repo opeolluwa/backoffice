@@ -1,6 +1,6 @@
 use std::sync::Arc;
+
 use axum::middleware;
-use crate::http::middlewares::auth::authenticate;
 use axum::{
     Router,
     routing::{delete, get, post, put},
@@ -11,6 +11,7 @@ use crate::http::handlers::email::{
     find_email_by_identifier, find_emails_by_tag, find_starred_emails, find_unread_emails,
     update_email,
 };
+use crate::http::middlewares::auth::authenticate;
 use crate::state::AppState;
 
 pub(super) fn email_routes(state: Arc<AppState>) -> Router {

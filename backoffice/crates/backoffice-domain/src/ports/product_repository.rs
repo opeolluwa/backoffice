@@ -1,8 +1,4 @@
-use crate::{
-    dto::SaveProductCommand,
-    models::products,
-    errors::database_error::DatabaseError,
-};
+use crate::{dto::SaveProductCommand, errors::database_error::DatabaseError, models::products};
 
 #[cfg_attr(test, mockall::automock)]
 #[allow(async_fn_in_trait)]

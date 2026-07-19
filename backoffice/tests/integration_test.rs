@@ -1,8 +1,8 @@
 mod helpers;
+use helpers::*;
 
 use axum::http::StatusCode;
-use helpers::*;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 // A. Public Routes
 
@@ -79,7 +79,9 @@ async fn fetch_country_not_found() {
     let db = setup_db().await;
     let server = axum_test::TestServer::new(build_router(build_test_state(&db))).unwrap();
 
-    let response = server.get("/api/countries/00000000000000000000000000").await;
+    let response = server
+        .get("/api/countries/00000000000000000000000000")
+        .await;
     let status = response.status_code();
     assert!(
         status.is_success() || status.is_client_error(),
@@ -276,10 +278,7 @@ async fn fetch_profile_with_valid_token() {
     let token = login_body["data"]["token"].as_str().unwrap();
 
     let (key, val) = auth_header(token);
-    let response = server
-        .get("/api/users/profile")
-        .add_header(key, val)
-        .await;
+    let response = server.get("/api/users/profile").add_header(key, val).await;
 
     response.assert_status_ok();
 }
@@ -291,7 +290,11 @@ async fn fetch_profile_no_auth() {
     let server = axum_test::TestServer::new(build_router(build_test_state(&db))).unwrap();
 
     let response = server.get("/api/users/profile").await;
-    assert_eq!(response.status_code(), StatusCode::UNAUTHORIZED, "should return 401 without auth");
+    assert_eq!(
+        response.status_code(),
+        StatusCode::UNAUTHORIZED,
+        "should return 401 without auth"
+    );
 }
 
 #[tokio::test]
@@ -305,7 +308,11 @@ async fn fetch_profile_invalid_token() {
         .add_header("Authorization", "Bearer invalid-token-here")
         .await;
 
-    assert_eq!(response.status_code(), StatusCode::UNAUTHORIZED, "should return 401 for invalid token");
+    assert_eq!(
+        response.status_code(),
+        StatusCode::UNAUTHORIZED,
+        "should return 401 for invalid token"
+    );
 }
 
 // E. Marketplace CRUD (authenticated)
@@ -346,10 +353,7 @@ async fn marketplace_list_empty() {
     let token = test_token();
     let (key, val) = auth_header(&token);
 
-    let response = server
-        .get("/api/marketplaces")
-        .add_header(key, &val)
-        .await;
+    let response = server.get("/api/marketplaces").add_header(key, &val).await;
 
     response.assert_status_ok();
     let body: Value = response.json();
@@ -378,10 +382,7 @@ async fn marketplace_get_by_id() {
     let id = create_body["data"]["identifier"].as_str().unwrap();
 
     let url = format!("/api/marketplaces/{}", id);
-    let response = server
-        .get(url.as_str())
-        .add_header(key, &val)
-        .await;
+    let response = server.get(url.as_str()).add_header(key, &val).await;
 
     response.assert_status_ok();
     let body: Value = response.json();
@@ -442,10 +443,7 @@ async fn marketplace_delete() {
     let id = create_body["data"]["identifier"].as_str().unwrap();
 
     let url = format!("/api/marketplaces/{}", id);
-    let delete_resp = server
-        .delete(url.as_str())
-        .add_header(key, &val)
-        .await;
+    let delete_resp = server.delete(url.as_str()).add_header(key, &val).await;
     delete_resp.assert_status_ok();
 }
 
@@ -484,10 +482,7 @@ async fn team_list() {
     let token = test_token();
     let (key, val) = auth_header(&token);
 
-    let response = server
-        .get("/api/teams")
-        .add_header(key, &val)
-        .await;
+    let response = server.get("/api/teams").add_header(key, &val).await;
 
     response.assert_status_ok();
     let body: Value = response.json();
@@ -514,10 +509,7 @@ async fn team_get_by_id() {
     let id = body["data"]["identifier"].as_str().unwrap();
 
     let url = format!("/api/teams/{}", id);
-    let response = server
-        .get(url.as_str())
-        .add_header(key, &val)
-        .await;
+    let response = server.get(url.as_str()).add_header(key, &val).await;
 
     response.assert_status_ok();
     let body: Value = response.json();
@@ -544,10 +536,7 @@ async fn team_block() {
     let id = body["data"]["identifier"].as_str().unwrap();
 
     let url = format!("/api/teams/{}/block", id);
-    let response = server
-        .put(url.as_str())
-        .add_header(key, &val)
-        .await;
+    let response = server.put(url.as_str()).add_header(key, &val).await;
 
     response.assert_status_ok();
     let body: Value = response.json();
@@ -574,10 +563,7 @@ async fn team_delete() {
     let id = body["data"]["identifier"].as_str().unwrap();
 
     let url = format!("/api/teams/{}", id);
-    let delete_resp = server
-        .delete(url.as_str())
-        .add_header(key, &val)
-        .await;
+    let delete_resp = server.delete(url.as_str()).add_header(key, &val).await;
     delete_resp.assert_status_ok();
 }
 
@@ -615,10 +601,7 @@ async fn email_list() {
     let token = test_token();
     let (key, val) = auth_header(&token);
 
-    let response = server
-        .get("/api/emails")
-        .add_header(key, &val)
-        .await;
+    let response = server.get("/api/emails").add_header(key, &val).await;
 
     response.assert_status_ok();
     let body: Value = response.json();
@@ -633,10 +616,7 @@ async fn email_count() {
     let token = test_token();
     let (key, val) = auth_header(&token);
 
-    let count_resp = server
-        .get("/api/emails/count")
-        .add_header(key, &val)
-        .await;
+    let count_resp = server.get("/api/emails/count").add_header(key, &val).await;
     let body: Value = count_resp.json();
     assert_eq!(body["data"], 0);
 
@@ -651,10 +631,7 @@ async fn email_count() {
         }))
         .await;
 
-    let count_resp = server
-        .get("/api/emails/count")
-        .add_header(key, &val)
-        .await;
+    let count_resp = server.get("/api/emails/count").add_header(key, &val).await;
     let body: Value = count_resp.json();
     assert_eq!(body["data"], 1);
 }
@@ -681,10 +658,7 @@ async fn email_get_by_id() {
     let id = body["data"]["identifier"].as_str().unwrap();
 
     let url = format!("/api/emails/{}", id);
-    let response = server
-        .get(url.as_str())
-        .add_header(key, &val)
-        .await;
+    let response = server.get(url.as_str()).add_header(key, &val).await;
 
     response.assert_status_ok();
     let body: Value = response.json();
@@ -713,9 +687,6 @@ async fn email_delete() {
     let id = body["data"]["identifier"].as_str().unwrap();
 
     let url = format!("/api/emails/{}", id);
-    let delete_resp = server
-        .delete(url.as_str())
-        .add_header(key, &val)
-        .await;
+    let delete_resp = server.delete(url.as_str()).add_header(key, &val).await;
     delete_resp.assert_status_ok();
 }

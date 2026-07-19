@@ -1,15 +1,17 @@
+use sea_orm::prelude::Uuid;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
     QueryOrder, Set,
 };
-use sea_orm::prelude::Uuid;
+use ulid::Ulid;
 
+use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::models::{
     invitation::{self, Entity as InvitationEntity},
     sea_orm_active_enums::InvitationStatus,
 };
 use backoffice_domain::ports::invitation_repository::InvitationRepositoryExt;
-use backoffice_domain::errors::database_error::DatabaseError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Debug, Clone)]
@@ -30,7 +32,7 @@ impl InvitationRepositoryExt for InvitationRepository {
         token: &str,
     ) -> Result<invitation::Model, DatabaseError> {
         let model = invitation::ActiveModel {
-            identifier: Set(Uuid::new_v4()),
+            identifier: Set(Ulid::new().to_string()),
             email: Set(email.to_string()),
             status: Set(Some(InvitationStatus::Pending)),
             token: Set(token.to_string()),
@@ -90,10 +92,7 @@ impl InvitationRepositoryExt for InvitationRepository {
         active.update(&self.db).await.map_err(DatabaseError::from)
     }
 
-    async fn block_invitation(
-        &self,
-        identifier: &str,
-    ) -> Result<invitation::Model, DatabaseError> {
+    async fn block_invitation(&self, identifier: &str) -> Result<invitation::Model, DatabaseError> {
         let uuid =
             Uuid::parse_str(identifier).map_err(|e| DatabaseError::InvalidData(e.to_string()))?;
 
