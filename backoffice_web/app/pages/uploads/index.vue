@@ -32,7 +32,12 @@ async function removeFile(identifier: string) {
 
   if (!confirmed) return;
 
-  await uploadStore.deleteOneUpload(identifier);
+  try {
+    await uploadStore.deleteOneUpload(identifier);
+    toast.add({ title: "File deleted", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to delete file", color: "error" });
+  }
 }
 
 async function copyFileId(identifier: string) {

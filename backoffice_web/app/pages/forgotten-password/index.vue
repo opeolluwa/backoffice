@@ -12,6 +12,7 @@ const email = ref("");
 const formError = ref<string>();
 const loading = ref<boolean>(false);
 const router = useRouter();
+const toast = useToast();
 
 async function onSubmit() {
   try {
@@ -20,6 +21,7 @@ async function onSubmit() {
     const { data: respData } = await api.post("/forgotten-password", {
       email: email.value,
     });
+    toast.add({ title: "Reset link sent", color: "success" });
     await router.push(`/set-password?token=${respData.data.token}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

@@ -1,126 +1,153 @@
 <script setup lang="ts">
 import * as v from "valibot";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { useInvitationsStore } from "~/stores/invitations";
 
 useHead({ title: "Invitations" });
 
 definePageMeta({
   layout: "dashboard",
+  breadcrumb: {
+    icon: "heroicons:paper-airplane",
+    ariaLabel: "Invitations",
+    title: "Invitations",
+  },
 });
+
+const invitationsStore = useInvitationsStore();
+const toast = useToast();
+
+const loading = ref(true);
+const sending = ref(false);
 
 const schema = v.object({
   email: v.pipe(v.string(), v.email("Please enter a valid email address.")),
-  role: v.pipe(v.string(), v.minLength(1, "Please select a role.")),
 });
 
 type Schema = v.InferOutput<typeof schema>;
 
-const state = reactive<Schema>({ email: "", role: "" });
-const formError = ref("");
-const loading = ref(false);
-const toast = useToast();
+const state = reactive<Schema>({ email: "" });
 
-const roles = [
-  { label: "Admin", value: "admin" },
-  { label: "Member", value: "member" },
-  { label: "Viewer", value: "viewer" },
-];
+const invitations = computed(() => invitationsStore.invitations);
+const pendingInvitations = computed(() =>
+  invitations.value.filter((i) => i.status === "Pending"),
+);
+const hasInvitations = computed(() => invitations.value.length > 0);
+
+onMounted(async () => {
+  try {
+    await invitationsStore.fetchAllInvitations();
+  } finally {
+    loading.value = false;
+  }
+});
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
-  loading.value = true;
-  formError.value = "";
-
+  sending.value = true;
   try {
-    // TODO: replace with actual API call
-    // await api.post("/invitations", data);
-    console.log("Invitation data:", data);
-
+    await invitationsStore.createInvitation(data.email);
     toast.add({
       title: "Invitation sent",
       description: `An invitation has been sent to ${data.email}.`,
       color: "success",
     });
-
     state.email = "";
-    state.role = "";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    formError.value =
-      err.message || "Failed to send invitation. Please try again.";
+    toast.add({
+      title: "Error",
+      description: err?.message || "Failed to send invitation. Please try again.",
+      color: "error",
+    });
   } finally {
-    loading.value = false;
+    sending.value = false;
+  }
+}
+
+async function onRevoke(identifier: string) {
+  try {
+    await invitationsStore.deleteInvitation(identifier);
+    toast.add({ title: "Invitation revoked", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to revoke invitation", color: "error" });
+  }
+}
+
+async function onBlock(identifier: string) {
+  try {
+    await invitationsStore.blockInvitation(identifier);
+    toast.add({ title: "Invitation blocked", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to block invitation", color: "error" });
   }
 }
 </script>
 
 <template>
-  <div class="max-w-lg">
-    <h1 class="text-2xl font-semibold">Send Invitation</h1>
-    <p class="text-gray-400 mt-1 text-sm">
-      Invite a team member to join your workspace.
-    </p>
-
-    <div
-      v-if="formError"
-      class="mt-4 rounded-md bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400"
-    >
-      {{ formError }}
+  <div class="space-y-6">
+    <div v-if="loading" class="flex items-center justify-center h-[60vh]">
+      <p class="text-sm text-muted">Loading invitations…</p>
     </div>
 
-    <UForm
-      :schema="schema"
-      :state="state"
-      class="space-y-4 mt-6"
-      :on-submit="onSubmit"
-    >
-      <UFormField
-        v-slot="{ error }"
-        label="Email address"
-        name="email"
-        required
-        :ui="{ error: 'text-red-500 text-sm mt-1' }"
-      >
-        <UInput
-          v-model="state.email"
-          placeholder="colleague@example.com"
-          :ui="{ base: 'py-4 px-6' }"
-          :class="[
-            'w-full transition-colors',
-            error
-              ? 'border-red-500 focus:border-red-500'
-              : 'border-gray-300 focus:border-black',
-          ]"
-        />
-      </UFormField>
+    <template v-else>
+      <div>
+        <h1 class="text-2xl font-semibold">Invitations</h1>
+        <p class="text-gray-400 mt-1 text-sm">
+          Manage and track workspace invitations.
+        </p>
+      </div>
 
-      <UFormField
-        v-slot="{ error }"
-        label="Role"
-        name="role"
-        required
-        :ui="{ error: 'text-red-500 text-sm mt-1' }"
+      <!-- Send invitation form -->
+      <div
+        class="border border-gray-100 dark:border-white/5 rounded-2xl p-5 max-w-lg"
       >
-        <USelect
-          v-model="state.role"
-          :items="roles"
-          value-key="value"
-          label-key="label"
-          placeholder="Select a role"
-          :class="[
-            'w-full transition-colors',
-            error ? 'border-red-500' : 'border-gray-300',
-          ]"
-        />
-      </UFormField>
+        <p class="font-semibold text-sm mb-4">Send an invitation</p>
+        <UForm
+          :schema="schema"
+          :state="state"
+          class="flex items-end gap-3"
+          :on-submit="onSubmit"
+        >
+          <UFormField
+            v-slot="{ error }"
+            label="Email address"
+            name="email"
+            required
+            class="flex-1"
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
+          >
+            <UInput
+              v-model="state.email"
+              placeholder="colleague@example.com"
+              :ui="{ base: 'py-3 px-4' }"
+              :class="[
+                'w-full transition-colors',
+                error
+                  ? 'border-red-500 focus:border-red-500'
+                  : 'border-gray-300 focus:border-black',
+              ]"
+            />
+          </UFormField>
+          <AppButton
+            :loading="sending"
+            :disabled="sending"
+            type="submit"
+            class="shrink-0 rounded px-5 py-3 text-sm text-white cursor-pointer"
+          >
+            Send
+          </AppButton>
+        </UForm>
+      </div>
 
-      <AppButton
-        :loading="loading"
-        :disabled="loading"
-        type="submit"
-        class="flex justify-center items-center text-center w-full rounded py-4 text-white cursor-pointer"
-      >
-        Send Invitation
-      </AppButton>
-    </UForm>
+      <!-- Invitations list -->
+      <div v-if="!hasInvitations" class="text-center py-12">
+        <p class="text-sm text-muted">No invitations yet.</p>
+      </div>
+
+      <TeamsInvitationTable
+        v-else
+        :invitations="invitations"
+        @revoke="onRevoke"
+      />
+    </template>
   </div>
 </template>

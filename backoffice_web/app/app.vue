@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useNuxtApp } from "#app";
+const toast = useToast();
 
 const { $viewport } = useNuxtApp();
 
@@ -26,10 +27,12 @@ watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
       </p>
     </div>
     <div v-else>
-      <NuxtLoadingIndicator />
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
+      <UApp :toaster="{ position: 'top-right', progress: true }">
+        <NuxtLoadingIndicator />
+        <NuxtLayout>
+          <NuxtPage />
+        </NuxtLayout>
+      </UApp>
     </div>
   </div>
 </template>

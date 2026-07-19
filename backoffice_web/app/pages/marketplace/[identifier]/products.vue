@@ -7,6 +7,7 @@ import { z } from "zod";
 
 const route = useRoute();
 const identifier = route.params.identifier;
+const toast = useToast();
 
 const openForm = ref(false);
 const state = reactive({
@@ -78,8 +79,13 @@ const onSubmit = async () => {
     }
     resetForm();
     openForm.value = false;
-  } catch (error) {
-    console.log({ error });
+    toast.add({ title: "Product created", color: "success" });
+  } catch (error: any) {
+    toast.add({
+      title: "Failed to create product",
+      description: error?.message || "Please try again.",
+      color: "error",
+    });
   } finally {
     loading.value = false;
   }

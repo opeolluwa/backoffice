@@ -73,6 +73,11 @@ const routes = [
     to: "/teams",
   },
   {
+    label: "Invitations",
+    icon: "heroicons:paper-airplane",
+    to: "/invitations",
+  },
+  {
     label: "Settings",
     icon: "heroicons:cog-6-tooth",
     to: "/settings",

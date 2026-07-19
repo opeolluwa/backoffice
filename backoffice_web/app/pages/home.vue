@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useUserInformationStore } from "~/stores/users";
 import { useMarketplaceStore } from "~/stores/marketplace";
+import { useTeamsStore } from "~/stores/teams";
+import { useUploadStore } from "~/stores/uploads";
+import api from "~/plugin/api";
 
 useHead({ title: "Dashboard" });
 
@@ -15,48 +18,52 @@ definePageMeta({
 });
 const userStore = useUserInformationStore();
 const marketplaceStore = useMarketplaceStore();
+const teamsStore = useTeamsStore();
+const uploadStore = useUploadStore();
+
+const totalProducts = ref(0);
 
 onMounted(async () => {
-  await marketplaceStore.fetchMarketplaces();
+  await Promise.all([
+    marketplaceStore.fetchMarketplaces(),
+    teamsStore.fetchAllMembers(),
+    uploadStore.countUploads(),
+  ]);
+
+  let count = 0;
+  for (const mp of marketplaceStore.marketplaces) {
+    try {
+      const { data } = await api.get(`/marketplaces/${mp.identifier}/products`);
+      count += data?.products?.length ?? 0;
+    } catch { /* skip failed */ }
+  }
+  totalProducts.value = count;
 });
 
 const firstName = computed(() => userStore.userFirstName || "there");
 const marketplaces = computed(() => marketplaceStore.marketplaces);
 const totalMarketplaces = computed(() => marketplaces.value.length);
 
-// Stat cards — real where available, indicative elsewhere
 const stats = computed(() => [
   {
     label: "Marketplaces",
     value: totalMarketplaces.value,
-    trend: "+12.4%",
-    up: true,
     icon: "heroicons:building-storefront",
-    color: "brand",
   },
   {
     label: "Total Products",
-    value: 0,
-    trend: "+8.1%",
-    up: true,
+    value: totalProducts.value,
     icon: "heroicons:tag",
-    color: "brand",
   },
   {
     label: "Team Members",
-    value: 0,
-    trend: "0%",
-    up: true,
+    value: teamsStore.members.length,
     icon: "heroicons:users",
-    color: "brand",
   },
   {
-    label: "Active Tasks",
-    value: 0,
-    trend: "+3.7%",
-    up: true,
-    icon: "heroicons:clipboard-document-check",
-    color: "brand",
+    label: "Uploads",
+    value: uploadStore.count,
+    icon: "heroicons:arrow-up-tray",
   },
 ]);
 
@@ -94,14 +101,6 @@ const recentMarketplaces = computed(() =>
     .slice(0, 5),
 );
 
-function formatDate(dt?: string | null) {
-  if (!dt) return "—";
-  return new Date(dt).toLocaleDateString("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 </script>
 
 <template>
@@ -110,7 +109,7 @@ function formatDate(dt?: string | null) {
     <div class="flex items-start justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-          Hi, {{ firstName }} 👋
+          Hi, {{ firstName }} 👋 <UIcon name="i-lucide:arrow-up-tray" />
         </h1>
         <p class="text-sm text-gray-400 dark:text-white/40 mt-1">
           Here's what's happening across your workspace today.
@@ -122,47 +121,13 @@ function formatDate(dt?: string | null) {
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <!-- Stat cards (2/3 width) -->
       <div class="xl:col-span-2 grid grid-cols-2 gap-4">
-        <div
+        <AppStatCard
           v-for="stat in stats"
           :key="stat.label"
-          class="border border-gray-100 dark:border-white/5 rounded-2xl p-5 flex flex-col gap-4"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500 dark:text-white/40 font-medium">
-              {{ stat.label }}
-            </span>
-            <div
-              class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand/10 flex items-center justify-center"
-            >
-              <UIcon :name="stat.icon" class="size-4 text-brand" />
-            </div>
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">
-              {{ stat.value.toLocaleString() }}
-            </p>
-            <div class="flex items-center gap-1.5 mt-1.5">
-              <UIcon
-                :name="
-                  stat.up
-                    ? 'heroicons:arrow-trending-up'
-                    : 'heroicons:arrow-trending-down'
-                "
-                :class="stat.up ? 'text-brand' : 'text-red-500'"
-                class="size-3.5"
-              />
-              <span
-                :class="stat.up ? 'text-brand' : 'text-red-500'"
-                class="text-xs font-semibold"
-              >
-                {{ stat.trend }}
-              </span>
-              <span class="text-xs text-gray-400 dark:text-white/25"
-                >vs last month</span
-              >
-            </div>
-          </div>
-        </div>
+          :label="stat.label"
+          :value="stat.value.toLocaleString()"
+          :icon="stat.icon"
+        />
       </div>
 
       <!-- Activity chart (1/3 width) -->
@@ -199,23 +164,14 @@ function formatDate(dt?: string | null) {
         </div>
 
         <div
-          class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-between"
+          class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5"
         >
-          <div>
-            <p class="text-lg font-bold text-gray-900 dark:text-white">
-              {{ chartValues[chartValues.length - 1] }}
-            </p>
-            <p class="text-xs text-gray-400 dark:text-white/30">
-              entries this month
-            </p>
-          </div>
-          <div class="flex items-center gap-1">
-            <UIcon
-              name="heroicons:arrow-trending-up"
-              class="size-3.5 text-brand"
-            />
-            <span class="text-xs font-semibold text-brand">+44%</span>
-          </div>
+          <p class="text-lg font-bold text-gray-900 dark:text-white">
+            {{ chartValues[chartValues.length - 1] }}
+          </p>
+          <p class="text-xs text-gray-400 dark:text-white/30">
+            entries this month
+          </p>
         </div>
       </div>
     </div>

@@ -25,6 +25,7 @@ const state = reactive<Schema>({ email: "", password: "" });
 const formError = ref("");
 const loading = ref(false);
 const showPassword = ref(false);
+const toast = useToast();
 
 const { login } = useLogin();
 
@@ -36,6 +37,9 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 
   if (!result.success) {
     formError.value = result.error || "An error occurred. Please try again.";
+    toast.add({ title: "Login failed", description: formError.value, color: "error" });
+  } else {
+    toast.add({ title: "Welcome back!", color: "success" });
   }
 
   loading.value = false;
