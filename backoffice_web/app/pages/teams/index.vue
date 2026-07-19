@@ -115,7 +115,13 @@ onMounted(async () => {
     </div>
 
     <template v-else>
-      <TeamsPageHeader v-if="hasContent" @invite="openInvite = true" />
+      <AppPageHeader
+        v-if="hasContent"
+        title="Team members"
+        subtitle="Manage your team and invitations.È"
+        cta-text="Add team member"
+        @cta="openInvite = true"
+      />
 
       <AppEmptyState
         v-if="!hasMembers && pendingInvitations.length === 0"

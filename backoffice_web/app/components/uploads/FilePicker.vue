@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { CreateUploadRequest } from "~/bindings/CreateUploadRequest";
+import type { FormSubmitEvent } from "@nuxt/ui";
+import * as v from "valibot";
 
 const open = defineModel<boolean>("open", { default: false });
 
@@ -8,17 +9,27 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  submit: [state: Partial<CreateUploadRequest>];
+  submit: [state: v.InferOutput<typeof schema>];
 }>();
 
-const state = reactive<Partial<CreateUploadRequest>>({
-  file: null,
+const schema = v.object({
+  file: v.pipe(
+    v.instance(File, "Please select a file."),
+  ),
+  name: v.pipe(v.string(), v.minLength(1, "File name is required.")),
+  file_type: v.nullable(v.string()),
+});
+
+type Schema = v.InferOutput<typeof schema>;
+
+const state = reactive<Schema>({
+  file: null as unknown as File,
   name: "",
   file_type: null,
 });
 
-function onSubmit() {
-  emit("submit", { ...state });
+function onSubmit({ data }: FormSubmitEvent<Schema>) {
+  emit("submit", { ...data });
 }
 
 function reset() {
@@ -39,15 +50,18 @@ defineExpose({ reset });
     :dismissible="loading != true && state.file != null && open == true"
   >
     <template #body>
-      <UForm class="space-y-4" :state="state" @submit="onSubmit">
+      <UForm
+        class="space-y-4"
+        :schema="schema"
+        :state="state"
+        @submit="onSubmit"
+      >
         <UFileUpload v-model="state.file" class="w-full min-h-48" />
         <AppInput
           v-model="state.name"
           label="File name"
-          name="fileName"
+          name="name"
           placeholder="example.jpg"
-          required
-          :ui="{ error: 'text-red-500 text-sm mt-1' }"
         />
 
         <AppButton
@@ -55,7 +69,6 @@ defineExpose({ reset });
           :size="'lg'"
           :loading="loading"
           :disabled="loading"
-          @click="onSubmit"
         >
           Upload
         </AppButton>

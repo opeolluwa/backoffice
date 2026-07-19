@@ -6,6 +6,7 @@ useHead({ title: "Dashboard" });
 
 definePageMeta({
   layout: "dashboard",
+  hideBreadcrumb: true,
   breadcrumb: {
     icon: "heroicons:squares-2x2",
     ariaLabel: "dashboard",
@@ -108,11 +109,6 @@ function formatDate(dt?: string | null) {
     <!-- Greeting row -->
     <div class="flex items-start justify-between">
       <div>
-        <p
-          class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-white/30 mb-1"
-        >
-          Dashboard
-        </p>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
           Hi, {{ firstName }} 👋
         </h1>
@@ -224,117 +220,7 @@ function formatDate(dt?: string | null) {
       </div>
     </div>
 
-    <!-- Quick links + Recent marketplaces -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      <!-- Quick links -->
-      <div class="border border-gray-100 dark:border-white/5 rounded-2xl p-5">
-        <p class="text-sm font-semibold text-gray-700 dark:text-white/80 mb-4">
-          Quick access
-        </p>
-        <div class="grid grid-cols-3 gap-3">
-          <NuxtLink
-            v-for="link in quickLinks"
-            :key="link.path"
-            :to="link.path"
-            class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-brand-50 dark:hover:bg-brand/10 hover:text-brand group transition-all"
-          >
-            <UIcon
-              :name="link.icon"
-              class="size-5 text-gray-400 dark:text-white/30 group-hover:text-brand transition-colors"
-            />
-            <span
-              class="text-[10px] font-medium text-gray-500 dark:text-white/40 group-hover:text-brand transition-colors text-center leading-tight"
-            >
-              {{ link.label }}
-            </span>
-          </NuxtLink>
-        </div>
-      </div>
 
-      <!-- Recent marketplaces -->
-      <div
-        class="xl:col-span-2 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <p class="text-sm font-semibold text-gray-700 dark:text-white/80">
-            Recent stores
-          </p>
-          <NuxtLink
-            to="/marketplace"
-            class="text-xs text-brand hover:text-brand-600 dark:text-brand-300 font-medium transition-colors"
-          >
-            View all
-          </NuxtLink>
-        </div>
-
-        <!-- Empty state -->
-        <div
-          v-if="recentMarketplaces.length === 0"
-          class="flex flex-col items-center justify-center py-10 gap-3 text-center"
-        >
-          <div
-            class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center"
-          >
-            <UIcon
-              name="heroicons:building-storefront"
-              class="size-5 text-gray-300 dark:text-white/20"
-            />
-          </div>
-          <p class="text-sm text-gray-400 dark:text-white/30">
-            No stores yet.
-            <NuxtLink to="/marketplace" class="text-brand hover:underline ml-1"
-              >Create one →</NuxtLink
-            >
-          </p>
-        </div>
-
-        <!-- Marketplace list -->
-        <div v-else class="divide-y divide-gray-50 dark:divide-white/5">
-          <div
-            v-for="mp in recentMarketplaces"
-            :key="mp.identifier"
-            class="flex items-center gap-4 py-3"
-          >
-            <!-- Avatar -->
-            <div
-              class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand/10 flex items-center justify-center shrink-0"
-            >
-              <UIcon
-                name="heroicons:building-storefront"
-                class="size-4 text-brand"
-              />
-            </div>
-
-            <!-- Info -->
-            <div class="flex-1 min-w-0">
-              <p
-                class="text-sm font-medium text-gray-800 dark:text-white/90 truncate"
-              >
-                {{ mp.name }}
-              </p>
-              <p class="text-xs text-gray-400 dark:text-white/30 truncate">
-                /{{ mp.slug }}
-              </p>
-            </div>
-
-            <!-- Date + action -->
-            <div class="flex items-center gap-3 shrink-0">
-              <span class="text-xs text-gray-400 dark:text-white/25">
-                {{ formatDate(mp.createdAt) }}
-              </span>
-              <NuxtLink :to="`/marketplace/${mp.identifier}/products`">
-                <UButton
-                  icon="heroicons:arrow-right"
-                  size="xs"
-                  color="neutral"
-                  variant="ghost"
-                />
-              </NuxtLink>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 

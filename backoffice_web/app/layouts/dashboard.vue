@@ -2,7 +2,9 @@
 import * as v from "valibot";
 import useLogout from "~/composables/useLogout";
 
-const items = useBreadcrumbItems();
+const items = useBreadcrumbItems({ rootSegment: "/home" });
+const route = useRoute();
+const hideBreadcrumb = computed(() => route.meta.hideBreadcrumb === true);
 
 const searchInputRef = ref<HTMLInputElement | null>(null);
 
@@ -36,6 +38,21 @@ const routes = [
     icon: "heroicons:building-storefront",
     to: "/marketplace",
   },
+  {
+    label: "Emails",
+    icon: "heroicons:envelope",
+    to: "/emails",
+  },
+  {
+    label: "Revenue",
+    icon: "heroicons:chart-bar-square",
+    to: "/revenue",
+  },
+  // {
+  //   label: "Calendar",
+  //   icon: "heroicons:calendar",
+  //   to: "/calendar",
+  // },
   {
     label: "Uploads",
     icon: "heroicons:arrow-up-tray",
@@ -176,20 +193,21 @@ const logout = async () => useLogout();
               </template>
             </UInput>
           </UFormField>
+          
         </UForm>
 
         <div class="flex items-center gap-4">
           <UIcon name="heroicons:bell" class="_icon" />
           <UColorModeButton />
           <NuxtLink to="/account">
-            <UserCard />
+            <AppUserCard />
           </NuxtLink>
         </div>
       </header>
 
       <!-- Page content -->
       <main class="flex-1 overflow-y-auto">
-        <div class="px-8 pt-5">
+        <div v-if="!hideBreadcrumb" class="px-8 pt-5">
           <UBreadcrumb
             :hide-non-existing="true"
             :hide-root="true"

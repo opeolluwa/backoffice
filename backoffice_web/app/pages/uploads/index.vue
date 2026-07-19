@@ -51,6 +51,9 @@ async function onUploadSubmit(state: Partial<CreateUploadRequest>) {
     await uploadStore.createUpload(state);
     uploadDialog.value?.reset();
     openUploadDialog.value = false;
+    toast.add({ title: "File uploaded successfully", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to upload file", color: "error" });
   } finally {
     isUploading.value = false;
   }
@@ -78,13 +81,22 @@ onMounted(async () => {
       @action="openUploadDialog = true"
     />
 
-    <UploadsFileGrid
-      v-else-if="hasFiles"
-      :files="files"
-      :loaded-previews="loadedPreviews"
-      @copy="copyFileId"
-      @delete="removeFile"
-    />
+    <template v-else-if="hasFiles">
+      <AppPageHeader
+        title="Uploads"
+        subtitle="Manage your uploaded files"
+        cta-text="Upload file"
+        @cta="openUploadDialog = true"
+      />
+
+      <UploadsFileGrid
+        È
+        :files="files"
+        :loaded-previews="loadedPreviews"
+        @copy="copyFileId"
+        @delete="removeFile"
+      />
+    </template>
 
     <UploadsFilePicker
       ref="uploadDialog"
@@ -93,6 +105,6 @@ onMounted(async () => {
       @submit="onUploadSubmit"
     />
 
-    <UploadsFab v-if="hasFiles" @click="openUploadDialog = true" />
+    <!-- <UploadsFab v-if="hasFiles" @click="openUploadDialog = true" /> -->
   </div>
 </template>
