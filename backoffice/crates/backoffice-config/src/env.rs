@@ -15,8 +15,8 @@ pub struct AppConfig {
     #[serde(default = "default_environment")]
     pub environment: Environment,
 
-    #[serde(default = "default_body_limit_bytes")]
-    pub body_limit_bytes: usize,
+    #[serde(default = "default_body_limit_megabytes")]
+    pub body_limit_megabytes: usize,
 
     // Storage
     #[serde(default = "default_upload_path")]
@@ -48,7 +48,7 @@ pub struct AppConfig {
     pub complexity_limit: Option<usize>,
 
     #[serde(default = "default_requests_time_out")]
-    pub requests_time_out: Duration,
+    pub requests_time_out_secs: Duration,
 
     // imagekit
     pub imagekit_public_key: SecretString,
@@ -64,7 +64,7 @@ impl AppConfig {
         let database_url = extract_env::<String>("DATABASE_URL")?;
         let database_url = database_url.into_boxed_str();
 
-        let requests_time_out = extract_env::<u64>("REQUESTS_TIME_OUT")
+        let requests_time_out = extract_env::<u64>("REQUESTS_TIME_OUT_SECS")
             .unwrap_or_else(|_| default_requests_time_out().as_secs());
 
         Ok(Self {
@@ -72,8 +72,8 @@ impl AppConfig {
             port: extract_env("PORT").unwrap_or_else(|_| default_port()),
             environment: extract_env::<Environment>("ENVIRONMENT")
                 .unwrap_or_else(|_| default_environment()),
-            body_limit_bytes: extract_env("BODY_LIMIT_BYTES")
-                .unwrap_or_else(|_| default_body_limit_bytes()),
+            body_limit_megabytes: extract_env("BODY_LIMIT_MEGA_BYTES")
+                .unwrap_or_else(|_| default_body_limit_megabytes()),
 
             // Storage
             upload_path: extract_env("UPLOAD_PATH").unwrap_or_else(|_| default_upload_path()),
@@ -101,7 +101,7 @@ impl AppConfig {
             depth_limit: extract_env::<usize>("DEPTH_LIMIT").ok(),
             complexity_limit: extract_env::<usize>("COMPLEXITY_LIMIT").ok(),
 
-            requests_time_out: Duration::from_secs(requests_time_out),
+            requests_time_out_secs: Duration::from_secs(    requests_time_out * 1000),
 
             imagekit_private_key: SecretString::from(extract_env::<String>(
                 "IMAGEKIT_PRIVATE_KEY",
@@ -170,8 +170,8 @@ fn default_environment() -> Environment {
     Environment::Development
 }
 
-fn default_body_limit_bytes() -> usize {
-    10 * 1024 * 1024 // 10 MiB
+fn default_body_limit_megabytes() -> usize {
+    10
 }
 
 fn default_upload_path() -> String {

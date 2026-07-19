@@ -25,10 +25,10 @@ pub async fn run() -> Result<(), AppError> {
         .merge(graphql_router)
         .merge(http_routes)
         .layer(DefaultBodyLimit::disable())
-        .layer(RequestBodyLimitLayer::new(app_config.body_limit_bytes))
+        .layer(RequestBodyLimitLayer::new(app_config.body_limit_megabytes * 1024 * 1024 ))
         .layer(TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
-            app_config.requests_time_out * 100,
+            app_config.requests_time_out_secs * 100,
         ))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(init_cors(&app_config));

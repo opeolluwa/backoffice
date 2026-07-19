@@ -28,7 +28,7 @@ function formatSize(bytes: number) {
       <template v-if="loaded">
         <NuxtImg
           provider="imagekit"
-          :src="file.thumbnailUrl"
+          :src="file.filePath"
           height="300"
         />
       </template>

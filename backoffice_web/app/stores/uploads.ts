@@ -14,8 +14,6 @@ const useUploadStore = defineStore("uploads", {
 
   actions: {
     async createUpload(payload: Partial<CreateUploadRequest>) {
-      const toast = useToast();
-
       const formData = new FormData();
 
       if (payload.file) {
@@ -35,17 +33,9 @@ const useUploadStore = defineStore("uploads", {
         this.uploads.unshift(created);
         this.count++;
 
-        toast.add({
-          title: "Success",
-          description: "Upload created successfully",
-        });
-
         return created;
       } catch (error) {
-        toast.add({
-          title: "Error",
-          description: (error as Error).message,
-        });
+        return error;
       }
     },
 

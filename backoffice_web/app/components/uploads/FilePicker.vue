@@ -36,7 +36,7 @@ defineExpose({ reset });
     title="Upload files"
     description="Drag and drop files or click to browse."
     close-icon="heroicons:x-mark"
-    :dismissible="loading!=true"
+    :dismissible="loading != true && state.file != null && open == true"
   >
     <template #body>
       <UForm class="space-y-4" :state="state" @submit="onSubmit">
