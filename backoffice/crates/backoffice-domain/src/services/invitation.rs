@@ -4,6 +4,7 @@ use crate::{
     errors::service_error::ServiceError,
 };
 
+#[derive(Clone)]
 pub struct InvitationService<R: InvitationRepositoryExt> {
     repo: R,
 }

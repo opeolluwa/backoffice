@@ -3,6 +3,7 @@ use crate::{
     errors::service_error::ServiceError,
 };
 
+#[derive(Clone)]
 pub struct CountryService<R: CountryRepositoryExt> {
     repo: R,
 }

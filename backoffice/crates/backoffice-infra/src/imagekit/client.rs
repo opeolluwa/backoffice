@@ -30,19 +30,18 @@ pub struct VersionInfo {
     pub name: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct ImagekitClient {
     client: Client,
     upload_url: String,
-    public_key: String,
     private_key: String,
 }
 
 impl ImagekitClient {
-    pub fn new(public_key: &str, private_key: &str) -> Result<Self, ImagekitError> {
+    pub fn new(private_key: &str) -> Result<Self, ImagekitError> {
         Ok(Self {
             client: Client::builder().build()?,
             upload_url: "https://upload.imagekit.io/api/v1/files/upload".to_string(),
-            public_key: public_key.to_string(),
             private_key: private_key.to_string(),
         })
     }
@@ -65,8 +64,7 @@ impl ImagekitClient {
                 "file",
                 multipart::Part::bytes(file_bytes).file_name(fine_name.to_string()),
             )
-            .text("fileName", fine_name.to_string())
-            .text("publicKey", self.public_key.clone());
+            .text("fileName", fine_name.to_string());
 
         let response = self
             .client
@@ -78,7 +76,7 @@ impl ImagekitClient {
 
         if !response.status().is_success() {
             return Err(ImagekitError::UploadFailed(format!(
-                "Upload failed: {}",
+                "Upload failed with status: {}",
                 response.status()
             )));
         }

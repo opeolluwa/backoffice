@@ -14,7 +14,7 @@ impl fmt::Display for ImagekitError {
             ImagekitError::Reqwest(err) => write!(f, "Request error: {}", err),
             ImagekitError::Io(err) => write!(f, "I/O error: {}", err),
             ImagekitError::InvalidHeader(err) => write!(f, "Invalid header: {}", err),
-            ImagekitError::UploadFailed(msg) => write!(f, "Upload failed: {}", msg),
+            ImagekitError::UploadFailed(msg) => write!(f, "{}", msg),
         }
     }
 }

@@ -8,6 +8,7 @@ use crate::{
     errors::service_error::ServiceError,
 };
 
+#[derive(Clone)]
 pub struct UploadsService<R: UploadRepositoryExt, U: ImageUploader> {
     repo: R,
     uploader: U,
@@ -56,14 +57,20 @@ impl<R: UploadRepositoryExt + Send + Sync, U: ImageUploader + Send + Sync> Uploa
         name: &str,
         starred: bool,
     ) -> Result<uploads::Model, ServiceError> {
+        tracing::debug!(file_name, name, "uploading file to imagekit");
+
         let upload_response = self.uploader
             .upload_file(&file_path, file_name)
             .await?;
+
+        tracing::debug!(url = %upload_response.url, size = upload_response.size, "imagekit upload done");
 
         let file_size = upload_response
             .size
             .try_into()
             .ok();
+
+        tracing::debug!("persisting upload record");
 
         let model = self
             .repo
@@ -76,7 +83,11 @@ impl<R: UploadRepositoryExt + Send + Sync, U: ImageUploader + Send + Sync> Uploa
             )
             .await?;
 
+        tracing::debug!(identifier = %model.identifier, "upload record persisted");
+
         let _ = std::fs::remove_file(&file_path);
+
+        tracing::debug!("temp file cleaned up");
 
         Ok(model)
     }

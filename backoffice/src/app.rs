@@ -26,7 +26,7 @@ pub async fn run() -> Result<(), AppError> {
         .layer(RequestBodyLimitLayer::new(app_config.body_limit_bytes))
         .layer(TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
-            app_config.requests_time_out,
+            app_config.requests_time_out*100,
         ))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(init_cors(&app_config));

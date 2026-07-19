@@ -65,6 +65,7 @@ impl ServiceError {
 #[cfg(feature = "http")]
 impl IntoResponse for ServiceError {
     fn into_response(self) -> Response {
+        tracing::error!(error = %self, "request failed");
         ApiResponseBuilder::<()>::new()
             .status_code(self.status_code())
             .message(&self.to_string())

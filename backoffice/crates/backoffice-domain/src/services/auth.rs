@@ -13,6 +13,7 @@ use crate::{
     services::user_helper::{UserHelperService, UserHelperServiceTrait},
 };
 
+#[derive(Clone)]
 pub struct AuthenticationService<R: UserRepositoryTrait, T: TokenService, E: EmailSender> {
     repo: R,
     user_helper_service: UserHelperService,

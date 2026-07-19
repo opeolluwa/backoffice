@@ -5,6 +5,7 @@ use crate::{
     errors::service_error::ServiceError,
 };
 
+#[derive(Clone)]
 pub struct ProductService<R: ProductRepositoryExt> {
     repo: R,
 }

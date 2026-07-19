@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use std::time::Duration;
 
 use backoffice_api::state::{AppState, ServicesState};
@@ -69,41 +68,31 @@ pub fn build_test_state(db: &DatabaseConnection) -> AppState {
     let upload_repository = UploadRepository::init(db);
 
     let email_client = ZeptoMail::new("test-api-key");
-    let imagekit_client = ImagekitClient::new("test-public-key", "test-private-key")
+    let imagekit_client = ImagekitClient::new("test-private-key")
         .expect("Failed to create ImagekitClient");
 
     let token_service = JwtTokenService::new();
-    let user_service = Arc::new(
-        backoffice_domain::services::user::UserService::new(user_repository.clone()),
+    let user_service = backoffice_domain::services::user::UserService::new(user_repository.clone());
+    let auth_service = backoffice_domain::services::auth::AuthenticationService::new(
+        user_repository,
+        token_service,
+        email_client,
     );
-    let auth_service = Arc::new(
-        backoffice_domain::services::auth::AuthenticationService::new(
-            user_repository,
-            token_service,
-            email_client,
-        ),
-    );
-    let country_service = Arc::new(
-        backoffice_domain::services::country::CountryService::new(country_repository),
-    );
-    let marketplace_service = Arc::new(
-        backoffice_domain::services::marketplace::MarketplaceService::new(marketplace_repository),
-    );
-    let product_service = Arc::new(
-        backoffice_domain::services::product::ProductService::new(product_repository),
-    );
+    let country_service =
+        backoffice_domain::services::country::CountryService::new(country_repository);
+    let marketplace_service =
+        backoffice_domain::services::marketplace::MarketplaceService::new(marketplace_repository);
+    let product_service =
+        backoffice_domain::services::product::ProductService::new(product_repository);
     let team_service =
-        Arc::new(backoffice_domain::services::team::TeamService::new(team_repository));
-    let root_service = Arc::new(backoffice_domain::services::root::RootService::init());
-    let emails_service = Arc::new(
-        backoffice_domain::services::emails::EmailsService::new(email_repository),
-    );
-    let invitation_service = Arc::new(
-        backoffice_domain::services::invitation::InvitationService::new(invitation_repository),
-    );
-    let upload_service = Arc::new(
-        backoffice_domain::services::upload::UploadsService::new(upload_repository, imagekit_client),
-    );
+        backoffice_domain::services::team::TeamService::new(team_repository);
+    let root_service = backoffice_domain::services::root::RootService::init();
+    let emails_service =
+        backoffice_domain::services::emails::EmailsService::new(email_repository);
+    let invitation_service =
+        backoffice_domain::services::invitation::InvitationService::new(invitation_repository);
+    let upload_service =
+        backoffice_domain::services::upload::UploadsService::new(upload_repository, imagekit_client);
 
     let services = ServicesState {
         user_service,

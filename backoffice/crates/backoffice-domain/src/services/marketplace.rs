@@ -5,6 +5,7 @@ use crate::{
 };
 use crate::errors::service_error::ServiceError;
 
+#[derive(Clone)]
 pub struct MarketplaceService<R: MarketplaceRepositoryExt> {
     repo: R,
 }

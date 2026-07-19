@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
 use sea_orm::DatabaseConnection;
@@ -29,77 +27,21 @@ use backoffice_infra::{
 
 #[derive(Clone)]
 pub struct ServicesState {
-    pub user_service: Arc<UserService<UserRepository>>,
-    pub root_service: Arc<RootService>,
-    pub auth_service: Arc<AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>>,
-    pub marketplace_service: Arc<MarketplaceService<MarketplaceRepository>>,
-    pub product_service: Arc<ProductService<ProductRepository>>,
-    pub country_service: Arc<CountryService<CountryRepository>>,
-    pub team_service: Arc<TeamService<TeamRepository>>,
-    pub emails_service: Arc<EmailsService<EmailRepository>>,
-    pub invitation_service: Arc<InvitationService<InvitationRepository>>,
-    pub upload_service: Arc<UploadsService<UploadRepository, ImagekitClient>>,
+    pub user_service: UserService<UserRepository>,
+    pub root_service: RootService,
+    pub auth_service: AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>,
+    pub marketplace_service: MarketplaceService<MarketplaceRepository>,
+    pub product_service: ProductService<ProductRepository>,
+    pub country_service: CountryService<CountryRepository>,
+    pub team_service: TeamService<TeamRepository>,
+    pub emails_service: EmailsService<EmailRepository>,
+    pub invitation_service: InvitationService<InvitationRepository>,
+    pub upload_service: UploadsService<UploadRepository, ImagekitClient>,
 }
 
-impl FromRef<ServicesState> for Arc<UserService<UserRepository>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.user_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<RootService> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.root_service)
-    }
-}
-
-impl FromRef<ServicesState>
-    for Arc<AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>>
-{
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.auth_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<MarketplaceService<MarketplaceRepository>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.marketplace_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<ProductService<ProductRepository>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.product_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<CountryService<CountryRepository>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.country_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<TeamService<TeamRepository>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.team_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<EmailsService<EmailRepository>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.emails_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<InvitationService<InvitationRepository>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.invitation_service)
-    }
-}
-
-impl FromRef<ServicesState> for Arc<UploadsService<UploadRepository, ImagekitClient>> {
-    fn from_ref(input: &ServicesState) -> Self {
-        Arc::clone(&input.upload_service)
+impl FromRef<AppState> for ServicesState {
+    fn from_ref(state: &AppState) -> Self {
+        state.services.clone()
     }
 }
 
@@ -117,20 +59,20 @@ impl ServicesState {
         imagekit_client: ImagekitClient,
     ) -> Self {
         let token_service = JwtTokenService::new();
-        let user_service = Arc::new(UserService::new(user_repository.clone()));
-        let auth_service = Arc::new(AuthenticationService::new(
+        let user_service = UserService::new(user_repository.clone());
+        let auth_service = AuthenticationService::new(
             user_repository,
             token_service,
             email_client,
-        ));
-        let country_service = Arc::new(CountryService::new(country_repository));
-        let marketplace_service = Arc::new(MarketplaceService::new(marketplace_repository));
-        let product_service = Arc::new(ProductService::new(product_repository));
-        let team_service = Arc::new(TeamService::new(team_repository));
-        let root_service = Arc::new(RootService::init());
-        let emails_service = Arc::new(EmailsService::new(email_repository));
-        let invitation_service = Arc::new(InvitationService::new(invitation_repository));
-        let upload_service = Arc::new(UploadsService::new(upload_repository, imagekit_client));
+        );
+        let country_service = CountryService::new(country_repository);
+        let marketplace_service = MarketplaceService::new(marketplace_repository);
+        let product_service = ProductService::new(product_repository);
+        let team_service = TeamService::new(team_repository);
+        let root_service = RootService::init();
+        let emails_service = EmailsService::new(email_repository);
+        let invitation_service = InvitationService::new(invitation_repository);
+        let upload_service = UploadsService::new(upload_repository, imagekit_client);
 
         Self {
             user_service,
@@ -178,9 +120,7 @@ impl AppState {
         let email_client = ZeptoMail::new(app_config.email_api_key.clone());
 
         let imagekit_private_key: String = extract_env("IMAGEKIT_PRIVATE_KEY")?;
-        let imagekit_public_key: String = extract_env("IMAGEKIT_PUBLIC_KEY")?;
         let imagekit_client = ImagekitClient::new(
-            &imagekit_public_key,
             &imagekit_private_key,
         )
         .map_err(|e| AppError::OperationFailed(e.to_string()))?;

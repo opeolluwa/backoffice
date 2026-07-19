@@ -3,6 +3,7 @@ use std::future::Future;
 use crate::errors::service_error::ServiceError;
 use crate::{dto::UserProfile, ports::user_repository::UserRepositoryTrait};
 
+#[derive(Clone)]
 pub struct UserService<R: UserRepositoryTrait> {
     repo: R,
 }

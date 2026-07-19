@@ -8,6 +8,7 @@ use backoffice_domain::{
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
 use backoffice_domain::shared::extract_env::extract_env;
 
+#[derive(Clone)]
 pub struct JwtTokenService;
 
 impl JwtTokenService {
