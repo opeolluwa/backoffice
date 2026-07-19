@@ -9,6 +9,7 @@ defineProps<{
 defineEmits<{
   copy: [id: string];
   delete: [id: string];
+  edit: [id: string];
 }>();
 
 function formatSize(bytes: number) {
@@ -26,11 +27,7 @@ function formatSize(bytes: number) {
       class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden"
     >
       <template v-if="loaded">
-        <NuxtImg
-          provider="imagekit"
-          :src="file.filePath"
-          height="300"
-        />
+        <NuxtImg provider="imagekit" :src="file.filePath" height="500" />
       </template>
       <div
         v-else
@@ -38,8 +35,10 @@ function formatSize(bytes: number) {
       />
     </div>
 
-    <div class="flex gap-2 items-center justify-between">
-      <div class="px-2.5 py-2 flex flex-col gap-0.5">
+    <div
+      class="px-2.5 py-2 flex items-center justify-between gap-2"
+    >
+      <div class="min-w-0 flex flex-col gap-0.5">
         <p class="text-xs font-medium truncate leading-tight">
           {{ file.name }}
         </p>
@@ -48,25 +47,29 @@ function formatSize(bytes: number) {
         </p>
       </div>
 
-      <button
-        class="size-6 rounded-full bg-black/50 text-white flex items-center justify-center"
-        aria-label="Copy file ID"
-        @click.stop="$emit('copy', file.identifier)"
-      >
-        <UIcon name="heroicons:clipboard" class="size-3.5" />
-      </button>
-    </div>
-
-    <div
-      class="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-    >
-      <button
-        class="size-6 rounded-full bg-black/50 text-white flex items-center justify-center"
-        aria-label="Remove file"
-        @click.stop="$emit('delete', file.identifier)"
-      >
-        <UIcon name="heroicons:trash" class="size-3.5 text-red-500" />
-      </button>
+      <div class="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          class="size-6 rounded-full bg-black/50 text-white flex items-center justify-center"
+          aria-label="Edit file"
+          @click.stop="$emit('edit', file.identifier)"
+        >
+          <UIcon name="heroicons:pencil" class="size-3" />
+        </button>
+        <button
+          class="size-6 rounded-full bg-black/50 text-white flex items-center justify-center"
+          aria-label="Copy file ID"
+          @click.stop="$emit('copy', file.identifier)"
+        >
+          <UIcon name="heroicons:clipboard" class="size-3" />
+        </button>
+        <button
+          class="size-6 rounded-full bg-black/50 text-white flex items-center justify-center"
+          aria-label="Remove file"
+          @click.stop="$emit('delete', file.identifier)"
+        >
+          <UIcon name="heroicons:trash" class="size-3 text-red-400" />
+        </button>
+      </div>
     </div>
   </div>
 </template>

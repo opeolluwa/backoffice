@@ -8,6 +8,8 @@ import type { Row } from "@tanstack/vue-table";
 import { getPaginationRowModel } from "@tanstack/vue-table";
 import type { MarketplaceInterface as MarketPlace } from "@bindings/Marketplace";
 
+useHead({ title: "Marketplace" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

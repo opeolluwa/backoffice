@@ -2,6 +2,8 @@
 import * as v from "valibot";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
+useHead({ title: "Invitations" });
+
 definePageMeta({
   layout: "dashboard",
 });

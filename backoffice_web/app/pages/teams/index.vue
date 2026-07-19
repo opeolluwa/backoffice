@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { TeamsInterface } from "~/bindings/TeamsInterface";
 import { useTeamsStore } from "~/stores/teams";
 import { useInvitationsStore } from "~/stores/invitations";
+
+useHead({ title: "Team Members" });
 
 definePageMeta({
   layout: "dashboard",
@@ -114,9 +115,12 @@ onMounted(async () => {
     </div>
 
     <template v-else>
-      <TeamsPageHeader
+      <AppPageHeader
         v-if="hasContent"
-        @invite="openInvite = true"
+        title="Team members"
+        subtitle="Manage your team and invitations.È"
+        cta-text="Add team member"
+        @cta="openInvite = true"
       />
 
       <AppEmptyState

@@ -2,7 +2,7 @@
 
 <template>
   <div
-    class="h-screen w-full flex items-center justify-center overflow-hidden relative bg-gray-200/50"
+    class="h-screen w-full flex items-center justify-center overflow-hidden relative bg-app-200/90"
   >
     <div class="relative z-10 min-w-1/3 mx-auto px-4 overflow-y-auto py-10">
       <div

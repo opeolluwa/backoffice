@@ -14,6 +14,14 @@ export default defineNuxtConfig({
 
   app: {
     pageTransition: { name: "slide-left", mode: "out-in" },
+    head: {
+      titleTemplate: "%s | Backoffice",
+      meta: [
+        { name: "robots", content: "noindex, nofollow" },
+        { name: "description", content: "Backoffice admin panel" },
+        { name: "theme-color", content: "#ffffff" },
+      ],
+    },
   },
 
   image: {

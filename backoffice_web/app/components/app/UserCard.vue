@@ -1,9 +1,11 @@
 <template>
-  <div class="flex items-center justify-center gap-x-3 cursor-pointer">
+  <div class="flex  gap-x-3 cursor-pointer">
     <UAvatar
       :alt="userStore.fullName"
       :name="userStore.fullName"
       color="primary"
+      class="squircle"
+      size="xl"
     />
     <div class="flex flex-col">
       <span>{{ userStore.fullName }}</span>
@@ -16,7 +18,6 @@
 import { useUserInformationStore } from "~/stores/users";
 
 const userStore = useUserInformationStore();
-const initials = computed(() => useGetInitials(userStore.user));
 </script>
 
 <style>

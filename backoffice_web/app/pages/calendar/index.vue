@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ title: "Calendar" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {
