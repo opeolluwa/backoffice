@@ -112,3 +112,90 @@ impl<R: UploadRepositoryExt + Send + Sync, U: ImageUploader + Send + Sync> Uploa
         Ok(self.repo.count_uploads().await?)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ports::{upload_repository::MockUploadRepositoryExt, image_uploader::MockImageUploader};
+    use sea_orm::sqlx::types::chrono::Utc;
+    use std::path::PathBuf;
+
+    fn test_upload() -> crate::models::uploads::Model {
+        crate::models::uploads::Model {
+            identifier: "up-001".to_string(),
+            name: "photo.jpg".to_string(),
+            url: "https://cdn.example.com/photo.jpg".to_string(),
+            file_size: Some(1024),
+            starred: false,
+            created_at: Utc::now().naive_utc().and_utc().into(),
+            updated_at: None,
+            file_type: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn find_upload_by_identifier() {
+        let mut repo = MockUploadRepositoryExt::new();
+        let upload = test_upload();
+        repo.expect_find_upload_by_identifier()
+            .returning(move |_| Ok(upload.clone()));
+        let uploader = MockImageUploader::new();
+        let service = UploadsService::new(repo, uploader);
+
+        let result = service.find_upload_by_identifier("up-001").await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn find_all_uploads() {
+        let mut repo = MockUploadRepositoryExt::new();
+        repo.expect_find_all_uploads()
+            .returning(|| Ok(vec![test_upload(), test_upload()]));
+        let uploader = MockImageUploader::new();
+        let service = UploadsService::new(repo, uploader);
+
+        assert_eq!(service.find_all_uploads().await.unwrap().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn count_uploads() {
+        let mut repo = MockUploadRepositoryExt::new();
+        repo.expect_count_uploads().returning(|| Ok(25));
+        let uploader = MockImageUploader::new();
+        let service = UploadsService::new(repo, uploader);
+
+        assert_eq!(service.count_uploads().await.unwrap(), 25);
+    }
+
+    #[tokio::test]
+    async fn delete_upload() {
+        let mut repo = MockUploadRepositoryExt::new();
+        repo.expect_delete_upload().returning(|_| Ok(()));
+        let uploader = MockImageUploader::new();
+        let service = UploadsService::new(repo, uploader);
+
+        assert!(service.delete_upload("up-001").await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn create_upload_success() {
+        let mut repo = MockUploadRepositoryExt::new();
+        let upload = test_upload();
+        repo.expect_create_upload()
+            .returning(move |_, _, _, _, _| Ok(upload.clone()));
+
+        let mut uploader = MockImageUploader::new();
+        uploader.expect_upload_file().returning(|_, _| {
+            Ok(crate::ports::image_uploader::UploadResult {
+                url: "https://cdn.example.com/photo.jpg".to_string(),
+                size: 1024,
+            })
+        });
+
+        let service = UploadsService::new(repo, uploader);
+        let result = service
+            .create_upload(PathBuf::from("/tmp/photo.jpg"), "photo.jpg", "photo", false)
+            .await;
+        assert!(result.is_ok());
+    }
+}

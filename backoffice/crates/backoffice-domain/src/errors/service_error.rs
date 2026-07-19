@@ -4,8 +4,6 @@ use axum::extract::rejection::{FormRejection, JsonRejection};
 use axum::response::Response;
 #[cfg(feature = "http")]
 use axum::{http::StatusCode, response::IntoResponse};
-#[cfg(feature = "http")]
-use sea_orm::sqlx;
 
 #[cfg(feature = "http")]
 use crate::errors::api_response::ApiResponseBuilder;

@@ -1,5 +1,6 @@
 use crate::{models::countries, errors::database_error::DatabaseError};
 
+#[cfg_attr(test, mockall::automock)]
 #[allow(async_fn_in_trait)]
 pub trait CountryRepositoryExt {
     async fn fetch_all_countries(&self) -> Result<Vec<countries::Model>, DatabaseError>;

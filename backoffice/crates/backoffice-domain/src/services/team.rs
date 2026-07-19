@@ -88,3 +88,94 @@ impl<R: TeamRepositoryExt + Send + Sync> TeamServiceExt for TeamService<R> {
         Ok(self.repo.count_team_members().await?)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ports::team_repository::MockTeamRepositoryExt;
+    use sea_orm::sqlx::types::chrono::Utc;
+
+    fn test_team_member() -> teams::Model {
+        teams::Model {
+            identifier: "tm-001".to_string(),
+            name: "Jane Smith".to_string(),
+            email: "jane@example.com".to_string(),
+            phone: Some("+1234567890".to_string()),
+            role: Some("admin".to_string()),
+            blocked: false,
+            created_at: Utc::now().naive_utc().and_utc().into(),
+            updated_at: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn create_team_member() {
+        let mut repo = MockTeamRepositoryExt::new();
+        let member = test_team_member();
+        repo.expect_create_team_member()
+            .returning(move |_| Ok(member.clone()));
+        let service = TeamService::new(repo);
+
+        let cmd = crate::dto::CreateTeamMemberCommand {
+            name: "Jane Smith".to_string(),
+            email: "jane@example.com".to_string(),
+            phone: Some("+1234567890".to_string()),
+            role: Some("admin".to_string()),
+        };
+        let result = service.create_team_member(&cmd).await;
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().name, "Jane Smith");
+    }
+
+    #[tokio::test]
+    async fn find_team_member_by_identifier() {
+        let mut repo = MockTeamRepositoryExt::new();
+        let member = test_team_member();
+        repo.expect_find_team_member_by_identifier()
+            .returning(move |_| Ok(member.clone()));
+        let service = TeamService::new(repo);
+
+        assert!(service.find_team_member_by_identifier("tm-001").await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn find_all_team_members() {
+        let mut repo = MockTeamRepositoryExt::new();
+        repo.expect_find_all_team_members()
+            .returning(|| Ok(vec![test_team_member()]));
+        let service = TeamService::new(repo);
+
+        assert_eq!(service.find_all_team_members().await.unwrap().len(), 1);
+    }
+
+    #[tokio::test]
+    async fn count_team_members() {
+        let mut repo = MockTeamRepositoryExt::new();
+        repo.expect_count_team_members().returning(|| Ok(7));
+        let service = TeamService::new(repo);
+
+        assert_eq!(service.count_team_members().await.unwrap(), 7);
+    }
+
+    #[tokio::test]
+    async fn block_team_member() {
+        let mut repo = MockTeamRepositoryExt::new();
+        let mut member = test_team_member();
+        member.blocked = true;
+        repo.expect_block_team_member()
+            .returning(move |_, _| Ok(member.clone()));
+        let service = TeamService::new(repo);
+
+        let result = service.block_team_member("tm-001", true).await;
+        assert!(result.unwrap().blocked);
+    }
+
+    #[tokio::test]
+    async fn delete_team_member() {
+        let mut repo = MockTeamRepositoryExt::new();
+        repo.expect_delete_team_member().returning(|_| Ok(()));
+        let service = TeamService::new(repo);
+
+        assert!(service.delete_team_member("tm-001").await.is_ok());
+    }
+}

@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
-use ts_rs::TS;
 
-#[derive(Debug, Clone, Serialize, Deserialize,TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct UserProfile {
     pub identifier: String,
@@ -11,8 +9,7 @@ pub struct UserProfile {
     pub last_name: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize,TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct CreateUserCommand {
     pub email: String,
@@ -21,85 +18,73 @@ pub struct CreateUserCommand {
     pub last_name: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct LoginCommand {
     pub email: String,
     pub password: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct ForgottenPasswordCommand {
     pub email: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct SetNewPasswordCommand {
     pub password: String,
     pub confirm_password: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct VerifyAccountCommand {
     pub otp: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct RefreshTokenCommand {
     pub email: String,
     pub identifier: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct TokenClaims {
     pub email: String,
     pub identifier: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct LoginResult {
     pub token: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct ForgottenPasswordResult {
     pub token: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct SetNewPasswordResult {}
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct VerifyAccountResult {}
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct RefreshTokenResult {
     pub token: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct CreateMarketplaceCommand {
     pub name: String,
@@ -107,9 +92,8 @@ pub struct CreateMarketplaceCommand {
     pub slug: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
-#[ts(export)]
 pub struct CreateEmailCommand {
     pub subject: String,
     pub body: String,
@@ -120,8 +104,7 @@ pub struct CreateEmailCommand {
     pub data: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct UpdateEmailCommand {
     pub tag: Option<String>,
@@ -129,8 +112,7 @@ pub struct UpdateEmailCommand {
     pub is_starred: Option<bool>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct CreateTeamMemberCommand {
     pub name: String,
@@ -139,8 +121,7 @@ pub struct CreateTeamMemberCommand {
     pub role: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct UpdateTeamMemberCommand {
     pub name: Option<String>,
@@ -149,16 +130,14 @@ pub struct UpdateTeamMemberCommand {
     pub blocked: Option<bool>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct UpdateUploadCommand {
     pub name: Option<String>,
     pub starred: Option<bool>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct SaveProductCommand {
     pub picture: String,
@@ -168,8 +147,7 @@ pub struct SaveProductCommand {
     pub currency_identifier: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
 pub struct EmailMessage {
     pub from_address: String,

@@ -17,3 +17,14 @@ impl RootServiceTrait for RootService {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn health_check_returns_ok() {
+        let service = RootService::init();
+        assert!(service.health_check().is_ok());
+    }
+}

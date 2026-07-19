@@ -4,6 +4,7 @@ use crate::{
     errors::database_error::DatabaseError,
 };
 
+#[cfg_attr(test, mockall::automock)]
 #[allow(async_fn_in_trait)]
 pub trait UploadRepositoryExt {
     async fn create_upload(

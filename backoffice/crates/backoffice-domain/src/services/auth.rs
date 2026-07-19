@@ -225,3 +225,343 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender> Auth
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ports::{
+        email_sender::MockEmailSender,
+        token_service::MockTokenService,
+        user_repository::MockUserRepositoryTrait,
+    };
+    use sea_orm::sqlx::types::chrono::Utc;
+
+    fn test_claims() -> TokenClaims {
+        TokenClaims {
+            email: "user@test.com".to_string(),
+            identifier: "user-001".to_string(),
+        }
+    }
+
+    fn test_user_model(password: &str) -> crate::models::users::Model {
+        crate::models::users::Model {
+            identifier: "user-001".to_string(),
+            email: "user@test.com".to_string(),
+            password: password.to_string(),
+            first_name: Some("Test".to_string()),
+            last_name: Some("User".to_string()),
+            created_at: Utc::now().naive_utc().and_utc().into(),
+            updated_at: None,
+            is_active: true,
+            role_identifier: None,
+        }
+    }
+
+    fn test_create_command() -> CreateUserCommand {
+        CreateUserCommand {
+            email: "new@test.com".to_string(),
+            password: "Password123!".to_string(),
+            first_name: "New".to_string(),
+            last_name: "User".to_string(),
+        }
+    }
+
+    fn setup_auth_service(
+        repo: MockUserRepositoryTrait,
+        token_service: MockTokenService,
+        email_sender: MockEmailSender,
+    ) -> AuthenticationService<MockUserRepositoryTrait, MockTokenService, MockEmailSender> {
+        AuthenticationService::new(repo, token_service, email_sender)
+    }
+
+    // --- create_user tests ---
+
+    #[tokio::test]
+    async fn create_user_success() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let mut email_sender = MockEmailSender::new();
+
+        repo.expect_find_by_email().returning(|_| Box::pin(async { None }));
+        repo.expect_create_user()
+            .returning(|_| Box::pin(async { Ok(()) }));
+        email_sender.expect_send_email().returning(|_| {
+            Box::pin(async { Ok(()) })
+        });
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = test_create_command();
+
+        let result = service.create_user(&cmd).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn create_user_duplicate_email() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        let existing_user = test_user_model("hashed");
+        repo.expect_find_by_email()
+            .returning(move |_| {
+                let u = existing_user.clone();
+                Box::pin(async move { Some(u) })
+            });
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = test_create_command();
+
+        let result = service.create_user(&cmd).await;
+        assert!(result.is_err());
+    }
+
+    // --- login tests ---
+
+    #[tokio::test]
+    async fn login_success() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let mut token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        let hashed_password = bcrypt::hash("Password123!", bcrypt::DEFAULT_COST).unwrap();
+        let user = test_user_model(&hashed_password);
+        repo.expect_find_by_email()
+            .returning(move |_| {
+                let u = user.clone();
+                Box::pin(async move { Some(u) })
+            });
+        token_service
+            .expect_generate_token()
+            .returning(|_, _| Ok("jwt-token-abc".to_string()));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = LoginCommand {
+            email: "user@test.com".to_string(),
+            password: "Password123!".to_string(),
+        };
+
+        let result = service.login(&cmd).await;
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().token, "jwt-token-abc");
+    }
+
+    #[tokio::test]
+    async fn login_wrong_email() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        repo.expect_find_by_email().returning(|_| Box::pin(async { None }));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = LoginCommand {
+            email: "nobody@test.com".to_string(),
+            password: "whatever".to_string(),
+        };
+
+        let result = service.login(&cmd).await;
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            AuthenticationServiceError::WrongCredentials
+        ));
+    }
+
+    #[tokio::test]
+    async fn login_wrong_password() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        let hashed_password = bcrypt::hash("CorrectPassword", bcrypt::DEFAULT_COST).unwrap();
+        let user = test_user_model(&hashed_password);
+        repo.expect_find_by_email()
+            .returning(move |_| {
+                let u = user.clone();
+                Box::pin(async move { Some(u) })
+            });
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = LoginCommand {
+            email: "user@test.com".to_string(),
+            password: "WrongPassword".to_string(),
+        };
+
+        let result = service.login(&cmd).await;
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            AuthenticationServiceError::WrongCredentials
+        ));
+    }
+
+    // --- forgotten_password tests ---
+
+    #[tokio::test]
+    async fn forgotten_password_success() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let mut token_service = MockTokenService::new();
+        let mut email_sender = MockEmailSender::new();
+
+        let user = test_user_model("hashed");
+        repo.expect_find_by_email()
+            .returning(move |_| {
+                let u = user.clone();
+                Box::pin(async move { Some(u) })
+            });
+        token_service
+            .expect_generate_token()
+            .returning(|_, _| Ok("reset-token-xyz".to_string()));
+        email_sender.expect_send_email().returning(|_| {
+            Box::pin(async { Ok(()) })
+        });
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = ForgottenPasswordCommand {
+            email: "user@test.com".to_string(),
+        };
+
+        let result = service.forgotten_password(&cmd).await;
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().token, "reset-token-xyz");
+    }
+
+    #[tokio::test]
+    async fn forgotten_password_user_not_found() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        repo.expect_find_by_email().returning(|_| Box::pin(async { None }));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = ForgottenPasswordCommand {
+            email: "nobody@test.com".to_string(),
+        };
+
+        let result = service.forgotten_password(&cmd).await;
+        assert!(result.is_err());
+    }
+
+    // --- set_new_password tests ---
+
+    #[tokio::test]
+    async fn set_new_password_success() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        let user = test_user_model("old-hash");
+        repo.expect_find_by_identifier()
+            .returning(move |_| {
+                let u = user.clone();
+                Box::pin(async move { Some(u) })
+            });
+        repo.expect_update_password()
+            .returning(|_, _| Box::pin(async { Ok(()) }));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let claims = test_claims();
+        let cmd = SetNewPasswordCommand {
+            password: "NewSecurePass!".to_string(),
+            confirm_password: "NewSecurePass!".to_string(),
+        };
+
+        let result = service.set_new_password(&cmd, &claims).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn set_new_password_user_not_found() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        repo.expect_find_by_identifier()
+            .returning(|_| Box::pin(async { None }));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let claims = test_claims();
+        let cmd = SetNewPasswordCommand {
+            password: "NewSecurePass!".to_string(),
+            confirm_password: "NewSecurePass!".to_string(),
+        };
+
+        let result = service.set_new_password(&cmd, &claims).await;
+        assert!(result.is_err());
+        assert!(matches!(
+            result.unwrap_err(),
+            AuthenticationServiceError::InvalidToken
+        ));
+    }
+
+    // --- verify_account tests ---
+
+    #[tokio::test]
+    async fn verify_account_success() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        let user = test_user_model("hashed");
+        repo.expect_find_by_identifier()
+            .returning(move |_| {
+                let u = user.clone();
+                Box::pin(async move { Some(u) })
+            });
+        repo.expect_update_account_status()
+            .returning(|_| Box::pin(async { Ok(()) }));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let claims = test_claims();
+        let cmd = VerifyAccountCommand {
+            otp: "123456".to_string(),
+        };
+
+        let result = service.verify_account(&claims, &cmd).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn verify_account_user_not_found() {
+        let mut repo = MockUserRepositoryTrait::new();
+        let token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        repo.expect_find_by_identifier()
+            .returning(|_| Box::pin(async { None }));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let claims = test_claims();
+        let cmd = VerifyAccountCommand {
+            otp: "123456".to_string(),
+        };
+
+        let result = service.verify_account(&claims, &cmd).await;
+        assert!(result.is_err());
+    }
+
+    // --- request_refresh_token tests ---
+
+    #[tokio::test]
+    async fn request_refresh_token_success() {
+        let repo = MockUserRepositoryTrait::new();
+        let mut token_service = MockTokenService::new();
+        let email_sender = MockEmailSender::new();
+
+        token_service
+            .expect_generate_token()
+            .returning(|_, _| Ok("refresh-token-abc".to_string()));
+
+        let service = setup_auth_service(repo, token_service, email_sender);
+        let cmd = RefreshTokenCommand {
+            email: "user@test.com".to_string(),
+            identifier: "user-001".to_string(),
+        };
+
+        let result = service.request_refresh_token(&cmd).await;
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().token, "refresh-token-abc");
+    }
+}

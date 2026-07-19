@@ -4,6 +4,7 @@ use crate::{
     errors::service_error::ServiceError,
 };
 
+#[cfg_attr(test, mockall::automock)]
 pub trait UserRepositoryTrait {
     fn find_by_identifier(
         &self,
