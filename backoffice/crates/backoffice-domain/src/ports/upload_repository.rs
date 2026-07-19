@@ -1,7 +1,7 @@
 use crate::{
     dto::UpdateUploadCommand,
-    models::{uploads, sea_orm_active_enums::FileType},
     errors::database_error::DatabaseError,
+    models::{sea_orm_active_enums::FileType, uploads},
 };
 
 #[cfg_attr(test, mockall::automock)]
@@ -14,6 +14,8 @@ pub trait UploadRepositoryExt {
         file_type: Option<FileType>,
         file_size: Option<i64>,
         starred: bool,
+        file_path: &str,
+        thumbnail_url: &str,
     ) -> Result<uploads::Model, DatabaseError>;
 
     async fn find_upload_by_identifier(

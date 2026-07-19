@@ -1,6 +1,3 @@
-use backoffice_config::env::AppConfig;
-use backoffice_domain::models::{app_config, user_roles, users};
-use backoffice_infra::database::connection::init_db_pool;
 use bcrypt::{DEFAULT_COST, hash};
 use clap::{Parser, Subcommand};
 use dialoguer::theme::ColorfulTheme;
@@ -9,6 +6,10 @@ use sea_orm::{
     ActiveModelTrait, ActiveValue::Set, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
 };
 use ulid::Ulid;
+
+use backoffice_config::env::AppConfig;
+use backoffice_domain::models::{app_config, user_roles, users};
+use backoffice_infra::database::connection::init_db_pool;
 
 use crate::{errors::CliError, logging::LogMessage};
 

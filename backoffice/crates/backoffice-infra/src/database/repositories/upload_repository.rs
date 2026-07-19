@@ -4,15 +4,16 @@ use sea_orm::{
 };
 use ulid::Ulid;
 
+use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::{
     dto::UpdateUploadCommand,
     models::{
-        uploads::{self, Entity as UploadEntity},
         sea_orm_active_enums::FileType,
+        uploads::{self, Entity as UploadEntity},
     },
     ports::upload_repository::UploadRepositoryExt,
 };
-use backoffice_domain::errors::database_error::DatabaseError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Debug, Clone)]
@@ -34,6 +35,8 @@ impl UploadRepositoryExt for UploadRepository {
         file_type: Option<FileType>,
         file_size: Option<i64>,
         starred: bool,
+        file_path: &str,
+        thumbnail_url: &str,
     ) -> Result<uploads::Model, DatabaseError> {
         let model = uploads::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
@@ -42,6 +45,8 @@ impl UploadRepositoryExt for UploadRepository {
             file_type: Set(file_type),
             file_size: Set(file_size),
             starred: Set(starred),
+            file_path: Set(file_path.to_string()),
+            thumbnail_url: Set(thumbnail_url.to_string()),
             ..Default::default()
         };
         model.insert(&self.db).await.map_err(DatabaseError::from)

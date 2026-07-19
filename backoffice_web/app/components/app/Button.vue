@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-
 defineProps({
   type: {
     type: String as PropType<"button" | "submit" | "reset">,
@@ -43,7 +42,7 @@ defineProps({
   },
   size: {
     type: String as PropType<"xs" | "sm" | "md" | "lg" | "xl">,
-    default: "md",
+    default: "lg",
   },
 });
 </script>

@@ -10,9 +10,7 @@ impl MigrationTrait for Migration {
         if backend == sea_orm::DatabaseBackend::Postgres {
             manager
                 .get_connection()
-                .execute_unprepared(
-                    "ALTER TABLE activities ADD PRIMARY KEY (identifier);",
-                )
+                .execute_unprepared("ALTER TABLE activities ADD PRIMARY KEY (identifier);")
                 .await?;
         }
         // SQLite already has implicit rowid; no ALTER needed

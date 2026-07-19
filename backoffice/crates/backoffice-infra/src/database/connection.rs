@@ -1,11 +1,11 @@
 use std::time::Duration;
 
-use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, DatabaseConnection};
 use secrecy::ExposeSecret;
 
 use backoffice_config::env::AppConfig;
 use backoffice_domain::errors::app_error::AppError;
+use migration::{Migrator, MigratorTrait};
 
 pub async fn init_db_pool(app_config: &AppConfig) -> Result<DatabaseConnection, AppError> {
     let database_url = app_config.database_url.to_owned();

@@ -1,7 +1,4 @@
-use crate::{
-    models::invitation,
-    errors::database_error::DatabaseError,
-};
+use crate::{errors::database_error::DatabaseError, models::invitation};
 
 #[cfg_attr(test, mockall::automock)]
 #[allow(async_fn_in_trait)]
@@ -24,15 +21,10 @@ pub trait InvitationRepositoryExt {
 
     async fn find_all_invitations(&self) -> Result<Vec<invitation::Model>, DatabaseError>;
 
-    async fn accept_invitation(
-        &self,
-        identifier: &str,
-    ) -> Result<invitation::Model, DatabaseError>;
+    async fn accept_invitation(&self, identifier: &str)
+    -> Result<invitation::Model, DatabaseError>;
 
-    async fn block_invitation(
-        &self,
-        identifier: &str,
-    ) -> Result<invitation::Model, DatabaseError>;
+    async fn block_invitation(&self, identifier: &str) -> Result<invitation::Model, DatabaseError>;
 
     async fn delete_invitation(&self, identifier: &str) -> Result<(), DatabaseError>;
 

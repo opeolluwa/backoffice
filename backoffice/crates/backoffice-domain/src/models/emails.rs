@@ -24,7 +24,6 @@ pub struct Model {
     pub is_read: bool,
     pub is_starred: bool,
     pub has_attachments: bool,
-    #[sea_orm(column_type = "JsonBinary", nullable)]
     pub data: Option<Json>,
     pub user_identifier: Option<String>,
     pub created_at: DateTimeWithTimeZone,

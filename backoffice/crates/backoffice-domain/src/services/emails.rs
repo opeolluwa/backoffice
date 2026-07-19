@@ -1,8 +1,8 @@
 use crate::{
     dto::{CreateEmailCommand, UpdateEmailCommand},
+    errors::service_error::ServiceError,
     models::emails,
     ports::email_repository::EmailRepositoryExt,
-    errors::service_error::ServiceError,
 };
 
 #[derive(Clone)]
@@ -134,10 +134,7 @@ impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> 
         identifier: &str,
         user_identifier: &str,
     ) -> Result<(), ServiceError> {
-        Ok(self
-            .repo
-            .delete_email(identifier, user_identifier)
-            .await?)
+        Ok(self.repo.delete_email(identifier, user_identifier).await?)
     }
 
     async fn count_emails(&self, user_identifier: &str) -> Result<i64, ServiceError> {
@@ -204,7 +201,12 @@ mod tests {
             .returning(move |_, _| Ok(email.clone()));
         let service = EmailsService::new(repo);
 
-        assert!(service.find_email_by_identifier("em-001", "user-001").await.is_ok());
+        assert!(
+            service
+                .find_email_by_identifier("em-001", "user-001")
+                .await
+                .is_ok()
+        );
     }
 
     #[tokio::test]

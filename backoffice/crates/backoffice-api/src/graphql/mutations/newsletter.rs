@@ -7,8 +7,9 @@ use seaography::{
 };
 use validator::Validate;
 
-use crate::graphql::types::newsletter::SubscribeToNewsletterInput;
 use backoffice_domain::{errors::app_error::AppError, utils::error::format_validation_errors};
+
+use crate::graphql::types::newsletter::SubscribeToNewsletterInput;
 
 pub struct SubscribeNewsletter;
 

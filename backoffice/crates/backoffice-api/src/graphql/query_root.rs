@@ -2,9 +2,10 @@ use async_graphql::dynamic::*;
 use sea_orm::DatabaseConnection;
 use seaography::{Builder, BuilderContext, async_graphql, lazy_static::lazy_static};
 
+use backoffice_domain::models::*;
+
 use super::mutations;
 use crate::state::AppState;
-use backoffice_domain::models::*;
 
 lazy_static! {
     static ref CONTEXT: BuilderContext = BuilderContext::default();
@@ -30,7 +31,7 @@ pub fn schema_builder(
     builder = register_entity_modules(builder);
     builder = register_active_enums(builder);
     builder = register_active_enums(builder);
-    
+
     seaography::register_custom_inputs!(
         builder,
         [super::types::newsletter::SubscribeToNewsletterInput]

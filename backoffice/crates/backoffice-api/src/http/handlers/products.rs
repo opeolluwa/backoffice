@@ -5,18 +5,21 @@ use axum::{
     http::StatusCode,
 };
 
-use crate::http::dto::jwt::Claims;
 use backoffice_domain::errors::api_response::ApiResponse;
-use crate::state::AppState;
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::products::Model as Product;
 use backoffice_domain::services::product::ProductServiceStateExt;
-use backoffice_domain::errors::service_error::ServiceError;
+
+use crate::http::dto::jwt::Claims;
+use crate::state::AppState;
 
 pub async fn add_product_to_marketplace(
     State(state): State<Arc<AppState>>,
     claims: Claims,
     Path(marketplace_identifier): Path<String>,
-    _request: axum_typed_multipart::TypedMultipart<crate::http::extractors::products::CreateProductRequest>,
+    _request: axum_typed_multipart::TypedMultipart<
+        crate::http::extractors::products::CreateProductRequest,
+    >,
 ) -> Result<ApiResponse<Product>, ServiceError> {
     let product = state
         .services

@@ -7,14 +7,15 @@ use axum::{
 use axum_typed_multipart::TypedMultipart;
 use tracing::{debug, info};
 
-use crate::http::dto::api_request::AuthenticatedRequest;
-use backoffice_domain::errors::api_response::ApiResponse;
-use crate::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest};
-use crate::state::AppState;
 use backoffice_domain::dto::UpdateUploadCommand;
+use backoffice_domain::errors::api_response::ApiResponse;
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::uploads;
 use backoffice_domain::services::upload::UploadsServiceExt;
-use backoffice_domain::errors::service_error::ServiceError;
+
+use crate::http::dto::api_request::AuthenticatedRequest;
+use crate::http::extractors::upload::{CreateUploadRequest, UpdateUploadRequest};
+use crate::state::AppState;
 
 fn to_update_command(req: &UpdateUploadRequest) -> UpdateUploadCommand {
     UpdateUploadCommand {
@@ -32,16 +33,14 @@ pub async fn create_upload(
         starred,
     }): TypedMultipart<CreateUploadRequest>,
 ) -> Result<ApiResponse<uploads::Model>, ServiceError> {
-    let file_name = file
-        .metadata
-        .file_name
-        .clone()
-        .unwrap_or_else(|| "upload".to_string());
+    let file_name = if name.is_empty() {
+        chrono::Local::now().format("%Y%m%d%H%M%S").to_string()
+    } else {
+        name.clone()
+    };
 
     let file_path = file.contents.path().to_path_buf();
-    let file_size = std::fs::metadata(&file_path)
-        .map(|m| m.len())
-        .unwrap_or(0);
+    let file_size = std::fs::metadata(&file_path).map(|m| m.len()).unwrap_or(0);
 
     debug!(
         file_name = %file_name,

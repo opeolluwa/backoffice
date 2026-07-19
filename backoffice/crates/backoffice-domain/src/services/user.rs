@@ -2,11 +2,11 @@ use crate::errors::service_error::ServiceError;
 use crate::{dto::UserProfile, ports::user_repository::UserRepositoryTrait};
 
 #[derive(Clone)]
-pub struct UserService<R: UserRepositoryTrait+ Send + Sync> {
+pub struct UserService<R: UserRepositoryTrait + Send + Sync> {
     repo: R,
 }
 
-impl<R: UserRepositoryTrait+ Send + Sync> UserService<R> {
+impl<R: UserRepositoryTrait + Send + Sync> UserService<R> {
     pub fn new(repo: R) -> Self {
         Self { repo }
     }

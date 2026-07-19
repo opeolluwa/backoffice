@@ -1,7 +1,7 @@
 use crate::{
     dto::{CreateUserCommand, UserProfile},
-    models::users,
     errors::service_error::ServiceError,
+    models::users,
 };
 
 #[cfg_attr(test, mockall::automock)]

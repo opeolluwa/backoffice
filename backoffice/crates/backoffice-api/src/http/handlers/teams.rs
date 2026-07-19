@@ -5,14 +5,15 @@ use axum::{
     http::StatusCode,
 };
 
-use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
-use backoffice_domain::errors::api_response::ApiResponse;
-use crate::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest};
-use crate::state::AppState;
 use backoffice_domain::dto::{CreateTeamMemberCommand, UpdateTeamMemberCommand};
+use backoffice_domain::errors::api_response::ApiResponse;
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::teams;
 use backoffice_domain::services::team::TeamServiceExt;
-use backoffice_domain::errors::service_error::ServiceError;
+
+use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
+use crate::http::extractors::team::{CreateTeamMemberRequest, UpdateTeamMemberRequest};
+use crate::state::AppState;
 
 fn to_create_command(req: &CreateTeamMemberRequest) -> CreateTeamMemberCommand {
     CreateTeamMemberCommand {

@@ -3,21 +3,22 @@ use std::sync::Arc;
 use axum::extract::State;
 use axum::http::StatusCode;
 
-use backoffice_domain::errors::api_response::ApiResponseBuilder;
-use crate::http::dto::jwt::Claims;
-use crate::http::middlewares::validator::ValidatedRequest;
-use crate::state::AppState;
 use backoffice_domain::dto::{
-    CreateUserCommand, ForgottenPasswordCommand, LoginCommand, SetNewPasswordCommand,
-    TokenClaims, VerifyAccountCommand, RefreshTokenCommand,
+    CreateUserCommand, ForgottenPasswordCommand, LoginCommand, RefreshTokenCommand,
+    SetNewPasswordCommand, TokenClaims, VerifyAccountCommand,
 };
 use backoffice_domain::errors::api_response::ApiResponse;
-use crate::http::extractors::auth::{
-    CreateUserRequest, ForgottenPasswordRequest, LoginRequest,
-    SetNewPasswordRequest, VerifyAccountRequest,
-};
-use backoffice_domain::services::auth::AuthenticationServiceTrait;
+use backoffice_domain::errors::api_response::ApiResponseBuilder;
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
+use backoffice_domain::services::auth::AuthenticationServiceTrait;
+
+use crate::http::dto::jwt::Claims;
+use crate::http::extractors::auth::{
+    CreateUserRequest, ForgottenPasswordRequest, LoginRequest, SetNewPasswordRequest,
+    VerifyAccountRequest,
+};
+use crate::http::middlewares::validator::ValidatedRequest;
+use crate::state::AppState;
 
 pub async fn create_account(
     State(state): State<Arc<AppState>>,
@@ -77,8 +78,11 @@ pub async fn verify_account(
 pub async fn forgotten_password(
     State(state): State<Arc<AppState>>,
     ValidatedRequest(request): ValidatedRequest<ForgottenPasswordRequest>,
-) -> Result<ApiResponse<backoffice_domain::dto::ForgottenPasswordResult>, AuthenticationServiceError> {
-    let command = ForgottenPasswordCommand { email: request.email };
+) -> Result<ApiResponse<backoffice_domain::dto::ForgottenPasswordResult>, AuthenticationServiceError>
+{
+    let command = ForgottenPasswordCommand {
+        email: request.email,
+    };
     let forgotten_password_response = state
         .services
         .auth_service

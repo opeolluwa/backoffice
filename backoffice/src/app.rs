@@ -1,11 +1,13 @@
 use std::net::{Ipv4Addr, SocketAddrV4};
 
 use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
-use backoffice_domain::errors::app_error::AppError;
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
 use backoffice_api::{load_graphql_router, load_http_routes, state::AppState};
-use backoffice_config::{cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal};
+use backoffice_config::{
+    cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal,
+};
+use backoffice_domain::errors::app_error::AppError;
 use backoffice_infra::database::connection::init_db_pool;
 
 pub async fn run() -> Result<(), AppError> {
@@ -23,10 +25,10 @@ pub async fn run() -> Result<(), AppError> {
         .merge(graphql_router)
         .merge(http_routes)
         .layer(DefaultBodyLimit::disable())
-        .layer(RequestBodyLimitLayer::new(app_config.body_limit_bytes))
+        .layer(RequestBodyLimitLayer::new(app_config.body_limit_megabytes * 1024 * 1024 ))
         .layer(TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
-            app_config.requests_time_out*100,
+            app_config.requests_time_out_secs * 100,
         ))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(init_cors(&app_config));

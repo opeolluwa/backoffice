@@ -10,4 +10,6 @@ export type UploadsInterface = {
   createdAt: string;
   updatedAt: string | null;
   fileType: FileType | null;
+  filePath: string;
+  thumbnailUrl: string;
 };

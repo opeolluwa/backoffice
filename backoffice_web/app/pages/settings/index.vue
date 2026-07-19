@@ -15,7 +15,6 @@ definePageMeta({
 const userStore = useUserInformationStore();
 const toast = useToast();
 
-
 type TabKey = "profile" | "security" | "notifications";
 const activeTab = ref<TabKey>("profile");
 
@@ -39,7 +38,6 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
     desc: "Email preferences",
   },
 ];
-
 
 const profileSchema = v.object({
   firstName: v.pipe(v.string(), v.minLength(1, "First name is required.")),
@@ -75,7 +73,6 @@ async function onProfileSubmit({ data }: FormSubmitEvent<ProfileSchema>) {
     profileLoading.value = false;
   }
 }
-
 
 const passwordSchema = v.pipe(
   v.object({
@@ -125,7 +122,6 @@ async function onPasswordSubmit({ data: _ }: FormSubmitEvent<PasswordSchema>) {
     passwordLoading.value = false;
   }
 }
-
 
 const notificationItems = [
   {

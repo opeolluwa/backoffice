@@ -1,11 +1,11 @@
 use crate::{
     dto::UpdateUploadCommand,
-    models::uploads,
-    ports::{
-        image_uploader::ImageUploader,
-        upload_repository::UploadRepositoryExt,
-    },
     errors::service_error::ServiceError,
+    models::{
+        sea_orm_active_enums::FileType,
+        uploads::{self},
+    },
+    ports::{image_uploader::ImageUploader, upload_repository::UploadRepositoryExt},
 };
 
 #[derive(Clone)]
@@ -49,7 +49,9 @@ pub trait UploadsServiceExt {
     async fn count_uploads(&self) -> Result<i64, ServiceError>;
 }
 
-impl<R: UploadRepositoryExt + Send + Sync, U: ImageUploader + Send + Sync> UploadsServiceExt for UploadsService<R, U> {
+impl<R: UploadRepositoryExt + Send + Sync, U: ImageUploader + Send + Sync> UploadsServiceExt
+    for UploadsService<R, U>
+{
     async fn create_upload(
         &self,
         file_path: std::path::PathBuf,
@@ -59,27 +61,27 @@ impl<R: UploadRepositoryExt + Send + Sync, U: ImageUploader + Send + Sync> Uploa
     ) -> Result<uploads::Model, ServiceError> {
         tracing::debug!(file_name, name, "uploading file to imagekit");
 
-        let upload_response = self.uploader
-            .upload_file(&file_path, file_name)
-            .await?;
+        let upload_response = self.uploader.upload_file(&file_path, file_name).await?;
 
-        tracing::debug!(url = %upload_response.url, size = upload_response.size, "imagekit upload done");
-
-        let file_size = upload_response
-            .size
-            .try_into()
-            .ok();
-
-        tracing::debug!("persisting upload record");
+        let file_size = upload_response.size.try_into().ok();
+        let thumbnail_url = upload_response.thumbnail_url;
+        let remote_file_path = upload_response.file_path;
+        let file_type = if !upload_response.file_type.is_empty() {
+            Some(FileType::from(upload_response.file_type))
+        } else {
+            None
+        };
 
         let model = self
             .repo
             .create_upload(
                 name,
                 &upload_response.url,
-                None, //TODO; use mime type to map file type  
+                file_type,
                 file_size,
                 starred,
+                &remote_file_path,
+                &thumbnail_url.unwrap_or("".to_string()),
             )
             .await?;
 
@@ -127,7 +129,9 @@ impl<R: UploadRepositoryExt + Send + Sync, U: ImageUploader + Send + Sync> Uploa
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ports::{upload_repository::MockUploadRepositoryExt, image_uploader::MockImageUploader};
+    use crate::ports::{
+        image_uploader::MockImageUploader, upload_repository::MockUploadRepositoryExt,
+    };
     use sea_orm::sqlx::types::chrono::Utc;
     use std::path::PathBuf;
 
@@ -141,6 +145,8 @@ mod tests {
             created_at: Utc::now().naive_utc().and_utc().into(),
             updated_at: None,
             file_type: None,
+            file_path: "".to_string(),
+            thumbnail_url: "".to_string(),
         }
     }
 
@@ -200,6 +206,9 @@ mod tests {
             Ok(crate::ports::image_uploader::UploadResult {
                 url: "https://cdn.example.com/photo.jpg".to_string(),
                 size: 1024,
+                file_path: "/tmp/photo.jpg".to_string(),
+                thumbnail_url: None,
+                file_type: "photo".to_string(),
             })
         });
 

@@ -1,6 +1,6 @@
 use crate::{
-    models::countries, ports::country_repository::CountryRepositoryExt,
-    errors::service_error::ServiceError,
+    errors::service_error::ServiceError, models::countries,
+    ports::country_repository::CountryRepositoryExt,
 };
 
 #[derive(Clone)]

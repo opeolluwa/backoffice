@@ -3,10 +3,11 @@ use std::sync::Arc;
 use axum::extract::{Path, State};
 
 use backoffice_domain::errors::api_response::ApiResponse;
-use crate::state::AppState;
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::countries;
 use backoffice_domain::services::country::CountryServiceExt;
-use backoffice_domain::errors::service_error::ServiceError;
+
+use crate::state::AppState;
 
 pub async fn fetch_all_countries(
     State(state): State<Arc<AppState>>,

@@ -9,8 +9,5 @@ pub trait TokenService: Send + Sync {
         validity_secs: u64,
     ) -> Result<String, AuthenticationServiceError>;
 
-    fn validate_token(
-        &self,
-        token: &str,
-    ) -> Result<TokenClaims, AuthenticationServiceError>;
+    fn validate_token(&self, token: &str) -> Result<TokenClaims, AuthenticationServiceError>;
 }

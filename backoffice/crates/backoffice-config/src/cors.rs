@@ -1,7 +1,7 @@
 use axum::http::{HeaderValue, Method, header};
 use tower_http::cors::{Any, CorsLayer};
 
-use crate::{env::{self, AppConfig}};
+use crate::env::{self, AppConfig};
 
 pub fn init_cors(config: &AppConfig) -> CorsLayer {
     let cors = CorsLayer::new()

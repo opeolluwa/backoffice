@@ -9,6 +9,6 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
-tokio.workspace = true
 sea-orm-migration.workspace = true
+tokio.workspace = true
 

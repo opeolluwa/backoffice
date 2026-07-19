@@ -1,4 +1,4 @@
-use crate::{models::countries, errors::database_error::DatabaseError};
+use crate::{errors::database_error::DatabaseError, models::countries};
 
 #[cfg_attr(test, mockall::automock)]
 #[allow(async_fn_in_trait)]

@@ -11,9 +11,10 @@ use axum_extra::{
 };
 use jsonwebtoken::{Validation, decode};
 
-use crate::http::dto::jwt::{Claims, Keys};
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
 use backoffice_domain::shared::extract_env::extract_env;
+
+use crate::http::dto::jwt::{Claims, Keys};
 
 impl<S> FromRequestParts<S> for Claims
 where

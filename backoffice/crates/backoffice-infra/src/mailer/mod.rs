@@ -2,11 +2,11 @@ pub mod auto_respond;
 pub mod invitation_accepted;
 pub mod password_reset;
 pub mod zepto_mailer;
+use zepto_mailer::{EmailRequestBuilder, ZeptoMail};
 
 use backoffice_domain::dto::EmailMessage;
-use backoffice_domain::ports::email_sender::EmailSender;
 use backoffice_domain::errors::email_service_error::EmailServiceError;
-use zepto_mailer::{EmailRequestBuilder, ZeptoMail};
+use backoffice_domain::ports::email_sender::EmailSender;
 
 impl EmailSender for ZeptoMail {
     async fn send_email(&self, message: EmailMessage) -> Result<(), EmailServiceError> {

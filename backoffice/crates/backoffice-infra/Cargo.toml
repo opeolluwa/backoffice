@@ -7,8 +7,8 @@ description = "Infrastructure layer: database repositories, JWT, mailer, ImageKi
 
 [dependencies]
 askama.workspace = true
-backoffice-domain = { workspace = true, features = ["http"] }
 backoffice-config.workspace = true
+backoffice-domain = { workspace = true, features = ["http"] }
 base64.workspace = true
 bcrypt.workspace = true
 chrono.workspace = true

@@ -10,10 +10,14 @@ default = []
 http = ["dep:axum", "dep:axum-extra"]
 
 [dependencies]
+
+# Optional: for http feature (error IntoResponse impls)
+axum = { workspace = true, optional = true }
+axum-extra = { workspace = true, optional = true }
 backoffice_macros.workspace = true
 bcrypt.workspace = true
-jsonwebtoken.workspace = true
 chrono.workspace = true
+jsonwebtoken.workspace = true
 rust_decimal.workspace = true
 sea-orm.workspace = true
 seaography.workspace = true
@@ -26,11 +30,8 @@ tokio.workspace = true
 tracing.workspace = true
 ts-rs.workspace = true
 ulid.workspace = true
+uuid = { version = "1.24.0", features = ["v4"] }
 validator.workspace = true
-
-# Optional: for http feature (error IntoResponse impls)
-axum = { workspace = true, optional = true }
-axum-extra = { workspace = true, optional = true }
 
 [dev-dependencies]
 mockall.workspace = true

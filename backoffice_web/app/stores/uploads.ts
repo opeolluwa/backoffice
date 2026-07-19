@@ -2,28 +2,7 @@ import { defineStore } from "pinia";
 import api, { UPLOADS_TIMEOUT } from "~/plugin/api";
 import type { UploadsInterface } from "~/bindings/UploadsInterface";
 import type { CreateUploadRequest } from "~/bindings/CreateUploadRequest";
-import type { FileType } from "~/bindings/FileType";
-
-function detectFileType(file: File): FileType {
-  const mime = file.type;
-
-  if (mime.startsWith("image/")) return "Image";
-  if (mime.startsWith("video/")) return "Video";
-  if (mime.startsWith("audio/")) return "Audio";
-
-  if (
-    mime === "application/pdf" ||
-    mime.startsWith("text/") ||
-    mime.includes("word") ||
-    mime.includes("spreadsheet") ||
-    mime.includes("presentation") ||
-    mime.includes("document")
-  ) {
-    return "Document";
-  }
-
-  return "Others";
-}
+import { useRandomName } from "~/composables/useRandomName";
 
 const useUploadStore = defineStore("uploads", {
   state: () => ({
@@ -34,40 +13,29 @@ const useUploadStore = defineStore("uploads", {
   }),
 
   actions: {
-    async createUpload(payload: CreateUploadRequest) {
-      const toast = useToast();
-
+    async createUpload(payload: Partial<CreateUploadRequest>) {
       const formData = new FormData();
 
       if (payload.file) {
         formData.append("file", payload.file);
       }
 
-      formData.append("name", payload.name);
-
-      const fileType = payload.file_type || detectFileType(payload.file);
-      formData.append("fileType", fileType);
+      formData.append("name", payload.name || useRandomName());
       if (payload.starred !== null && payload.starred !== undefined) {
         formData.append("starred", String(payload.starred));
       }
 
       try {
-        const res = await api.post("/uploads", formData, { timeout: UPLOADS_TIMEOUT });
+        const res = await api.post("/uploads", formData, {
+          timeout: UPLOADS_TIMEOUT,
+        });
         const created = res.data?.data as UploadsInterface;
         this.uploads.unshift(created);
         this.count++;
 
-        toast.add({
-          title: "Success",
-          description: "Upload created successfully",
-        });
-
         return created;
       } catch (error) {
-        toast.add({
-          title: "Error",
-          description: (error as Error).message,
-        });
+        return error;
       }
     },
 
@@ -101,9 +69,7 @@ const useUploadStore = defineStore("uploads", {
       const updated = res.data?.data as UploadsInterface;
       const idx = this.uploads.findIndex((u) => u.identifier === identifier);
       if (idx !== -1) this.uploads[idx] = updated;
-      const sIdx = this.starred.findIndex(
-        (u) => u.identifier === identifier,
-      );
+      const sIdx = this.starred.findIndex((u) => u.identifier === identifier);
       if (sIdx !== -1) this.starred[sIdx] = updated;
       if (this.currentUpload?.identifier === identifier)
         this.currentUpload = updated;
@@ -112,12 +78,8 @@ const useUploadStore = defineStore("uploads", {
 
     async deleteOneUpload(identifier: string) {
       await api.delete(`/uploads/${identifier}`);
-      this.uploads = this.uploads.filter(
-        (u) => u.identifier !== identifier,
-      );
-      this.starred = this.starred.filter(
-        (u) => u.identifier !== identifier,
-      );
+      this.uploads = this.uploads.filter((u) => u.identifier !== identifier);
+      this.starred = this.starred.filter((u) => u.identifier !== identifier);
       this.count = Math.max(0, this.count - 1);
       if (this.currentUpload?.identifier === identifier)
         this.currentUpload = null;

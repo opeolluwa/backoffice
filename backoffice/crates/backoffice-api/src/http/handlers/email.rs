@@ -5,14 +5,15 @@ use axum::{
     http::StatusCode,
 };
 
-use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
-use backoffice_domain::errors::api_response::ApiResponse;
-use crate::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest};
-use crate::state::AppState;
 use backoffice_domain::dto::{CreateEmailCommand, UpdateEmailCommand};
+use backoffice_domain::errors::api_response::ApiResponse;
+use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::emails;
 use backoffice_domain::services::emails::EmailsServiceExt;
-use backoffice_domain::errors::service_error::ServiceError;
+
+use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
+use crate::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest};
+use crate::state::AppState;
 
 fn to_create_command(req: &CreateEmailRequest) -> CreateEmailCommand {
     CreateEmailCommand {

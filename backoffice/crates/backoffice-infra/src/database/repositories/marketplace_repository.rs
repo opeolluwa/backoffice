@@ -7,12 +7,13 @@ use sea_orm::{
 };
 use ulid::Ulid;
 
+use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::{
     dto::CreateMarketplaceCommand,
     models::marketplaces::{self, Entity as MarketplaceEntity},
     ports::marketplace_repository::MarketplaceRepositoryExt,
 };
-use backoffice_domain::errors::database_error::DatabaseError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Debug, Clone)]

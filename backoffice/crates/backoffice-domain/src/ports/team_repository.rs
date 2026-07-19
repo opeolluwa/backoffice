@@ -1,7 +1,7 @@
 use crate::{
     dto::{CreateTeamMemberCommand, UpdateTeamMemberCommand},
-    models::teams,
     errors::database_error::DatabaseError,
+    models::teams,
 };
 
 #[cfg_attr(test, mockall::automock)]

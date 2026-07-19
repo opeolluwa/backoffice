@@ -1,7 +1,5 @@
 use crate::{
-    dto::CreateMarketplaceCommand,
-    models::marketplaces,
-    errors::database_error::DatabaseError,
+    dto::CreateMarketplaceCommand, errors::database_error::DatabaseError, models::marketplaces,
 };
 
 #[cfg_attr(test, mockall::automock)]

@@ -1,9 +1,9 @@
+use crate::errors::service_error::ServiceError;
 use crate::{
     dto::{CreateTeamMemberCommand, UpdateTeamMemberCommand},
     models::teams,
     ports::team_repository::TeamRepositoryExt,
 };
-use crate::errors::service_error::ServiceError;
 
 #[derive(Clone)]
 pub struct TeamService<R: TeamRepositoryExt> {
@@ -136,7 +136,12 @@ mod tests {
             .returning(move |_| Ok(member.clone()));
         let service = TeamService::new(repo);
 
-        assert!(service.find_team_member_by_identifier("tm-001").await.is_ok());
+        assert!(
+            service
+                .find_team_member_by_identifier("tm-001")
+                .await
+                .is_ok()
+        );
     }
 
     #[tokio::test]

@@ -1,14 +1,13 @@
-use sea_orm::{
-    ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait, Set,
-};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait, Set};
 use ulid::Ulid;
 
+use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::{
     dto::{CreateTeamMemberCommand, UpdateTeamMemberCommand},
     models::teams::{self, Entity as TeamEntity},
     ports::team_repository::TeamRepositoryExt,
 };
-use backoffice_domain::errors::database_error::DatabaseError;
+
 use crate::database::repositories::base::Repository;
 
 #[derive(Debug, Clone)]

@@ -1,12 +1,9 @@
 use jsonwebtoken::{Header, decode, encode};
 use serde::{Deserialize, Serialize};
 
-use backoffice_domain::{
-    dto::TokenClaims,
-    ports::token_service::TokenService,
-};
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
 use backoffice_domain::shared::extract_env::extract_env;
+use backoffice_domain::{dto::TokenClaims, ports::token_service::TokenService};
 
 #[derive(Clone)]
 pub struct JwtTokenService;
@@ -42,30 +39,22 @@ impl TokenService for JwtTokenService {
         let secret =
             extract_env::<String>("JWT_SIGNING_KEY").map_err(AuthenticationServiceError::from)?;
 
-        let encoding_key =
-            jsonwebtoken::EncodingKey::from_secret(secret.as_bytes());
+        let encoding_key = jsonwebtoken::EncodingKey::from_secret(secret.as_bytes());
         let token = encode(&Header::default(), &claim, &encoding_key)
             .map_err(AuthenticationServiceError::from)?;
 
         Ok(token)
     }
 
-    fn validate_token(
-        &self,
-        token: &str,
-    ) -> Result<TokenClaims, AuthenticationServiceError> {
+    fn validate_token(&self, token: &str) -> Result<TokenClaims, AuthenticationServiceError> {
         let secret =
             extract_env::<String>("JWT_SIGNING_KEY").map_err(AuthenticationServiceError::from)?;
 
-        let decoding_key =
-            jsonwebtoken::DecodingKey::from_secret(secret.as_bytes());
+        let decoding_key = jsonwebtoken::DecodingKey::from_secret(secret.as_bytes());
 
-        let token_data = decode::<JwtClaim>(
-            token,
-            &decoding_key,
-            &jsonwebtoken::Validation::default(),
-        )
-        .map_err(|_| AuthenticationServiceError::InvalidToken)?;
+        let token_data =
+            decode::<JwtClaim>(token, &decoding_key, &jsonwebtoken::Validation::default())
+                .map_err(|_| AuthenticationServiceError::InvalidToken)?;
 
         Ok(TokenClaims {
             email: token_data.claims.email,
