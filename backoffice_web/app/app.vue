@@ -22,7 +22,7 @@ watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
       <h1 class="text-2xl mt-4 font-medium">Unsupported media viewport!</h1>
       <p class="text-gray-500 leading-5 mt-1 text-sm">
         Unfortunately, you cannot access this page on a
-        {{ $viewport.breakpoint }}device Please use a tablet or desktop
+        {{ $viewport.breakpoint }} device Please use a tablet or desktop
       </p>
     </div>
     <div v-else>

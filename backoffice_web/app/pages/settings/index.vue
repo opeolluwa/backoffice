@@ -10,13 +10,13 @@ definePageMeta({
   },
 });
 
-type TabKey = "profile" | "security" | "local" | "app";
+type TabKey = "profile" | "security" | "locale" | "app";
 const activeTab = ref<TabKey>("profile");
 
 const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
   { key: "profile", label: "Profile", icon: "heroicons:user-circle", desc: "Your personal info" },
   { key: "security", label: "Security", icon: "heroicons:lock-closed", desc: "Password & access" },
-  { key: "local", label: "Local", icon: "heroicons:computer-desktop", desc: "Device preferences" },
+  { key: "locale", label: "Locale", icon: "heroicons:computer-desktop", desc: "Device preferences" },
   { key: "app", label: "App", icon: "heroicons:cog-6-tooth", desc: "Application settings" },
 ];
 </script>
@@ -35,7 +35,7 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
             class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm transition-all text-left cursor-pointer"
             :class="
               activeTab === tab.key
-                ? 'bg-brand text-white font-medium'
+                ? 'bg-accent/10 dark:bg-accent/15 text-accent font-medium'
                 : 'text-gray-500 dark:text-white/40 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-800 dark:hover:text-white'
             "
             @click="activeTab = tab.key"
@@ -45,7 +45,7 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
               <p class="leading-tight">{{ tab.label }}</p>
               <p
                 class="text-[10px] leading-tight mt-0.5 truncate"
-                :class="activeTab === tab.key ? 'text-white/70' : 'text-gray-400 dark:text-white/25'"
+                :class="activeTab === tab.key ? 'text-accent/60' : 'text-gray-400 dark:text-white/25'"
               >
                 {{ tab.desc }}
               </p>
@@ -58,7 +58,7 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
     <div class="flex-1 min-w-0 max-w-xl">
       <SettingsProfileTab v-show="activeTab === 'profile'" />
       <SettingsSecurityTab v-show="activeTab === 'security'" />
-      <SettingsLocalTab v-show="activeTab === 'local'" />
+      <SettingsLocaleTab v-show="activeTab === 'locale'" />
       <SettingsAppTab v-show="activeTab === 'app'" />
     </div>
   </div>
