@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ title: "Metrics" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

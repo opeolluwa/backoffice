@@ -26,11 +26,7 @@ function formatSize(bytes: number) {
       class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden"
     >
       <template v-if="loaded">
-        <NuxtImg
-          provider="imagekit"
-          :src="file.filePath"
-          height="300"
-        />
+        <NuxtImg provider="imagekit" :src="file.filePath" height="300" />
       </template>
       <div
         v-else

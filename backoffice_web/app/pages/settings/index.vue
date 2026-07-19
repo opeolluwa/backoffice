@@ -3,6 +3,8 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import * as v from "valibot";
 import { useUserInformationStore } from "~/stores/users";
 
+useHead({ title: "Settings" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

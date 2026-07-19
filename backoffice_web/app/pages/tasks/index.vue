@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ title: "Tasks" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ title: "Revenue" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

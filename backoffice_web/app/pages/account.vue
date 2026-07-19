@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ title: "Account" });
+
 definePageMeta({
   layout: "dashboard",
 });

@@ -1,31 +1,29 @@
-
 <script setup lang="ts">
-
 const props = withDefaults(
   defineProps<{
-    title?: string
-    description?: string
+    title?: string;
+    description?: string;
   }>(),
   {
     title: "Delete item?",
-    description: "This action cannot be undone."
-  }
-)
+    description: "This action cannot be undone.",
+  },
+);
 
 const { title, description } = props;
-const modelValue = defineModel<boolean>()
+const modelValue = defineModel<boolean>();
 
 const emit = defineEmits<{
-  confirm: []
-}>()
+  confirm: [];
+}>();
 
 function cancel() {
-  modelValue.value = false
+  modelValue.value = false;
 }
 
 function confirm() {
-  emit("confirm")
-  modelValue.value = false
+  emit("confirm");
+  modelValue.value = false;
 }
 </script>
 
@@ -45,20 +43,11 @@ function confirm() {
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <UButton
-          color="neutral"
-          variant="soft"
-          @click="cancel"
-        >
+        <UButton color="neutral" variant="soft" @click="cancel">
           Cancel
         </UButton>
 
-        <UButton
-          color="error"
-          @click="confirm"
-        >
-          Delete
-        </UButton>
+        <UButton color="error" @click="confirm"> Delete </UButton>
       </div>
     </template>
   </UModal>

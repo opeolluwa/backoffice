@@ -4,6 +4,8 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import api from "~/plugin/api";
 import { useRouter, useRoute } from "vue-router";
 
+useHead({ title: "Accept Invitation" });
+
 definePageMeta({
   layout: "auth",
 });

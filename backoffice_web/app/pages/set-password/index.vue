@@ -2,6 +2,8 @@
 import api from "~/plugin/api";
 import { useRouter, useRoute } from "vue-router";
 
+useHead({ title: "Set Password" });
+
 definePageMeta({
   layout: "security",
 });

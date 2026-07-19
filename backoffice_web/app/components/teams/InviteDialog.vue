@@ -83,11 +83,7 @@ defineExpose({ reset });
           :ui="{ error: 'text-red-500 text-sm mt-1' }"
         />
 
-        <AppButton
-          type="submit"
-          :loading="loading"
-          :disabled="loading"
-        >
+        <AppButton type="submit" :loading="loading" :disabled="loading">
           Send invitation
         </AppButton>
       </UForm>

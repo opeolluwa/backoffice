@@ -46,6 +46,8 @@ const resetForm = () => {
   state.currencyIdentifier = "";
 };
 
+useHead({ title: "Products" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

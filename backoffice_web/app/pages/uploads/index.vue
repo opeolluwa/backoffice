@@ -2,6 +2,8 @@
 import type { CreateUploadRequest } from "~/bindings/CreateUploadRequest";
 import { useUploadStore } from "~/stores/uploads";
 
+useHead({ title: "Uploads" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

@@ -2,6 +2,8 @@
 import type { Email } from "@bindings/Email";
 import { useEmailStore } from "~/stores/emails";
 
+useHead({ title: "Messages" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

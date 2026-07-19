@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { useCountdown } from "@vueuse/core";
+
+useHead({ title: "Verify OTP" });
+
 definePageMeta({
   layout: "security",
 });

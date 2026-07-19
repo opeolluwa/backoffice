@@ -2,6 +2,8 @@
 import { useUserInformationStore } from "~/stores/users";
 import { useMarketplaceStore } from "~/stores/marketplace";
 
+useHead({ title: "Dashboard" });
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {

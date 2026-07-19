@@ -3,10 +3,7 @@ import { AppConfirmDelete } from "#components";
 export function useConfirmDelete() {
   const overlay = useOverlay();
 
-  return (props?: {
-    title?: string;
-    description?: string;
-  }) =>
+  return (props?: { title?: string; description?: string }) =>
     new Promise<boolean>((resolve) => {
       const modal = overlay.create(AppConfirmDelete);
 

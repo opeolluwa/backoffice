@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+html, body{
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
 :root {
   --color-app-dark: oklch(13.676% 0.03548 287.59);
   --color-app-dark-50: oklch(40.069% 0.18338 279.76);
@@ -17,18 +23,18 @@
 }
 
 @theme {
-  --color-primary: oklch(51.546% 0.25256 264.74);
-  --color-primary-50: oklch(88.231% 0.05412 271.45);
-  --color-primary-100: oklch(83.579% 0.07657 271.6);
-  --color-primary-200: oklch(74.821% 0.12063 270.23);
-  --color-primary-300: oklch(66.319% 0.166 268.56);
-  --color-primary-400: oklch(58.284% 0.21304 266.78);
-  --color-primary-500: oklch(51.546% 0.25256 264.74);
-  --color-primary-600: oklch(43.672% 0.23384 264.31);
-  --color-primary-700: oklch(35.426% 0.18345 264.42);
-  --color-primary-800: oklch(26.682% 0.12927 264.22);
-  --color-primary-900: oklch(17.19% 0.07083 263.75);
-  --color-primary-950: oklch(11.862% 0.03661 260.4);
+  --color-primary: oklch(28.299% 0.07694 303.88);
+  --color-primary-50: oklch(57.836% 0.14241 304.4);
+  --color-primary-100: oklch(53.864% 0.15627 303.52);
+  --color-primary-200: oklch(47.521% 0.14582 303.37);
+  --color-primary-300: oklch(41.415% 0.12488 303.23);
+  --color-primary-400: oklch(35.007% 0.10164 303.48);
+  --color-primary-500: oklch(28.299% 0.07694 303.88);
+  --color-primary-600: oklch(18.429% 0.03734 303.43);
+  --color-primary-700: oklch(0% 0 none);
+  --color-primary-800: oklch(0% 0 none);
+  --color-primary-900: oklch(0% 0 none);
+  --color-primary-950: oklch(0% 0 none);
 }
 
 .dark {
