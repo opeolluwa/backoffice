@@ -13,6 +13,7 @@ axum_typed_multipart.workspace = true
 backoffice-config.workspace = true
 backoffice-domain = { workspace = true, features = ["http"] }
 backoffice-infra.workspace = true
+backoffice-payment-provider.workspace = true
 chrono.workspace = true
 jsonwebtoken.workspace = true
 sea-orm.workspace = true

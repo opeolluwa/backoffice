@@ -33,6 +33,7 @@ backoffice-cli = { path = "crates/backoffice-cli" }
 backoffice-config = { path = "crates/backoffice-config" }
 backoffice-domain = { path = "crates/backoffice-domain" }
 backoffice-infra = { path = "crates/backoffice-infra" }
+backoffice-payment-provider = { path = "crates/backoffice-payment-provider" }
 backoffice_macros = { path = "../backoffice_macros" }
 base64 = "0.22"
 bcrypt = "0.17.0"
@@ -106,8 +107,9 @@ axum.workspace = true
 backoffice-api = { workspace = true }
 backoffice-cli = { workspace = true }
 backoffice-config = { workspace = true }
-backoffice-domain = { workspace = true }
+backoffice-domain.workspace = true
 backoffice-infra = { workspace = true }
+backoffice-payment-provider.workspace = true
 migration.workspace = true
 secrecy.workspace = true
 tokio.workspace = true
