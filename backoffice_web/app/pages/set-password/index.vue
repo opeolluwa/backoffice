@@ -15,6 +15,7 @@ const loading = ref<boolean>(false);
 const router = useRouter();
 const route = useRoute();
 const token = computed(() => route.query.token as string | undefined);
+const toast = useToast();
 
 async function onSubmit() {
   try {
@@ -33,6 +34,7 @@ async function onSubmit() {
         },
       },
     );
+    toast.add({ title: "Password reset successfully", color: "success" });
     await router.push("/");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

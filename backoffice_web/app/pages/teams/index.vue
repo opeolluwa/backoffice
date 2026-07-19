@@ -54,15 +54,30 @@ const hasContent = computed(
 const toast = useToast();
 
 async function onMemberBlock(identifier: string) {
-  await teamsStore.blockMember(identifier);
+  try {
+    await teamsStore.blockMember(identifier);
+    toast.add({ title: "Member blocked", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to block member", color: "error" });
+  }
 }
 
 async function onMemberUnblock(identifier: string) {
-  await teamsStore.unblockMember(identifier);
+  try {
+    await teamsStore.unblockMember(identifier);
+    toast.add({ title: "Member unblocked", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to unblock member", color: "error" });
+  }
 }
 
 async function onMemberRemove(identifier: string) {
-  await teamsStore.deleteMember(identifier);
+  try {
+    await teamsStore.deleteMember(identifier);
+    toast.add({ title: "Member removed", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to remove member", color: "error" });
+  }
 }
 
 async function onInvitationRevoke(identifier: string) {

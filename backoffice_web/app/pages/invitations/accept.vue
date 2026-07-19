@@ -36,6 +36,7 @@ const formError = ref("");
 const loading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+const toast = useToast();
 
 const router = useRouter();
 const route = useRoute();
@@ -61,6 +62,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       },
       { headers: { Authorization: `Bearer ${token.value}` } },
     );
+    toast.add({ title: "Account created successfully", color: "success" });
     await router.push("/");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {

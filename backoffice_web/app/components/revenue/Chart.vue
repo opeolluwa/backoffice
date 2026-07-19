@@ -51,16 +51,9 @@ function barHeight(val: number, max: number) {
     >
       <div>
         <p class="text-lg font-bold text-gray-900 dark:text-white">
-          ${{ values[values.length - 1]?.toLocaleString() ?? 0 }}
+          ₦{{ values[values.length - 1]?.toLocaleString() ?? 0 }}
         </p>
         <p class="text-xs text-gray-400 dark:text-white/30">this month</p>
-      </div>
-      <div class="flex items-center gap-1">
-        <UIcon
-          name="heroicons:arrow-trending-up"
-          class="size-3.5 text-brand"
-        />
-        <span class="text-xs font-semibold text-brand">+0%</span>
       </div>
     </div>
   </div>

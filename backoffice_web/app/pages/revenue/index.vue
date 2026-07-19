@@ -13,35 +13,23 @@ definePageMeta({
 const stats = [
   {
     label: "Total Revenue",
-    value: "$0",
-    trend: "+0%",
-    up: true,
+    value: "₦0",
     icon: "heroicons:banknotes",
-    desc: "All time",
   },
   {
     label: "Monthly Recurring",
-    value: "$0",
-    trend: "+0%",
-    up: true,
+    value: "₦0",
     icon: "heroicons:arrow-path",
-    desc: "MRR",
   },
   {
     label: "Annual Recurring",
-    value: "$0",
-    trend: "+0%",
-    up: true,
+    value: "₦0",
     icon: "heroicons:calendar-days",
-    desc: "ARR",
   },
   {
     label: "Avg. Order Value",
-    value: "$0",
-    trend: "+0%",
-    up: true,
+    value: "₦0",
     icon: "heroicons:receipt-percent",
-    desc: "Per transaction",
   },
 ];
 
@@ -94,7 +82,7 @@ const selectedRange = ref<TimeRange>("30 days");
     </div>
 
     <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
-      <RevenueStatCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
+      <AppStatCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
