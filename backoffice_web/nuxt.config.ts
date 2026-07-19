@@ -15,6 +15,13 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: "slide-left", mode: "out-in" },
   },
+
+  image: {
+    imagekit: {
+      baseURL: "https://ik.imagekit.io/vkqa6un9v",
+    },
+  },
+
   colorMode: {
     preference: "light",
     fallback: "light",

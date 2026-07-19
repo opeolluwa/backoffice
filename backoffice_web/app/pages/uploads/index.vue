@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CreateUploadRequest } from "~/bindings/CreateUploadRequest";
-import type { UploadsInterface } from "~/bindings/UploadsInterface";
 import { useUploadStore } from "~/stores/uploads";
 
 definePageMeta({
@@ -11,203 +10,87 @@ definePageMeta({
   },
 });
 
-const FileType = [
-  { label: "Image", value: "image" },
-  { label: "Video", value: "video" },
-  { label: "Audio", value: "audio" },
-  { label: "PDF", value: "pdf" },
-  { label: "Zip", value: "zip" },
-];
+const uploadStore = useUploadStore();
+const openUploadDialog = ref(false);
+const isUploading = ref(false);
+const isFetchingFiles = ref(true);
+const hasFiles = computed(() => uploadStore?.uploads?.length > 0);
+const files = computed(() => uploadStore.uploads.filter(Boolean));
+const loadedPreviews = ref<Set<string>>(new Set());
 
+const toast = useToast();
+const confirmDelete = useConfirmDelete();
+const uploadDialog = ref<InstanceType<any>>();
 
+async function removeFile(identifier: string) {
+  const confirmed = await confirmDelete({
+    title: "Delete file?",
+    description: "This action cannot be undone.",
+  });
 
-const fileUploadState = reactive<CreateUploadRequest>({ file: null, fileName: "", fileType: "" });
+  if (!confirmed) return;
 
-const uploadStore = useUploadStore(); 
-const onUploadSubmit = async () => {
+  await uploadStore.deleteOneUpload(identifier);
+}
+
+async function copyFileId(identifier: string) {
+  try {
+    await navigator.clipboard.writeText(identifier);
+    toast.add({ title: "Copied file ID", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to copy", color: "error" });
+  }
+}
+
+async function onUploadSubmit(state: Partial<CreateUploadRequest>) {
   isUploading.value = true;
 
   try {
-    await uploadStore.createUpload(fileUploadState);
+    await uploadStore.createUpload(state);
+    uploadDialog.value?.reset();
     openUploadDialog.value = false;
   } finally {
     isUploading.value = false;
   }
-};
-
-const files = ref<UploadsInterface[]>([]);
-const openUploadDialog = ref(false);
-const isUploading = ref(false);
-const hasFiles = computed(() => files.value.length > 0);
-
-
-function formatSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function isImage(type: string) {
-  return type.startsWith("image/");
-}
-
-const loadedPreviews = ref<Set<string>>(new Set());
-
-function onTileVisible(id: string) {
-  loadedPreviews.value = new Set([...loadedPreviews.value, id]);
-}
-
-function useIntersection(id: string) {
-  return {
-    el: (el: Element | null) => {
-      if (!el) return;
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry?.isIntersecting) {
-            onTileVisible(id);
-            observer.disconnect();
-          }
-        },
-        { threshold: 0.1 },
-      );
-      observer.observe(el);
-    },
-  };
-}
-
-
-function fileIcon(type: string) {
-  if (type.startsWith("image/")) return "heroicons:photo";
-  if (type.startsWith("video/")) return "heroicons:film";
-  if (type.startsWith("audio/")) return "heroicons:musical-note";
-  if (type === "application/pdf") return "heroicons:document-text";
-  if (type.includes("zip") || type.includes("compressed"))
-    return "heroicons:archive-box";
-  return "heroicons:document";
-}
+onMounted(async () => {
+  try {
+    await uploadStore.findAllUploads();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isFetchingFiles.value = false;
+  }
+});
 </script>
 
 <template>
   <div class="space-y-6">
     <AppEmptyState
-      v-if="!hasFiles"
+      v-if="!hasFiles && !isFetchingFiles"
       icon="heroicons:arrow-up-tray"
       title="No files uploaded yet"
       description="Drag and drop files above or click to browse."
       action-label="Browse files"
-      @action="() => openUploadDialog = true"
+      @action="openUploadDialog = true"
     />
-    
-    <!-- File grid -->
-    <template v-else>
-      <div class="flex items-center justify-between">
-        <p class="text-sm text-muted">
-          {{ files.length }} {{ files.length === 1 ? "file" : "files" }}
-        </p>
-      </div>
 
-      <div
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"
-      >
-        <div
-          v-for="file in files"
-          :key="file.id"
-          :ref="(el) => useIntersection(file.id).el(el as Element)"
-          class="group relative rounded-xl border border-default bg-white dark:bg-white/3 overflow-hidden flex flex-col"
-        >
-          <!-- Preview area -->
-          <div
-            class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden"
-          >
-            <template v-if="loadedPreviews.has(file.id)">
-              <img
-                v-if="isImage(file.type)"
-                :src="file.url"
-                :alt="file.name"
-                class="w-full h-full object-cover transition-opacity duration-300"
-                loading="lazy"
-              />
-              <UIcon
-                v-else
-                :name="fileIcon(file.type)"
-                class="size-10 text-muted"
-              />
-            </template>
-            <!-- Skeleton while not in viewport -->
-            <div
-              v-else
-              class="w-full h-full animate-pulse bg-gray-200 dark:bg-white/10"
-            />
-          </div>
+    <UploadsFileGrid
+      v-else-if="hasFiles"
+      :files="files"
+      :loaded-previews="loadedPreviews"
+      @copy="copyFileId"
+      @delete="removeFile"
+    />
 
-          <!-- File info -->
-          <div class="px-2.5 py-2 flex flex-col gap-0.5">
-            <p class="text-xs font-medium truncate leading-tight">
-              {{ file.name }}
-            </p>
-            <p class="text-[11px] text-muted">{{ formatSize(file.size) }}</p>
-          </div>
-
-          <!-- Remove button -->
-          <button
-            class="absolute top-1.5 right-1.5 size-6 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            aria-label="Remove file"
-            @click.stop="removeFile(file.id)"
-          >
-            <UIcon name="heroicons:x-mark" class="size-3.5" />
-          </button>
-        </div>
-      </div>
-    </template>
-
-    <UModal
+    <UploadsFilePicker
+      ref="uploadDialog"
       v-model:open="openUploadDialog"
-      title="Upload files"
-      description="Drag and drop files or click to browse."
-      close-icon="heroicons:x-mark"
-    >
-      <template #body>
-        <UForm
-          class="space-y-4"
-          :state="fileUploadState"
-          @submit="onUploadSubmit"
-        >
-          <UFileUpload v-model="fileUploadState.file" class="w-full min-h-48" />
-          <AppInput
-            v-model="fileUploadState.name"
-            label="File name"
-            name="fileName"
-            placeholder="example.jpg"
-            required
-            :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          />
+      :loading="isUploading"
+      @submit="onUploadSubmit"
+    />
 
-
- 
-          <AppSelect
-            v-model="fileUploadState.file_type"
-            label="File type"
-            name="fileType"
-            :items="FileType"
-            placeholder="Please select a file type"
-            required
-            :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          />
-
-          <AppButton
-            type="submit"
-            :loading="isUploading"
-            :disabled="isUploading"
-            @click="onUploadSubmit"
-          >
-            Upload
-          </AppButton>
-        </UForm>
-      </template>
-    </UModal>
+    <UploadsFab v-if="hasFiles" @click="openUploadDialog = true" />
   </div>
-
-  
 </template>
-
-<style scoped></style>

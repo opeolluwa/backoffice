@@ -51,9 +51,7 @@ const useTeamsStore = defineStore("teams", {
     ) {
       const res = await api.put(`/teams/${identifier}`, payload);
       const updated = res.data?.data as TeamMember;
-      const idx = this.members.findIndex(
-        (m) => m.identifier === identifier,
-      );
+      const idx = this.members.findIndex((m) => m.identifier === identifier);
       if (idx !== -1) this.members[idx] = updated;
       if (this.currentMember?.identifier === identifier)
         this.currentMember = updated;
@@ -62,9 +60,7 @@ const useTeamsStore = defineStore("teams", {
 
     async deleteMember(identifier: string) {
       await api.delete(`/teams/${identifier}`);
-      this.members = this.members.filter(
-        (m) => m.identifier !== identifier,
-      );
+      this.members = this.members.filter((m) => m.identifier !== identifier);
       this.memberCount = Math.max(0, this.memberCount - 1);
       if (this.currentMember?.identifier === identifier)
         this.currentMember = null;
@@ -73,9 +69,7 @@ const useTeamsStore = defineStore("teams", {
     async blockMember(identifier: string) {
       const res = await api.put(`/teams/${identifier}/block`);
       const updated = res.data?.data as TeamMember;
-      const idx = this.members.findIndex(
-        (m) => m.identifier === identifier,
-      );
+      const idx = this.members.findIndex((m) => m.identifier === identifier);
       if (idx !== -1) this.members[idx] = updated;
       if (this.currentMember?.identifier === identifier)
         this.currentMember = updated;
@@ -85,9 +79,7 @@ const useTeamsStore = defineStore("teams", {
     async unblockMember(identifier: string) {
       const res = await api.put(`/teams/${identifier}/unblock`);
       const updated = res.data?.data as TeamMember;
-      const idx = this.members.findIndex(
-        (m) => m.identifier === identifier,
-      );
+      const idx = this.members.findIndex((m) => m.identifier === identifier);
       if (idx !== -1) this.members[idx] = updated;
       if (this.currentMember?.identifier === identifier)
         this.currentMember = updated;

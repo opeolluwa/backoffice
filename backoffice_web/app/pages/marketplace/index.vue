@@ -295,7 +295,6 @@ function clearFilters() {
       @action="console.log()"
     />
 
-
     <div v-else>
       <div
         class="flex flex-col lg:flex-row gap-3 mb-5 px-4 py-3 border rounded border-accented items-end"

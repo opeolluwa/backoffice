@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.2.6",
+    "@imagekit/vue": "^4.0.1",
     "@internationalized/date": "^3.10.0",
     "@nuxt/eslint": "^1.10.0",
     "@nuxt/image": "^1.11.0",
@@ -41,6 +42,7 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.16",
     "typescript": "^5.9.3",
+    "unique-names-generator": "^4.7.1",
     "valibot": "^1.1.0",
     "vue": "^3.5.22",
     "vue-money-format": "^1.2.4",
