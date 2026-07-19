@@ -1,6 +1,6 @@
 [package]
 name = "backoffice-domain"
-edition = "2024"
+edition.workspace = true
 version.workspace = true
 authors.workspace = true
 description = "Domain layer: models, ports, services, and errors"

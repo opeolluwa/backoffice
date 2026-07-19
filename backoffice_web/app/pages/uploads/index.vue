@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import * as v from "valibot";
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {
@@ -7,7 +9,6 @@ definePageMeta({
   },
 });
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UploadedFile {
   id: string;
@@ -18,15 +19,22 @@ interface UploadedFile {
   uploadedAt: string;
 }
 
-// ─── State ────────────────────────────────────────────────────────────────────
+const fileUplaodSchema = v.object({
+  file: v.file('Please select an image file.'),
+  fileName: v.pipe(v.string(), v.minLength(1, "Please enter a file name.")),
+  name: v.pipe(v.string(), v.minLength(1, "Name is required.")),
+});
+
+type InviteSchema = v.InferOutput<typeof inviteSchema>;
+
+const inviteState = reactive<InviteSchema>({ email: "", role: "", name: "" });
 
 const files = ref<UploadedFile[]>([]);
 const isDragging = ref(false);
-const fileInputRef = ref<HTMLInputElement | null>(null);
-
+const openUploadDialog = ref(false);
+const isUploading = ref(false);
 const hasFiles = computed(() => files.value.length > 0);
 
-// ─── Upload ───────────────────────────────────────────────────────────────────
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -71,7 +79,6 @@ function removeFile(id: string) {
   files.value = files.value.filter((f) => f.id !== id);
 }
 
-// ─── Lazy preview via IntersectionObserver ────────────────────────────────────
 
 const loadedPreviews = ref<Set<string>>(new Set());
 
@@ -97,7 +104,6 @@ function useIntersection(id: string) {
   };
 }
 
-// ─── File type icon ───────────────────────────────────────────────────────────
 
 function fileIcon(type: string) {
   if (type.startsWith("image/")) return "heroicons:photo";
@@ -118,7 +124,7 @@ function fileIcon(type: string) {
       title="No files uploaded yet"
       description="Drag and drop files above or click to browse."
       action-label="Browse files"
-      @action="fileInputRef?.click()"
+      @action="openUploadDialog"
     />
     <!-- File grid -->
     <template v-else>
@@ -181,7 +187,61 @@ function fileIcon(type: string) {
         </div>
       </div>
     </template>
+
+    <UModal
+      v-model:open="openUploadDialog"
+      title="Upload files"
+      description="Drag and drop files or click to browse."
+      close-icon="heroicons:x-mark"
+    >
+      <template #body>
+        <UForm
+          class="space-y-4"
+          :schema="inviteSchema"
+          :state="inviteState"
+          :on-submit="onInviteSubmit"
+        >
+          <AppInput
+            v-model="inviteState.name"
+            label="Full name"
+            name="name"
+            placeholder="John Doe"
+            required
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
+          />
+
+          <AppInput
+            v-model="inviteState.email"
+            label="Email address"
+            placeholder="colleague@example.com"
+            name="email"
+            required
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
+          />
+
+          <AppSelect
+            v-model="inviteState.role"
+            label="Role"
+            name="role"
+            :items="roleOptions"
+            placeholder="Please select a role"
+            required
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
+          />
+
+          <AppButton
+            type="submit"
+            :loading="isUploading"
+            :disabled="isUploading"
+          >
+            Send invitation
+          </AppButton>
+        </UForm>
+      </template>
+    </UModal>
   </div>
+
+  
 </template>
 
 <style scoped></style>

@@ -4,7 +4,7 @@ import * as v from "valibot";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
 import type { TeamsInterface } from "~/bindings/TeamsInterface";
-import type { Invitation } from "~/bindings/InvitationInterface";
+import type { InvitationInterface as Invitation } from "~/bindings/InvitationInterface";
 import { useTeamsStore } from "~/stores/teams";
 import { useInvitationsStore } from "~/stores/invitations";
 

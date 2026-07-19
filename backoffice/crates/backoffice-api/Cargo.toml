@@ -1,6 +1,6 @@
 [package]
 name = "backoffice-api"
-edition = "2024"
+edition.workspace = true
 version.workspace = true
 authors.workspace = true
 description = "API layer: HTTP handlers, GraphQL, middleware, and extractors"

@@ -1,6 +1,6 @@
 [package]
 name = "backoffice-infra"
-edition = "2024"
+edition.workspace = true
 version.workspace = true
 authors.workspace = true
 description = "Infrastructure layer: database repositories, JWT, mailer, ImageKit"

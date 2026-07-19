@@ -1,6 +1,6 @@
 [package]
 name = "backoffice-config"
-edition = "2024"
+edition.workspace = true
 version.workspace = true
 authors.workspace = true
 description = "Configuration: environment, CORS, logging, and shutdown"

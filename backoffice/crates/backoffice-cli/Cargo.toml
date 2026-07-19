@@ -1,6 +1,6 @@
 [package]
 name = "backoffice-cli"
-edition = "2024"
+edition.workspace = true
 version.workspace = true
 authors.workspace = true
 description = "CLI tool for backoffice administration"

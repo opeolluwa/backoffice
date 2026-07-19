@@ -1,6 +1,6 @@
 [package]
 default-run = "backoffice"
-edition = "2024"
+edition.workspace = true
 name = "backoffice"
 version = "0.1.0"
 
@@ -54,6 +54,7 @@ sea-orm = { version = "=2.0.0-rc.37", features = [
     "with-rust_decimal",
     "with-uuid",
 ] }
+sea-orm-migration = { version = "=2.0.0-rc.37", features = ["runtime-tokio-rustls", "sqlx-postgres"] }
 seaography = { version = "=2.0.0-rc.8", features = [
     "graphql-playground",
     "with-decimal",
@@ -89,6 +90,8 @@ ts-rs = { version = "11.1.0", features = [
 ] }
 ulid = { version = "1.2.1", features = ["serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
+fs_extra = "1.3.0"
+axum-test = "18.2.1"
 
 [lib]
 name = "backoffice_lib"
@@ -108,11 +111,11 @@ tracing.workspace = true
 ulid.workspace = true
 
 [build-dependencies]
-fs_extra = "1.3.0"
+fs_extra.workspace = true
 
 [dev-dependencies]
-axum = { version = "0.8.3", features = ["macros"] }
-axum-test = "18.2.1"
+axum = { workspace = true, features = ["macros"] }
+axum-test.workspace = true
 
 [profile.release]
 codegen-units = 1

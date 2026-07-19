@@ -1,3 +1,5 @@
+#![allow(async_fn_in_trait)]
+
 pub mod dto;
 pub mod errors;
 pub mod models;

@@ -6,7 +6,7 @@ import { useMarketplaceStore } from "~/stores/marketplace";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
 import { getPaginationRowModel } from "@tanstack/vue-table";
-import type { MarketPlace } from "@bindings/Marketplace";
+import type { MarketplaceInterface as MarketPlace } from "@bindings/Marketplace";
 
 definePageMeta({
   layout: "dashboard",
