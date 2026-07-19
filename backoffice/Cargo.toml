@@ -13,6 +13,7 @@ members = [
     "crates/backoffice-config",
     "crates/backoffice-cli",
 ]
+resolver = "2"
 
 [workspace.package]
 authors = ["Adefemi Adeoye"]
@@ -27,6 +28,7 @@ backoffice-config = { path = "crates/backoffice-config" }
 backoffice-domain = { path = "crates/backoffice-domain" }
 backoffice-infra = { path = "crates/backoffice-infra" }
 askama = "0.15.6"
+base64 = "0.22"
 async-graphql-axum = "7.0"
 axum = "0.8.3"
 axum-extra = { version = "0.12.1", features = ["typed-header"] }
@@ -108,6 +110,7 @@ backoffice-config = { workspace = true }
 backoffice-domain = { workspace = true }
 backoffice-infra = { workspace = true }
 migration.workspace = true
+secrecy.workspace = true
 tokio.workspace = true
 tower-http.workspace = true
 tracing.workspace = true

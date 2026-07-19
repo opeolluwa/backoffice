@@ -2,9 +2,9 @@ use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
+use secrecy::ExposeSecret;
 
 use backoffice_config::env::AppConfig;
-use backoffice_domain::shared::extract_env::extract_env;
 use backoffice_domain::{
     errors::app_error::AppError,
     services::{
@@ -60,11 +60,7 @@ impl ServicesState {
     ) -> Self {
         let token_service = JwtTokenService::new();
         let user_service = UserService::new(user_repository.clone());
-        let auth_service = AuthenticationService::new(
-            user_repository,
-            token_service,
-            email_client,
-        );
+        let auth_service = AuthenticationService::new(user_repository, token_service, email_client);
         let country_service = CountryService::new(country_repository);
         let marketplace_service = MarketplaceService::new(marketplace_repository);
         let product_service = ProductService::new(product_repository);
@@ -119,9 +115,9 @@ impl AppState {
         // externals
         let email_client = ZeptoMail::new(app_config.email_api_key.clone());
 
-        let imagekit_private_key: String = extract_env("IMAGEKIT_PRIVATE_KEY")?;
         let imagekit_client = ImagekitClient::new(
-            &imagekit_private_key,
+            &app_config.imagekit_public_key,
+            &app_config.imagekit_private_key,
         )
         .map_err(|e| AppError::OperationFailed(e.to_string()))?;
 

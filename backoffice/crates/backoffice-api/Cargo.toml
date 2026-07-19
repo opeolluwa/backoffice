@@ -17,6 +17,7 @@ chrono.workspace = true
 jsonwebtoken.workspace = true
 sea-orm.workspace = true
 seaography.workspace = true
+secrecy.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tempfile = "3.23.0"
