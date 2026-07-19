@@ -6,9 +6,18 @@ const toast = useToast();
 
 const schema = v.pipe(
   v.object({
-    currentPassword: v.pipe(v.string(), v.minLength(1, "Current password is required.")),
-    newPassword: v.pipe(v.string(), v.minLength(8, "Password must be at least 8 characters.")),
-    confirmPassword: v.pipe(v.string(), v.minLength(1, "Please confirm your password.")),
+    currentPassword: v.pipe(
+      v.string(),
+      v.minLength(1, "Current password is required."),
+    ),
+    newPassword: v.pipe(
+      v.string(),
+      v.minLength(8, "Password must be at least 8 characters."),
+    ),
+    confirmPassword: v.pipe(
+      v.string(),
+      v.minLength(1, "Please confirm your password."),
+    ),
   }),
   v.forward(
     v.partialCheck(
@@ -47,8 +56,6 @@ async function onSubmit({ data: _ }: FormSubmitEvent<Schema>) {
 
 <template>
   <div class="space-y-4">
-
-
     <div
       class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
@@ -59,7 +66,12 @@ async function onSubmit({ data: _ }: FormSubmitEvent<Schema>) {
         You'll be asked to sign in again after changing your password.
       </p>
 
-      <UForm :schema="schema" :state="state" class="space-y-4" :on-submit="onSubmit">
+      <UForm
+        :schema="schema"
+        :state="state"
+        class="space-y-4"
+        :on-submit="onSubmit"
+      >
         <AppInput
           v-model="state.currentPassword"
           label="Current password"
@@ -68,7 +80,9 @@ async function onSubmit({ data: _ }: FormSubmitEvent<Schema>) {
           placeholder="••••••••"
         />
 
-        <div class="border-t border-gray-100 dark:border-white/5 pt-4 space-y-4">
+        <div
+          class="border-t border-gray-100 dark:border-white/5 pt-4 space-y-4"
+        >
           <AppInput
             v-model="state.newPassword"
             label="New password"

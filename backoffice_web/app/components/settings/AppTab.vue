@@ -16,7 +16,10 @@ const config = reactive<AppConfigInterface>({
 
 const schema = v.object({
   appName: v.pipe(v.string(), v.minLength(1, "App name is required.")),
-  supportEmail: v.pipe(v.string(), v.email("Please enter a valid email address.")),
+  supportEmail: v.pipe(
+    v.string(),
+    v.email("Please enter a valid email address."),
+  ),
 });
 
 type Schema = v.InferOutput<typeof schema>;
@@ -45,7 +48,9 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 function toggleMaintenance() {
   config.maintenanceMode = !config.maintenanceMode;
   toast.add({
-    title: config.maintenanceMode ? "Maintenance mode enabled" : "Maintenance mode disabled",
+    title: config.maintenanceMode
+      ? "Maintenance mode enabled"
+      : "Maintenance mode disabled",
     color: config.maintenanceMode ? "warning" : "success",
   });
 }
@@ -62,7 +67,12 @@ function toggleMaintenance() {
         Basic application settings.
       </p>
 
-      <UForm :schema="schema" :state="state" class="space-y-4" :on-submit="onSubmit">
+      <UForm
+        :schema="schema"
+        :state="state"
+        class="space-y-4"
+        :on-submit="onSubmit"
+      >
         <AppInput
           v-model="state.appName"
           label="App name"
@@ -89,7 +99,9 @@ function toggleMaintenance() {
     <div
       class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
-      <p class="font-semibold text-gray-900 dark:text-white mb-1">Maintenance</p>
+      <p class="font-semibold text-gray-900 dark:text-white mb-1">
+        Maintenance
+      </p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
         Temporarily disable access for non-admin users.
       </p>
@@ -101,25 +113,37 @@ function toggleMaintenance() {
           <div
             class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-white/5 flex items-center justify-center shrink-0"
           >
-            <UIcon name="heroicons:wrench-screwdriver" class="size-4 text-gray-400 dark:text-white/25" />
+            <UIcon
+              name="heroicons:wrench-screwdriver"
+              class="size-4 text-gray-400 dark:text-white/25"
+            />
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-800 dark:text-white/80">Maintenance mode</p>
+            <p class="text-sm font-medium text-gray-800 dark:text-white/80">
+              Maintenance mode
+            </p>
             <p class="text-xs text-gray-400 dark:text-white/30 mt-0.5">
               {{ config.maintenanceMode ? "Currently active" : "Inactive" }}
             </p>
           </div>
         </div>
-        <UToggle :model-value="config.maintenanceMode" @update:model-value="toggleMaintenance" />
+        <UToggle
+          :model-value="config.maintenanceMode"
+          @update:model-value="toggleMaintenance"
+        />
       </div>
 
       <div
         v-if="config.maintenanceMode"
         class="mt-3 flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10"
       >
-        <UIcon name="heroicons:exclamation-triangle" class="size-4 text-amber-500 shrink-0 mt-0.5" />
+        <UIcon
+          name="heroicons:exclamation-triangle"
+          class="size-4 text-amber-500 shrink-0 mt-0.5"
+        />
         <p class="text-xs text-amber-600 dark:text-amber-400">
-          Maintenance mode is active. Non-admin users cannot access the application.
+          Maintenance mode is active. Non-admin users cannot access the
+          application.
         </p>
       </div>
     </div>
@@ -135,8 +159,12 @@ function toggleMaintenance() {
 
       <div class="space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-500 dark:text-white/40">Identifier</span>
-          <span class="text-sm font-medium text-gray-700 dark:text-white/60">{{ config.identifier }}</span>
+          <span class="text-sm text-gray-500 dark:text-white/40"
+            >Identifier</span
+          >
+          <span class="text-sm font-medium text-gray-700 dark:text-white/60">{{
+            config.identifier
+          }}</span>
         </div>
         <div class="border-t border-gray-100 dark:border-white/5" />
         <div class="flex items-center justify-between">
@@ -147,7 +175,9 @@ function toggleMaintenance() {
         </div>
         <div class="border-t border-gray-100 dark:border-white/5" />
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-500 dark:text-white/40">Last updated</span>
+          <span class="text-sm text-gray-500 dark:text-white/40"
+            >Last updated</span
+          >
           <span class="text-sm font-medium text-gray-700 dark:text-white/60">
             {{ new Date(config.lastUpdated).toLocaleDateString() }}
           </span>

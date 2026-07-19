@@ -9,7 +9,10 @@ const toast = useToast();
 const schema = v.object({
   firstName: v.pipe(v.string(), v.minLength(1, "First name is required.")),
   lastName: v.pipe(v.string(), v.minLength(1, "Last name is required.")),
-  username: v.pipe(v.string(), v.minLength(2, "Username must be at least 2 characters.")),
+  username: v.pipe(
+    v.string(),
+    v.minLength(2, "Username must be at least 2 characters."),
+  ),
   email: v.pipe(v.string(), v.email("Please enter a valid email address.")),
 });
 
@@ -47,7 +50,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
     <div
       class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
-        <AppUserCard/>
+      <AppUserCard />
     </div>
 
     <div
@@ -60,15 +63,40 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
         Update your name, username, and email.
       </p>
 
-      <UForm :schema="schema" :state="state" class="space-y-4" :on-submit="onSubmit">
+      <UForm
+        :schema="schema"
+        :state="state"
+        class="space-y-4"
+        :on-submit="onSubmit"
+      >
         <div class="grid grid-cols-2 gap-4">
-          <AppInput v-model="state.firstName" label="First name" name="firstName" placeholder="Jane" />
-          <AppInput v-model="state.lastName" label="Last name" name="lastName" placeholder="Doe" />
+          <AppInput
+            v-model="state.firstName"
+            label="First name"
+            name="firstName"
+            placeholder="Jane"
+          />
+          <AppInput
+            v-model="state.lastName"
+            label="Last name"
+            name="lastName"
+            placeholder="Doe"
+          />
         </div>
 
-        <AppInput v-model="state.username" label="Username" name="username" placeholder="janedoe" />
+        <AppInput
+          v-model="state.username"
+          label="Username"
+          name="username"
+          placeholder="janedoe"
+        />
 
-        <AppInput v-model="state.email" label="Email address" name="email" placeholder="jane@example.com" />
+        <AppInput
+          v-model="state.email"
+          label="Email address"
+          name="email"
+          placeholder="jane@example.com"
+        />
 
         <div class="pt-1">
           <AppButton type="submit" :loading="loading" :disabled="loading">

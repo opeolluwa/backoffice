@@ -35,7 +35,9 @@ onMounted(async () => {
     try {
       const { data } = await api.get(`/marketplaces/${mp.identifier}/products`);
       count += data?.products?.length ?? 0;
-    } catch { /* skip failed */ }
+    } catch {
+      /* skip failed */
+    }
   }
   totalProducts.value = count;
 });
@@ -100,7 +102,6 @@ const recentMarketplaces = computed(() =>
     })
     .slice(0, 5),
 );
-
 </script>
 
 <template>
@@ -163,9 +164,7 @@ const recentMarketplaces = computed(() =>
           </template>
         </div>
 
-        <div
-          class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5"
-        >
+        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
           <p class="text-lg font-bold text-gray-900 dark:text-white">
             {{ chartValues[chartValues.length - 1] }}
           </p>
@@ -175,8 +174,6 @@ const recentMarketplaces = computed(() =>
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
 

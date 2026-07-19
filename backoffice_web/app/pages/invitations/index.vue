@@ -55,7 +55,8 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   } catch (err: any) {
     toast.add({
       title: "Error",
-      description: err?.message || "Failed to send invitation. Please try again.",
+      description:
+        err?.message || "Failed to send invitation. Please try again.",
       color: "error",
     });
   } finally {

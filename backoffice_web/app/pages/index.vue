@@ -37,7 +37,11 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 
   if (!result.success) {
     formError.value = result.error || "An error occurred. Please try again.";
-    toast.add({ title: "Login failed", description: formError.value, color: "error" });
+    toast.add({
+      title: "Login failed",
+      description: formError.value,
+      color: "error",
+    });
   } else {
     toast.add({ title: "Welcome back!", color: "success" });
   }

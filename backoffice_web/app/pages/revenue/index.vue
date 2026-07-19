@@ -39,11 +39,21 @@ const chartValues = [0, 0, 0, 0, 0, 0];
 const sources = [
   { label: "Marketplace sales", pct: 0, color: "bg-brand" },
   { label: "Subscriptions", pct: 0, color: "bg-brand-300" },
-  { label: "One-time purchases", pct: 0, color: "bg-brand-100 dark:bg-brand/30" },
+  {
+    label: "One-time purchases",
+    pct: 0,
+    color: "bg-brand-100 dark:bg-brand/30",
+  },
   { label: "Other", pct: 0, color: "bg-gray-200 dark:bg-white/10" },
 ];
 
-const transactions: { id: string; description: string; date: string; amount: string; status: "completed" | "pending" | "failed" }[] = [];
+const transactions: {
+  id: string;
+  description: string;
+  date: string;
+  amount: string;
+  status: "completed" | "pending" | "failed";
+}[] = [];
 
 const timeRanges = ["7 days", "30 days", "90 days", "12 months"] as const;
 type TimeRange = (typeof timeRanges)[number];

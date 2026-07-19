@@ -120,7 +120,8 @@ function formatFullDate(dateStr: string) {
         <pre
           v-else
           class="whitespace-pre-wrap text-sm text-gray-700 dark:text-white/70 font-sans leading-relaxed"
-        >{{ email.body }}</pre>
+          >{{ email.body }}</pre
+        >
       </div>
     </template>
   </div>
