@@ -1,0 +1,25 @@
+[package]
+name = "backoffice-cli"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description = "CLI tool for backoffice administration"
+
+[[bin]]
+name = "backoffice_cli"
+path = "src/main.rs"
+
+[dependencies]
+backoffice-config.workspace = true
+backoffice-domain.workspace = true
+backoffice-infra.workspace = true
+bcrypt.workspace = true
+clap.workspace = true
+console.workspace = true
+dialoguer.workspace = true
+migration.workspace = true
+sea-orm.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+ulid.workspace = true

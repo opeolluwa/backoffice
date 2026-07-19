@@ -112,7 +112,7 @@ migrate-add target:
         --model-extra-attributes 'backoffice_macros::ts_rs_export_sea_orm_entity_name' \
         --enum-extra-attributes 'ts(export)' \
         --ignore-tables backoffice_server_migrations \
-        -o backoffice/src/domain/models --seaography
+        -o backoffice/crates/backoffice-domain/src/models --seaography
 
 
 
@@ -122,7 +122,7 @@ migrate-add target:
 
 [working-directory: 'backoffice']
 export-bindings:
-    cargo test
+    cargo test --workspace
 
 db-pull:
     just run-migrations

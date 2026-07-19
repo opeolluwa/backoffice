@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type { CreateUploadRequest } from "~/bindings/CreateUploadRequest";
+import type { UploadsInterface } from "~/bindings/UploadsInterface";
+import { useUploadStore } from "~/stores/uploads";
+
 definePageMeta({
   layout: "dashboard",
   breadcrumb: {
@@ -7,26 +11,35 @@ definePageMeta({
   },
 });
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const FileType = [
+  { label: "Image", value: "image" },
+  { label: "Video", value: "video" },
+  { label: "Audio", value: "audio" },
+  { label: "PDF", value: "pdf" },
+  { label: "Zip", value: "zip" },
+];
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  url: string;
-  uploadedAt: string;
-}
 
-// ─── State ────────────────────────────────────────────────────────────────────
 
-const files = ref<UploadedFile[]>([]);
-const isDragging = ref(false);
-const fileInputRef = ref<HTMLInputElement | null>(null);
+const fileUploadState = reactive<CreateUploadRequest>({ file: null, fileName: "", fileType: "" });
 
+const uploadStore = useUploadStore(); 
+const onUploadSubmit = async () => {
+  isUploading.value = true;
+
+  try {
+    await uploadStore.createUpload(fileUploadState);
+    openUploadDialog.value = false;
+  } finally {
+    isUploading.value = false;
+  }
+};
+
+const files = ref<UploadsInterface[]>([]);
+const openUploadDialog = ref(false);
+const isUploading = ref(false);
 const hasFiles = computed(() => files.value.length > 0);
 
-// ─── Upload ───────────────────────────────────────────────────────────────────
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -37,41 +50,6 @@ function formatSize(bytes: number) {
 function isImage(type: string) {
   return type.startsWith("image/");
 }
-
-function processFiles(incoming: FileList | File[]) {
-  const list = Array.from(incoming);
-  for (const file of list) {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const url = URL.createObjectURL(file);
-    files.value.push({
-      id,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      url,
-      uploadedAt: new Date().toISOString(),
-    });
-  }
-}
-
-function onFileInputChange(e: Event) {
-  const input = e.target as HTMLInputElement;
-  if (input.files?.length) processFiles(input.files);
-  input.value = "";
-}
-
-function onDrop(e: DragEvent) {
-  isDragging.value = false;
-  if (e.dataTransfer?.files?.length) processFiles(e.dataTransfer.files);
-}
-
-function removeFile(id: string) {
-  const file = files.value.find((f) => f.id === id);
-  if (file) URL.revokeObjectURL(file.url);
-  files.value = files.value.filter((f) => f.id !== id);
-}
-
-// ─── Lazy preview via IntersectionObserver ────────────────────────────────────
 
 const loadedPreviews = ref<Set<string>>(new Set());
 
@@ -97,7 +75,6 @@ function useIntersection(id: string) {
   };
 }
 
-// ─── File type icon ───────────────────────────────────────────────────────────
 
 function fileIcon(type: string) {
   if (type.startsWith("image/")) return "heroicons:photo";
@@ -118,8 +95,9 @@ function fileIcon(type: string) {
       title="No files uploaded yet"
       description="Drag and drop files above or click to browse."
       action-label="Browse files"
-      @action="fileInputRef?.click()"
+      @action="() => openUploadDialog = true"
     />
+    
     <!-- File grid -->
     <template v-else>
       <div class="flex items-center justify-between">
@@ -181,7 +159,55 @@ function fileIcon(type: string) {
         </div>
       </div>
     </template>
+
+    <UModal
+      v-model:open="openUploadDialog"
+      title="Upload files"
+      description="Drag and drop files or click to browse."
+      close-icon="heroicons:x-mark"
+    >
+      <template #body>
+        <UForm
+          class="space-y-4"
+          :state="fileUploadState"
+          @submit="onUploadSubmit"
+        >
+          <UFileUpload v-model="fileUploadState.file" class="w-full min-h-48" />
+          <AppInput
+            v-model="fileUploadState.name"
+            label="File name"
+            name="fileName"
+            placeholder="example.jpg"
+            required
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
+          />
+
+
+ 
+          <AppSelect
+            v-model="fileUploadState.file_type"
+            label="File type"
+            name="fileType"
+            :items="FileType"
+            placeholder="Please select a file type"
+            required
+            :ui="{ error: 'text-red-500 text-sm mt-1' }"
+          />
+
+          <AppButton
+            type="submit"
+            :loading="isUploading"
+            :disabled="isUploading"
+            @click="onUploadSubmit"
+          >
+            Upload
+          </AppButton>
+        </UForm>
+      </template>
+    </UModal>
   </div>
+
+  
 </template>
 
 <style scoped></style>

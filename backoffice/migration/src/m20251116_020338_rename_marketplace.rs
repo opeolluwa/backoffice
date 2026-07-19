@@ -6,16 +6,22 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        let query = include_str!("sqlx/20251116020338_rename-marketplace-add-s.sql");
-        manager.get_connection().execute_unprepared(query).await?;
-        Ok(())
+        manager
+            .rename_table(
+                Table::rename()
+                    .table("marketplace", "marketplaces")
+                    .to_owned(),
+            )
+            .await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .get_connection()
-            .execute_unprepared("ALTER TABLE marketplaces RENAME TO marketplace")
-            .await?;
-        Ok(())
+            .rename_table(
+                Table::rename()
+                    .table("marketplaces", "marketplace")
+                    .to_owned(),
+            )
+            .await
     }
 }
