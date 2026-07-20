@@ -94,7 +94,7 @@ impl PaymnetProviderTrait for PaystackClient {
             .json::<PaystackInitializeTransactionResponse>()
             .await
             .map_err(|err| PaymentError::UnexpectedError(err.to_string()))?;
-        
+
         Ok(parsed.into())
     }
 }

@@ -1,7 +1,7 @@
 use async_graphql::dynamic::*;
-use sea_orm::DatabaseConnection;
 use seaography::{Builder, BuilderContext, async_graphql, lazy_static::lazy_static};
 
+use super::types as Inputs;
 use backoffice_domain::models::*;
 
 use super::mutations;
@@ -12,42 +12,45 @@ lazy_static! {
 }
 
 pub fn schema(
-    database: DatabaseConnection,
     depth: Option<usize>,
     complexity: Option<usize>,
     app_state: AppState,
 ) -> Result<Schema, SchemaError> {
-    schema_builder(&CONTEXT, database, depth, complexity, app_state).finish()
+    schema_builder(&CONTEXT, depth, complexity, app_state).finish()
 }
 
 pub fn schema_builder(
     context: &'static BuilderContext,
-    database: DatabaseConnection,
     depth: Option<usize>,
     complexity: Option<usize>,
     app_state: AppState,
 ) -> SchemaBuilder {
-    let mut builder = Builder::new(context, database.clone());
+    let mut builder = Builder::new(context, app_state.database_connection.clone());
     builder = register_entity_modules(builder);
     builder = register_active_enums(builder);
     builder = register_active_enums(builder);
 
     seaography::register_custom_inputs!(
         builder,
-        [super::types::newsletter::SubscribeToNewsletterInput]
+        [
+            Inputs::newsletter::SubscribeToNewsletterInput,
+            Inputs::emails::SendEmailInput
+        ]
     );
     seaography::register_custom_mutations!(
         builder,
         [
             mutations::newsletter::SubscribeNewsletter,
-            mutations::health_check::HealthCheck
+            mutations::health_check::HealthCheck,
+            mutations::emails::SendEmail
         ]
+        
     );
 
     builder
         .set_depth_limit(depth)
         .set_complexity_limit(complexity)
         .schema_builder()
-        .data(database)
+        .data(app_state.clone().database_connection)
         .data(app_state)
 }

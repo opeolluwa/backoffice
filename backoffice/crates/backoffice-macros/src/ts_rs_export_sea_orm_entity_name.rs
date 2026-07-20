@@ -5,7 +5,6 @@ use quote::quote;
 
 use crate::utils::convert_snake_to_pascal;
 
-
 pub(crate) fn expand(
     mut input: DeriveInput,
     args: TokenStream,

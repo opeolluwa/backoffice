@@ -17,6 +17,7 @@ axum-extra = { workspace = true, optional = true }
 backoffice-macros = { version = "0.1.0", path = "../backoffice-macros" }
 bcrypt.workspace = true
 chrono.workspace = true
+either = { version = "1.16.0", features = ["serde"] }
 jsonwebtoken.workspace = true
 rust_decimal.workspace = true
 sea-orm.workspace = true
@@ -24,7 +25,6 @@ seaography.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 serde_with.workspace = true
-sqlx.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
 tracing.workspace = true

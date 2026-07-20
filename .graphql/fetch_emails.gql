@@ -1,0 +1,17 @@
+query fetchEmails {
+    emails {
+        nodes {
+            identifier
+            subject
+            body
+            senderEmail
+            recipientEmail
+            tag
+            hasAttachments
+        }
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+        }
+    }
+}

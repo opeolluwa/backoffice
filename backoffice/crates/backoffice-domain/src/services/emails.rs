@@ -20,129 +20,110 @@ pub trait EmailsServiceExt {
     async fn create_email(
         &self,
         command: &CreateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError>;
 
     async fn find_email_by_identifier(
         &self,
         identifier: &str,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError>;
 
     async fn find_all_emails(
         &self,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError>;
 
     async fn find_emails_by_tag(
         &self,
         tag: &str,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError>;
 
     async fn find_starred_emails(
         &self,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError>;
 
     async fn find_unread_emails(
         &self,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError>;
 
     async fn update_email(
         &self,
         identifier: &str,
         command: &UpdateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError>;
 
     async fn delete_email(
         &self,
         identifier: &str,
-        user_identifier: &str,
     ) -> Result<(), ServiceError>;
 
-    async fn count_emails(&self, user_identifier: &str) -> Result<i64, ServiceError>;
+    async fn count_emails(&self) -> Result<i64, ServiceError>;
 
-    async fn count_unread_emails(&self, user_identifier: &str) -> Result<i64, ServiceError>;
+    async fn count_unread_emails(&self) -> Result<i64, ServiceError>;
 }
 
 impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> {
     async fn create_email(
         &self,
         command: &CreateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError> {
-        Ok(self.repo.create_email(command, user_identifier).await?)
+        Ok(self.repo.create_email(command).await?)
     }
 
     async fn find_email_by_identifier(
         &self,
         identifier: &str,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError> {
-        Ok(self
-            .repo
-            .find_email_by_identifier(identifier, user_identifier)
-            .await?)
+        Ok(self.repo.find_email_by_identifier(identifier).await?)
     }
 
     async fn find_all_emails(
         &self,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        Ok(self.repo.find_all_emails(user_identifier).await?)
+        Ok(self.repo.find_all_emails().await?)
     }
 
     async fn find_emails_by_tag(
         &self,
         tag: &str,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        Ok(self.repo.find_emails_by_tag(tag, user_identifier).await?)
+        Ok(self.repo.find_emails_by_tag(tag).await?)
     }
 
     async fn find_starred_emails(
         &self,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        Ok(self.repo.find_starred_emails(user_identifier).await?)
+        Ok(self.repo.find_starred_emails().await?)
     }
 
     async fn find_unread_emails(
         &self,
-        user_identifier: &str,
     ) -> Result<Vec<emails::Model>, ServiceError> {
-        Ok(self.repo.find_unread_emails(user_identifier).await?)
+        Ok(self.repo.find_unread_emails().await?)
     }
 
     async fn update_email(
         &self,
         identifier: &str,
         command: &UpdateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError> {
         Ok(self
             .repo
-            .update_email(identifier, command, user_identifier)
+            .update_email(identifier, command)
             .await?)
     }
 
     async fn delete_email(
         &self,
         identifier: &str,
-        user_identifier: &str,
     ) -> Result<(), ServiceError> {
-        Ok(self.repo.delete_email(identifier, user_identifier).await?)
+        Ok(self.repo.delete_email(identifier).await?)
     }
 
-    async fn count_emails(&self, user_identifier: &str) -> Result<i64, ServiceError> {
-        Ok(self.repo.count_emails(user_identifier).await?)
+    async fn count_emails(&self) -> Result<i64, ServiceError> {
+        Ok(self.repo.count_emails().await?)
     }
 
-    async fn count_unread_emails(&self, user_identifier: &str) -> Result<i64, ServiceError> {
-        Ok(self.repo.count_unread_emails(user_identifier).await?)
+    async fn count_unread_emails(&self) -> Result<i64, ServiceError> {
+        Ok(self.repo.count_unread_emails().await?)
     }
 }
 
@@ -176,7 +157,7 @@ mod tests {
         let mut repo = MockEmailRepositoryExt::new();
         let email = test_email();
         repo.expect_create_email()
-            .returning(move |_, _| Ok(email.clone()));
+            .returning(move |_| Ok(email.clone()));
         let service = EmailsService::new(repo);
 
         let cmd = crate::dto::CreateEmailCommand {
@@ -188,7 +169,7 @@ mod tests {
             has_attachments: None,
             data: None,
         };
-        let result = service.create_email(&cmd, "user-001").await;
+        let result = service.create_email(&cmd).await;
         assert!(result.is_ok());
         assert_eq!(result.unwrap().subject, "Test Subject");
     }
@@ -198,12 +179,12 @@ mod tests {
         let mut repo = MockEmailRepositoryExt::new();
         let email = test_email();
         repo.expect_find_email_by_identifier()
-            .returning(move |_, _| Ok(email.clone()));
+            .returning(move |_| Ok(email.clone()));
         let service = EmailsService::new(repo);
 
         assert!(
             service
-                .find_email_by_identifier("em-001", "user-001")
+                .find_email_by_identifier("em-001")
                 .await
                 .is_ok()
         );
@@ -213,36 +194,36 @@ mod tests {
     async fn find_all_emails() {
         let mut repo = MockEmailRepositoryExt::new();
         repo.expect_find_all_emails()
-            .returning(|_| Ok(vec![test_email()]));
+            .returning(|| Ok(vec![test_email()]));
         let service = EmailsService::new(repo);
 
-        assert_eq!(service.find_all_emails("user-001").await.unwrap().len(), 1);
+        assert_eq!(service.find_all_emails().await.unwrap().len(), 1);
     }
 
     #[tokio::test]
     async fn count_emails() {
         let mut repo = MockEmailRepositoryExt::new();
-        repo.expect_count_emails().returning(|_| Ok(10));
+        repo.expect_count_emails().returning(|| Ok(10));
         let service = EmailsService::new(repo);
 
-        assert_eq!(service.count_emails("user-001").await.unwrap(), 10);
+        assert_eq!(service.count_emails().await.unwrap(), 10);
     }
 
     #[tokio::test]
     async fn count_unread_emails() {
         let mut repo = MockEmailRepositoryExt::new();
-        repo.expect_count_unread_emails().returning(|_| Ok(3));
+        repo.expect_count_unread_emails().returning(|| Ok(3));
         let service = EmailsService::new(repo);
 
-        assert_eq!(service.count_unread_emails("user-001").await.unwrap(), 3);
+        assert_eq!(service.count_unread_emails().await.unwrap(), 3);
     }
 
     #[tokio::test]
     async fn delete_email_succeeds() {
         let mut repo = MockEmailRepositoryExt::new();
-        repo.expect_delete_email().returning(|_, _| Ok(()));
+        repo.expect_delete_email().returning(|_| Ok(()));
         let service = EmailsService::new(repo);
 
-        assert!(service.delete_email("em-001", "user-001").await.is_ok());
+        assert!(service.delete_email("em-001").await.is_ok());
     }
 }

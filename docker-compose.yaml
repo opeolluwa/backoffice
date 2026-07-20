@@ -20,7 +20,8 @@ services:
     networks:
       - internal
     volumes:
-      - ./backoffice:/app:cachedbackoffice-macros
+      - ./backoffice:/app:cached
+      - ./backoffice_macros:/backoffice_macros:cached
       - cargo-target:/cargo-target:delegated
       - rust-cache:/usr/local/cargo/registry:delegated
     stdin_open: true

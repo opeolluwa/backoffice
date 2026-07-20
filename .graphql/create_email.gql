@@ -1,0 +1,20 @@
+mutation sendEmail {
+    send_email(
+        input: {
+            subject: "Your subscription expired!"
+            body: "Etiam ut dolor nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec imperdiet massa purus, vitae pretium magna maximus non. Ut nec finibus urna, ac vulputate erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aliquam auctor porttitor orci mattis scelerisque. Etiam placerat fringilla efficitur. Morbi non gravida augue. "
+            sender_email: "noreply@backoffice.com"
+            recipient_email: "john.doe@example.com"
+            tag: "welcome"
+            has_attachments: false
+        }
+    ) {
+        identifier
+        subject
+        body
+        senderEmail
+        recipientEmail
+        tag
+        hasAttachments
+    }
+}

@@ -18,14 +18,16 @@ pub async fn run() -> Result<(), AppError> {
     let db_conn = init_db_pool(&app_config).await?;
 
     let app_state = AppState::new(&db_conn)?;
-    let graphql_router = load_graphql_router(db_conn, &app_config, app_state.clone())?;
+    let graphql_router = load_graphql_router(&app_config, app_state.clone())?;
     let http_routes = load_http_routes(app_state);
 
     let app = Router::new()
         .merge(graphql_router)
         .merge(http_routes)
         .layer(DefaultBodyLimit::disable())
-        .layer(RequestBodyLimitLayer::new(app_config.body_limit_megabytes * 1024 * 1024 ))
+        .layer(RequestBodyLimitLayer::new(
+            app_config.body_limit_megabytes * 1024 * 1024,
+        ))
         .layer(TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
             app_config.requests_time_out_secs * 100,

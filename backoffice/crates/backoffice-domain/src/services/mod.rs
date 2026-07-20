@@ -3,6 +3,7 @@ pub mod country;
 pub mod emails;
 pub mod invitation;
 pub mod marketplace;
+pub mod newsletter;
 pub mod product;
 pub mod root;
 pub mod team;

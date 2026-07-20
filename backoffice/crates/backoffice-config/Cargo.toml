@@ -9,6 +9,7 @@ description = "Configuration: environment, CORS, logging, and shutdown"
 axum.workspace = true
 backoffice-domain.workspace = true
 dotenv.workspace = true
+dotenvy = "0.15.7"
 secrecy.workspace = true
 serde.workspace = true
 tokio.workspace = true
