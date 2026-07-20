@@ -11,7 +11,7 @@ use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::emails;
 use backoffice_domain::services::emails::EmailsServiceExt;
 
-use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
+use crate::http::dto::api_request::AuthenticatedRequest;
 use crate::http::extractors::email::{CreateEmailRequest, UpdateEmailRequest};
 use crate::state::AppState;
 
@@ -54,12 +54,11 @@ pub async fn create_email(
 
 pub async fn find_all_emails(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
 ) -> Result<ApiResponse<Vec<emails::Model>>, ServiceError> {
     let emails = state
         .services
         .emails_service
-        .find_all_emails(&claims.identifier)
+        .find_all_emails()
         .await?;
     Ok(ApiResponse::builder()
         .message("Emails fetched successfully")
@@ -69,13 +68,12 @@ pub async fn find_all_emails(
 
 pub async fn find_email_by_identifier(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<emails::Model>, ServiceError> {
     let email = state
         .services
         .emails_service
-        .find_email_by_identifier(&identifier, &claims.identifier)
+        .find_email_by_identifier(&identifier)
         .await?;
     Ok(ApiResponse::builder()
         .message("Email fetched successfully")
@@ -85,13 +83,12 @@ pub async fn find_email_by_identifier(
 
 pub async fn find_emails_by_tag(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
     Path(tag): Path<String>,
 ) -> Result<ApiResponse<Vec<emails::Model>>, ServiceError> {
     let emails = state
         .services
         .emails_service
-        .find_emails_by_tag(&tag, &claims.identifier)
+        .find_emails_by_tag(&tag)
         .await?;
     Ok(ApiResponse::builder()
         .message("Emails by tag fetched successfully")
@@ -101,12 +98,11 @@ pub async fn find_emails_by_tag(
 
 pub async fn find_starred_emails(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
 ) -> Result<ApiResponse<Vec<emails::Model>>, ServiceError> {
     let emails = state
         .services
         .emails_service
-        .find_starred_emails(&claims.identifier)
+        .find_starred_emails()
         .await?;
     Ok(ApiResponse::builder()
         .message("Starred emails fetched successfully")
@@ -116,12 +112,11 @@ pub async fn find_starred_emails(
 
 pub async fn find_unread_emails(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
 ) -> Result<ApiResponse<Vec<emails::Model>>, ServiceError> {
     let emails = state
         .services
         .emails_service
-        .find_unread_emails(&claims.identifier)
+        .find_unread_emails()
         .await?;
     Ok(ApiResponse::builder()
         .message("Unread emails fetched successfully")
@@ -132,13 +127,13 @@ pub async fn find_unread_emails(
 pub async fn update_email(
     State(state): State<Arc<AppState>>,
     Path(identifier): Path<String>,
-    AuthenticatedRequest { data, claims }: AuthenticatedRequest<UpdateEmailRequest>,
+    AuthenticatedRequest { data, .. }: AuthenticatedRequest<UpdateEmailRequest>,
 ) -> Result<ApiResponse<emails::Model>, ServiceError> {
     let command = to_update_command(&data);
     let email = state
         .services
         .emails_service
-        .update_email(&identifier, &command, &claims.identifier)
+        .update_email(&identifier, &command)
         .await?;
     Ok(ApiResponse::builder()
         .message("Email updated successfully")
@@ -148,13 +143,12 @@ pub async fn update_email(
 
 pub async fn delete_email(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<()>, ServiceError> {
     state
         .services
         .emails_service
-        .delete_email(&identifier, &claims.identifier)
+        .delete_email(&identifier)
         .await?;
     Ok(ApiResponse::builder()
         .message("Email deleted successfully")
@@ -163,12 +157,11 @@ pub async fn delete_email(
 
 pub async fn count_emails(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
 ) -> Result<ApiResponse<i64>, ServiceError> {
     let count = state
         .services
         .emails_service
-        .count_emails(&claims.identifier)
+        .count_emails()
         .await?;
     Ok(ApiResponse::builder()
         .message("Emails counted successfully")
@@ -178,12 +171,11 @@ pub async fn count_emails(
 
 pub async fn count_unread_emails(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
 ) -> Result<ApiResponse<i64>, ServiceError> {
     let count = state
         .services
         .emails_service
-        .count_unread_emails(&claims.identifier)
+        .count_unread_emails()
         .await?;
     Ok(ApiResponse::builder()
         .message("Unread emails counted successfully")
