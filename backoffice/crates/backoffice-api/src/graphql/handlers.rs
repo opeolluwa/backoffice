@@ -5,7 +5,6 @@ use axum::{
     response::{self, IntoResponse},
     routing::get,
 };
-use sea_orm::DatabaseConnection;
 use seaography::async_graphql::http::{GraphQLPlaygroundConfig, playground_source};
 
 use backoffice_config::env::AppConfig;
@@ -28,13 +27,13 @@ pub async fn graphql_handler(
     schema.execute(req).await.into()
 }
 
-pub fn build_router(
-    db_conn: DatabaseConnection,
-    app_config: &AppConfig,
-    app_state: AppState,
-) -> Result<Router, AppError> {
-    let schema = query_root::schema(db_conn, Some(100), app_config.complexity_limit, app_state)
-        .map_err(|err| AppError::GraphQLError(err.to_string()))?;
+pub fn build_router(app_config: &AppConfig, app_state: AppState) -> Result<Router, AppError> {
+    let schema = query_root::schema(
+        app_config.depth_limit,
+        app_config.complexity_limit,
+        app_state,
+    )
+    .map_err(|err| AppError::GraphQLError(err.to_string()))?;
 
     let state = GraphQlState {
         schema,

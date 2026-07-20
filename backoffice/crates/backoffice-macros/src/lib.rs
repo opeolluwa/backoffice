@@ -5,10 +5,7 @@ mod utils;
 use proc_macro::TokenStream;
 
 #[proc_macro_attribute]
-pub fn ts_rs_export_sea_orm_entity_name(
-    args: TokenStream,
-    input: TokenStream,
-) -> TokenStream {
+pub fn ts_rs_export_sea_orm_entity_name(args: TokenStream, input: TokenStream) -> TokenStream {
     let derive_input = syn::parse_macro_input!(input as syn::DeriveInput);
 
     match ts_rs_export_sea_orm_entity_name::expand(derive_input, args) {

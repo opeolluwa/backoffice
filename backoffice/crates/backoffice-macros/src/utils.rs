@@ -1,4 +1,3 @@
-
 /// #Description
 /// Convert a snake case string to pascal case
 pub fn convert_snake_to_pascal(input: &str) -> String {
@@ -26,4 +25,3 @@ pub fn convert_snake_to_pascal(input: &str) -> String {
     }
     ret
 }
-

@@ -1,14 +1,29 @@
 {
-  "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs",
-    "prepare": "husky"
-  },
+  "name": "backoffice",
+  "version": "1.0.0",
+  "description": "A content management system and administrative platform for web applications.",
+  "main": "index.js",
   "devDependencies": {
-    "vitepress": "^2.0.0-alpha.15"
+    "concurrently": "^10.0.3",
+    "husky": "^9.1.7"
   },
-  "dependencies": {
-    "graphql-tag": "^2.12.7"
-  }
+  "scripts": {
+    "dev:server": "just logs",
+    "dev:fe":"just run-fe",
+    "predev": "just start",
+    "concurrently":"concurrently",
+    "dev": "npm run concurrently \"npm run dev:fe\", \"npm run dev:server\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opeolluwa/backoffice.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/opeolluwa/backoffice/issues"
+  },
+  "homepage": "https://github.com/opeolluwa/backoffice#readme"
 }

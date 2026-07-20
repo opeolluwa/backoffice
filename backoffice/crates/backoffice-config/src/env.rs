@@ -1,6 +1,5 @@
 use std::{str::FromStr, time::Duration};
 
-use dotenv::dotenv;
 use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
 
@@ -62,8 +61,6 @@ pub struct AppConfig {
 
 impl AppConfig {
     pub fn from_env() -> Result<Self, AppError> {
-        dotenv().ok();
-
         tracing::info!("Loading application configuration...");
 
         let database_url = extract_env::<String>("DATABASE_URL")?;
@@ -152,6 +149,8 @@ impl AppConfig {
 }
 
 pub fn load_config() -> Result<AppConfig, AppError> {
+    // dotenvy::from_filename(".env.local").map_err(|err| AppError::EnvError(err.to_string()))?;
+
     AppConfig::from_env()
 }
 

@@ -6,6 +6,8 @@ alias install := install-dependencies
 alias run-fe := run-frontend
 alias r := restart
 alias cfg := copy-env
+alias start  := watch 
+alias dev := watch 
 
 set dotenv-required := false
 set dotenv-load := true
@@ -35,6 +37,7 @@ DEV_DB_URL := "postgres://backoffice:backoffice@localhost:6543/backoffice"
     {{ DOCKER_CMD }} up -d
     @just l
 
+    
 
 @logs:
     {{ DOCKER_CMD }} logs -f --tail='30' app

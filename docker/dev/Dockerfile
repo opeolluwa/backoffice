@@ -28,12 +28,4 @@ RUN cargo build
 
 VOLUME ["/cargo-target", "/usr/local/cargo/registry"]
 
-CMD ["cargo", "watch", \
-     "--why", \
-     "--ignore", ".git/", \
-     "--ignore", "target/", \
-     "-w", "src", \
-     "-w", "Cargo.toml", \
-     "-w", "migration", \
-     "-x", "check", \
-     "-x", "run"]
+CMD ["cargo", "watch" , "-qcx", "run"]

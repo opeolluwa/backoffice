@@ -10,7 +10,7 @@ pub(crate) fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream
             return Err(syn::Error::new(
                 input.ident.span(),
                 "ts_rs_decimal_fields can only be applied to structs",
-            ))
+            ));
         }
     };
 
@@ -20,7 +20,7 @@ pub(crate) fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream
             return Err(syn::Error::new(
                 input.ident.span(),
                 "ts_rs_decimal_fields only supports structs with named fields",
-            ))
+            ));
         }
     };
 

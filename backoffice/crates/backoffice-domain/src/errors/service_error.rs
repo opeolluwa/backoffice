@@ -15,8 +15,6 @@ use crate::errors::imagekit_error::ImagekitError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ServiceError {
-    #[error("an internal database error has occurred")]
-    SqlxError(#[from] sqlx::error::Error),
     #[error(transparent)]
     ValidationError(#[from] validator::ValidationErrors),
     #[cfg(feature = "http")]
@@ -53,7 +51,6 @@ impl ServiceError {
         match self {
             ServiceError::ValidationError(_) => StatusCode::BAD_REQUEST,
             ServiceError::AxumFormRejection(_) => StatusCode::BAD_REQUEST,
-            ServiceError::SqlxError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ServiceError::AxumJsonRejection(_) => StatusCode::BAD_REQUEST,
             ServiceError::AuthenticationError(error) => error.status_code(),
             ServiceError::DatabaseError(_) => StatusCode::UNPROCESSABLE_ENTITY,

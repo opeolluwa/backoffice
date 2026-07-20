@@ -78,19 +78,19 @@ export default defineNuxtConfig({
       },
     ],
   ],
-  routeRules: {
-    "/api/**": {
-      proxy: { to: "http://localhost:8000/api/**", bodyLimit: 26214400 },
-    },
-  },
-  nitro: {
-    devProxy: {
-      "/api": {
-        target: "http://localhost:8000/api",
-        changeOrigin: true,
-      },
-    },
-  },
+  // routeRules: {
+  //   "/api/**": {
+  //     proxy: { to: "http://localhost:8000/api/**", bodyLimit: 26214400 },
+  //   },
+  // },
+  // nitro: {
+  //   devProxy: {
+  //     "/api": {
+  //       target: "http://localhost:8000/api",
+  //       changeOrigin: true,
+  //     },
+  //   },
+  // },
   pinia: {
     storesDirs: ["./stores/**"],
   },
