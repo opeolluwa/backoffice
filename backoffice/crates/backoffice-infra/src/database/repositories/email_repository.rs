@@ -28,7 +28,6 @@ impl EmailRepositoryExt for EmailRepository {
     async fn create_email(
         &self,
         command: &CreateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, DatabaseError> {
         let model = emails::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
@@ -39,7 +38,6 @@ impl EmailRepositoryExt for EmailRepository {
             tag: Set(command.tag.clone()),
             has_attachments: Set(command.has_attachments.unwrap_or(false)),
             data: Set(command.data.clone().map(|v| v.to_string().into())),
-            user_identifier: Set(Some(user_identifier.to_string())),
             ..Default::default()
         };
         model.insert(&self.db).await.map_err(DatabaseError::from)

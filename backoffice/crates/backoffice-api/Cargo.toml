@@ -17,6 +17,7 @@ backoffice-payment-provider.workspace = true
 chrono.workspace = true
 dotenvy = "0.15.7"
 jsonwebtoken.workspace = true
+sanitizer = { version = "1.0.0", features = ["derive"] }
 sea-orm.workspace = true
 seaography = { workspace = true, features = ["field-camel-case", "serde"] }
 secrecy.workspace = true

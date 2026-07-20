@@ -10,7 +10,6 @@ pub trait EmailRepositoryExt {
     async fn create_email(
         &self,
         command: &CreateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, DatabaseError>;
 
     async fn find_email_by_identifier(

@@ -149,8 +149,6 @@ impl AppConfig {
 }
 
 pub fn load_config() -> Result<AppConfig, AppError> {
-    // dotenvy::from_filename(".env.local").map_err(|err| AppError::EnvError(err.to_string()))?;
-
     AppConfig::from_env()
 }
 

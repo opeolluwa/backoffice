@@ -43,7 +43,7 @@ pub async fn create_email(
     let email = state
         .services
         .emails_service
-        .create_email(&command, &request.claims.identifier)
+        .create_email(&command)
         .await?;
     Ok(ApiResponse::builder()
         .message("Email created successfully")

@@ -20,7 +20,6 @@ pub trait EmailsServiceExt {
     async fn create_email(
         &self,
         command: &CreateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError>;
 
     async fn find_email_by_identifier(
@@ -72,9 +71,8 @@ impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> 
     async fn create_email(
         &self,
         command: &CreateEmailCommand,
-        user_identifier: &str,
     ) -> Result<emails::Model, ServiceError> {
-        Ok(self.repo.create_email(command, user_identifier).await?)
+        Ok(self.repo.create_email(command).await?)
     }
 
     async fn find_email_by_identifier(
@@ -176,7 +174,7 @@ mod tests {
         let mut repo = MockEmailRepositoryExt::new();
         let email = test_email();
         repo.expect_create_email()
-            .returning(move |_, _| Ok(email.clone()));
+            .returning(move |_| Ok(email.clone()));
         let service = EmailsService::new(repo);
 
         let cmd = crate::dto::CreateEmailCommand {
@@ -188,7 +186,7 @@ mod tests {
             has_attachments: None,
             data: None,
         };
-        let result = service.create_email(&cmd, "user-001").await;
+        let result = service.create_email(&cmd).await;
         assert!(result.is_ok());
         assert_eq!(result.unwrap().subject, "Test Subject");
     }

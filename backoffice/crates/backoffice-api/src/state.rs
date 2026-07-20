@@ -40,6 +40,49 @@ pub struct Repositories {
     pub newsletter: NewsletterRepository,
 }
 
+#[derive(Clone)]
+pub struct Contracts {
+    pub email: ZeptoMail,
+    pub imagekit: ImagekitClient,
+    pub paystack: PaystackClient,
+}
+
+#[derive(Clone)]
+pub struct ServicesState {
+    pub user_service: UserService<UserRepository>,
+    pub root_service: RootService,
+    pub auth_service: AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>,
+    pub marketplace_service: MarketplaceService<MarketplaceRepository>,
+    pub product_service: ProductService<ProductRepository>,
+    pub country_service: CountryService<CountryRepository>,
+    pub team_service: TeamService<TeamRepository>,
+    pub emails_service: EmailsService<EmailRepository>,
+    pub invitation_service: InvitationService<InvitationRepository>,
+    pub upload_service: UploadsService<UploadRepository, ImagekitClient>,
+    pub paystack_client: PaystackClient,
+    pub newsletter_service: NewsletterService<NewsletterRepository>,
+}
+
+#[derive(Clone)]
+pub struct GraphQlState {
+    pub schema: Schema,
+    pub endpoint: String,
+}
+
+pub struct Application {
+    pub config: AppConfig,
+    pub db: DatabaseConnection,
+    pub repositories: Repositories,
+    pub services: ServicesState,
+}
+
+#[derive(Clone)]
+pub struct AppState {
+    pub services: ServicesState,
+    pub database_connection: DatabaseConnection,
+    pub app_config: AppConfig,
+}
+
 impl Repositories {
     pub fn new(db: &DatabaseConnection) -> Self {
         Self {
@@ -54,13 +97,6 @@ impl Repositories {
             newsletter: NewsletterRepository::init(db),
         }
     }
-}
-
-#[derive(Clone)]
-pub struct Contracts {
-    pub email: ZeptoMail,
-    pub imagekit: ImagekitClient,
-    pub paystack: PaystackClient,
 }
 
 impl Contracts {
@@ -83,28 +119,6 @@ impl Contracts {
             imagekit,
             paystack,
         })
-    }
-}
-
-#[derive(Clone)]
-pub struct ServicesState {
-    pub user_service: UserService<UserRepository>,
-    pub root_service: RootService,
-    pub auth_service: AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>,
-    pub marketplace_service: MarketplaceService<MarketplaceRepository>,
-    pub product_service: ProductService<ProductRepository>,
-    pub country_service: CountryService<CountryRepository>,
-    pub team_service: TeamService<TeamRepository>,
-    pub emails_service: EmailsService<EmailRepository>,
-    pub invitation_service: InvitationService<InvitationRepository>,
-    pub upload_service: UploadsService<UploadRepository, ImagekitClient>,
-    pub paystack_client: PaystackClient,
-    pub newsletter_service: NewsletterService<NewsletterRepository>,
-}
-
-impl FromRef<AppState> for ServicesState {
-    fn from_ref(state: &AppState) -> Self {
-        state.services.clone()
     }
 }
 
@@ -133,24 +147,27 @@ impl ServicesState {
     }
 }
 
-#[derive(Clone)]
-pub struct GraphQlState {
-    pub schema: Schema,
-    pub endpoint: String,
+impl FromRef<AppState> for ServicesState {
+    fn from_ref(state: &AppState) -> Self {
+        state.services.clone()
+    }
 }
 
-pub struct Application {
-    pub config: AppConfig,
-    pub db: DatabaseConnection,
-    pub repositories: Repositories,
-    pub services: ServicesState,
-}
+impl Application {
+    pub fn new(db: &DatabaseConnection) -> Result<Self, AppError> {
+        let config = AppConfig::from_env()?;
+        let contracts = Contracts::new(&config)?;
+        let repositories = Repositories::new(db);
 
-#[derive(Clone)]
-pub struct AppState {
-    pub services: ServicesState,
-    pub database_connection: DatabaseConnection,
-    pub app_config: AppConfig,
+        let services = ServicesState::new(repositories.clone(), contracts);
+
+        Ok(Self {
+            services,
+            db: db.clone(),
+            config,
+            repositories,
+        })
+    }
 }
 
 impl AppState {

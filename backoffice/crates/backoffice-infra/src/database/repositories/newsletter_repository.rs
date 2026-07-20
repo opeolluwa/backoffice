@@ -4,7 +4,8 @@ use backoffice_domain::{
     ports::newsletter_repository::NewsletterRepositoryExt,
 };
 use sea_orm::{
-    ActiveModelTrait, ActiveValue::Set, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
+    ActiveModelTrait, ActiveValue::Set, ColumnTrait, DatabaseConnection, DbErr, EntityTrait,
+    QueryFilter,
 };
 use ulid::Ulid;
 
@@ -29,7 +30,14 @@ impl NewsletterRepositoryExt for NewsletterRepository {
             subscribed: Set(true),
         };
 
-        model.insert(&self.db).await.map_err(DatabaseError::from)
+        model.insert(&self.db).await.map_err(|err: DbErr| {
+            let msg = err.to_string();
+            if msg.contains("UNIQUE constraint failed") || msg.contains("duplicate key") {
+                DatabaseError::DuplicateEntry(email.to_string())
+            } else {
+                DatabaseError::from(err)
+            }
+        })
     }
 
     async fn unsubscribe(&self, email: &str) -> Result<(), database_error::DatabaseError> {

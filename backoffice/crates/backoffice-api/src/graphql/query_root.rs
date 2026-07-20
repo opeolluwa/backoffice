@@ -1,6 +1,7 @@
 use async_graphql::dynamic::*;
 use seaography::{Builder, BuilderContext, async_graphql, lazy_static::lazy_static};
 
+use super::types as Inputs;
 use backoffice_domain::models::*;
 
 use super::mutations;
@@ -31,19 +32,25 @@ pub fn schema_builder(
 
     seaography::register_custom_inputs!(
         builder,
-        [super::types::newsletter::SubscribeToNewsletterInput]
+        [
+            Inputs::newsletter::SubscribeToNewsletterInput,
+            Inputs::emails::SendEmailInput
+        ]
     );
     seaography::register_custom_mutations!(
         builder,
         [
             mutations::newsletter::SubscribeNewsletter,
-            mutations::health_check::HealthCheck
+            mutations::health_check::HealthCheck,
+            mutations::emails::SendEmail
         ]
+        
     );
 
     builder
         .set_depth_limit(depth)
         .set_complexity_limit(complexity)
         .schema_builder()
+        .data(app_state.clone().database_connection)
         .data(app_state)
 }
