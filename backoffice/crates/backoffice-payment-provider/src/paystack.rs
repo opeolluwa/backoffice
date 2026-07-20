@@ -11,6 +11,7 @@ use crate::{
     port::PaymnetProviderTrait,
 };
 
+#[derive(Clone)]
 pub struct PaystackClient {
     private_key: SecretString,
     http_client: reqwest::Client,

@@ -12,6 +12,7 @@ members = [
     "crates/backoffice-domain",
     "crates/backoffice-infra", "crates/backoffice-payment-provider",
     "migration",
+    "crates/backoffice-macros"
 ]
 resolver = "2"
 
@@ -34,7 +35,7 @@ backoffice-config = { path = "crates/backoffice-config" }
 backoffice-domain = { path = "crates/backoffice-domain" }
 backoffice-infra = { path = "crates/backoffice-infra" }
 backoffice-payment-provider = { path = "crates/backoffice-payment-provider" }
-backoffice_macros = { path = "../backoffice_macros" }
+backoffice-macros = { path = "crates/backoffice-macros" }
 base64 = "0.22"
 bcrypt = "0.17.0"
 chrono = { version = "0.4.41", features = ["serde"] }
@@ -60,7 +61,7 @@ sea-orm = { version = "=2.0.0-rc.37", features = [
     "with-rust_decimal",
     "with-uuid",
 ] }
-sea-orm-migration = { version = "=2.0.0-rc.37", features = ["runtime-tokio-rustls", "sqlx-postgres", "sqlx-sqlite"] }
+sea-orm-migration = { version = "=2.0.0-rc.37", features = ["runtime-tokio-rustls", "sqlx-postgres"] }
 seaography = { version = "=2.0.0-rc.8", features = [
     "graphql-playground",
     "with-decimal",
@@ -123,7 +124,7 @@ fs_extra.workspace = true
 [dev-dependencies]
 axum = { workspace = true, features = ["macros"] }
 axum-test.workspace = true
-sea-orm.workspace = true
+sea-orm = { workspace = true, features = ["sqlx-sqlite"] }
 secrecy.workspace = true
 serde_json.workspace = true
 

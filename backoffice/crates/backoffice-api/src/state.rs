@@ -37,6 +37,7 @@ pub struct ServicesState {
     pub emails_service: EmailsService<EmailRepository>,
     pub invitation_service: InvitationService<InvitationRepository>,
     pub upload_service: UploadsService<UploadRepository, ImagekitClient>,
+    pub paystack_client: PaystackClient,
 }
 
 impl FromRef<AppState> for ServicesState {
@@ -57,6 +58,7 @@ impl ServicesState {
         upload_repository: UploadRepository,
         email_client: ZeptoMail,
         imagekit_client: ImagekitClient,
+        paystack_client: PaystackClient,
     ) -> Self {
         let token_service = JwtTokenService::new();
         let user_service = UserService::new(user_repository.clone());
@@ -81,6 +83,7 @@ impl ServicesState {
             emails_service,
             invitation_service,
             upload_service,
+            paystack_client,
         }
     }
 }
@@ -114,10 +117,10 @@ impl AppState {
 
         // externals
         let email_client = ZeptoMail::new(app_config.email_api_key.clone());
-        // let paystack_client = PaystackClient::new(
-        //     app_config.paystack_api_key.clone(),
-        //     app_config.paystack_base_url.clone(),
-        // );
+        let paystack_client = PaystackClient::new(
+            &app_config.paystack_api_secret,
+            &app_config.paystack_base_url,
+        );
 
         let imagekit_client = ImagekitClient::new(
             &app_config.imagekit_public_key,
@@ -137,6 +140,7 @@ impl AppState {
             upload_repository,
             email_client,
             imagekit_client,
+            paystack_client,
         );
 
         Ok(Self {

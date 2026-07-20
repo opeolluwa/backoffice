@@ -14,7 +14,7 @@ http = ["dep:axum", "dep:axum-extra"]
 # Optional: for http feature (error IntoResponse impls)
 axum = { workspace = true, optional = true }
 axum-extra = { workspace = true, optional = true }
-backoffice_macros.workspace = true
+backoffice-macros = { version = "0.1.0", path = "../backoffice-macros" }
 bcrypt.workspace = true
 chrono.workspace = true
 jsonwebtoken.workspace = true

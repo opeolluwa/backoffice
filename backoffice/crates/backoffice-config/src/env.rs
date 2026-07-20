@@ -55,7 +55,7 @@ pub struct AppConfig {
     pub imagekit_private_key: SecretString,
 
     // payment providers
-    pub paystack_api_key: String,
+    pub paystack_api_key: SecretString,
     pub paystack_api_secret: SecretString,
     pub paystack_base_url: String,
 }
@@ -72,7 +72,7 @@ impl AppConfig {
         let paystack_api_key = extract_env::<String>("PAYSTACK_API_KEY")?;
         let paystack_api_secret = extract_env::<String>("PAYSTACK_API_SECRET")?;
         let paystack_base_url = extract_env::<String>("PAYSTACK_BASE_URL")?;
-        
+
         let requests_time_out = extract_env::<u64>("REQUESTS_TIME_OUT_SECS")
             .unwrap_or_else(|_| default_requests_time_out().as_secs());
 
@@ -89,11 +89,10 @@ impl AppConfig {
             export_path: extract_env("EXPORT_PATH").unwrap_or_else(|_| default_export_path()),
 
             // payment providers
-            paystack_api_key,
+            paystack_api_key: SecretString::from(paystack_api_key),
             paystack_api_secret: SecretString::from(paystack_api_secret),
             paystack_base_url,
 
-            
             // CORS
             allowed_origins: extract_env::<String>("ALLOWED_ORIGINS")
                 .unwrap_or_else(|_| "*".into())
@@ -116,7 +115,7 @@ impl AppConfig {
             depth_limit: extract_env::<usize>("DEPTH_LIMIT").ok(),
             complexity_limit: extract_env::<usize>("COMPLEXITY_LIMIT").ok(),
 
-            requests_time_out_secs: Duration::from_secs(    requests_time_out * 1000),
+            requests_time_out_secs: Duration::from_secs(requests_time_out * 1000),
 
             imagekit_private_key: SecretString::from(extract_env::<String>(
                 "IMAGEKIT_PRIVATE_KEY",

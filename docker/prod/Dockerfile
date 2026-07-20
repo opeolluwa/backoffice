@@ -27,7 +27,7 @@ RUN set -eux; \
 WORKDIR /app
 
 COPY backoffice/ ./backoffice/
-COPY backoffice_macros/ ./backoffice_macros/
+
 
 WORKDIR /app/backoffice
 

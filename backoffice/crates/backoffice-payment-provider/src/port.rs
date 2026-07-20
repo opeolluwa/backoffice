@@ -4,8 +4,8 @@ use crate::{
 };
 
 pub trait PaymnetProviderTrait {
-    async fn initialize_payment(
+    fn initialize_payment(
         &self,
         command: InitializePaymentCommand,
-    ) -> Result<InitializePaymentResponse, PaymentError>;
+    ) -> impl std::future::Future<Output = Result<InitializePaymentResponse, PaymentError>> + Send;
 }
