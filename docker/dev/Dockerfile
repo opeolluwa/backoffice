@@ -21,11 +21,27 @@ WORKDIR /app
 
 COPY backoffice/ ./backoffice/
 
-
 WORKDIR /app/backoffice
 
 RUN cargo build
 
 VOLUME ["/cargo-target", "/usr/local/cargo/registry"]
 
-CMD ["cargo", "watch" , "-qcx", "run"]
+CMD ["cargo", "watch", \
+     "--why", \
+     "--clear", \
+     "--quiet", \
+     "--ignore", ".git/", \
+     "--ignore", "target/", \
+     "-w", "src", \
+     "-w", "Cargo.toml", \
+     "-w", "migration", \
+     "-w", "crates/backoffice-api", \
+     "-w", "crates/backoffice-cli", \
+     "-w", "crates/backoffice-config", \
+     "-w", "crates/backoffice-domain", \
+     "-w", "crates/backoffice-infra", \
+     "-w", "crates/backoffice-macros", \
+     "-w", "crates/backoffice-payment-provider", \
+     "-x", "check", \
+     "-x", "run"]
