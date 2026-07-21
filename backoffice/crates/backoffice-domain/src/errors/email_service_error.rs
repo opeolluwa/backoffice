@@ -10,6 +10,10 @@ pub enum EmailServiceError {
     SendEmailError,
     #[error("failed due to {0}")]
     OperationFailed(String),
+    #[error("failed due to {0}")]
+    ProviderError(String),
+    #[error("failed due to {0}")]
+    DeliveryError(String),
 }
 
 impl EmailServiceError {
@@ -18,6 +22,8 @@ impl EmailServiceError {
         match self {
             Self::SendEmailError => StatusCode::INTERNAL_SERVER_ERROR,
             Self::OperationFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ProviderError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::DeliveryError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

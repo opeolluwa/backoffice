@@ -1,12 +1,13 @@
 use crate::{
     dto::{
-        CreateUserCommand, EmailMessage, ForgottenPasswordCommand, ForgottenPasswordResult,
-        LoginCommand, LoginResult, RefreshTokenCommand, RefreshTokenResult, SetNewPasswordCommand,
+        CreateUserCommand, ForgottenPasswordCommand, ForgottenPasswordResult, LoginCommand,
+        LoginResult, RefreshTokenCommand, RefreshTokenResult, SetNewPasswordCommand,
         SetNewPasswordResult, TokenClaims, VerifyAccountCommand, VerifyAccountResult,
     },
     errors::{auth_service_error::AuthenticationServiceError, service_error::ServiceError},
     ports::{
-        email_sender::EmailSender, token_service::TokenService,
+        email_sender::{EmailMessage, EmailSender},
+        token_service::TokenService,
         user_repository::UserRepositoryTrait,
     },
     services::user_helper::{UserHelperService, UserHelperServiceTrait},
@@ -67,7 +68,7 @@ pub trait AuthenticationServiceTrait {
     ) -> impl std::future::Future<Output = Result<RefreshTokenResult, AuthenticationServiceError>> + Send;
 }
 
-impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender>
+impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender + Send + Sync>
     AuthenticationServiceTrait for AuthenticationService<R, T, E>
 {
     async fn create_user(&self, command: &CreateUserCommand) -> Result<(), ServiceError> {
@@ -101,7 +102,7 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender>
             html_body: format!("Welcome to Backoffice!"),
         };
 
-        if let Err(err) = email_sender.send_email(message).await {
+        if let Err(err) = email_sender.send_email(message) {
             tracing::error!("Failed to send welcome email: {}", err);
         }
 
@@ -161,7 +162,7 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender>
             ),
         };
 
-        if let Err(err) = self.email_sender.send_email(message).await {
+        if let Err(err) = self.email_sender.send_email(message) {
             tracing::error!("Failed to send password reset email: {}", err);
         }
 

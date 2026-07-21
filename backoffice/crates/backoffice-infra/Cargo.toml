@@ -13,6 +13,7 @@ base64.workspace = true
 bcrypt.workspace = true
 chrono.workspace = true
 jsonwebtoken.workspace = true
+lettre = "0.11.22"
 log = "0.4.27"
 migration.workspace = true
 reqwest.workspace = true
@@ -21,6 +22,7 @@ sea-orm.workspace = true
 secrecy = { workspace = true, features = ["serde"] }
 serde.workspace = true
 serde_json.workspace = true
+thiserror.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 ulid.workspace = true

@@ -38,6 +38,7 @@ enum Commands {
 pub async fn run() -> Result<(), CliError> {
     let app_config = AppConfig::from_env().map_err(|err| CliError::ConfigError(err.to_string()))?;
 
+    let app = Application::new();
     let db = init_db_pool(&app_config)
         .await
         .map_err(|err| CliError::DatabaseError(err.to_string()))?;
