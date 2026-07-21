@@ -10,6 +10,7 @@ name = "backoffice_cli"
 path = "src/main.rs"
 
 [dependencies]
+backoffice-api.workspace = true
 backoffice-config.workspace = true
 backoffice-domain.workspace = true
 backoffice-infra.workspace = true

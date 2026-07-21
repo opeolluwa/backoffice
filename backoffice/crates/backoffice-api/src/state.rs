@@ -16,11 +16,12 @@ use backoffice_domain::{
 };
 use backoffice_infra::{
     database::repositories::{
-        base::Repository, country_repository::CountryRepository, email_repository::EmailRepository,
+        app_config_repository::AppConfigRepository, base::Repository,
+        country_repository::CountryRepository, email_repository::EmailRepository,
         invitation_repository::InvitationRepository, marketplace_repository::MarketplaceRepository,
         newsletter_repository::NewsletterRepository, product_repository::ProductRepository,
-        team_repository::TeamRepository, upload_repository::UploadRepository,
-        user_repository::UserRepository,
+        role_repository::RoleRepository, team_repository::TeamRepository,
+        upload_repository::UploadRepository, user_repository::UserRepository,
     },
     imagekit::ImagekitClient,
     jwt::JwtTokenService,
@@ -38,6 +39,8 @@ pub struct Repositories {
     pub invitation: InvitationRepository,
     pub upload: UploadRepository,
     pub newsletter: NewsletterRepository,
+    pub role: RoleRepository,
+    pub app_config: AppConfigRepository,
 }
 
 #[derive(Clone)]
@@ -95,6 +98,8 @@ impl Repositories {
             invitation: InvitationRepository::init(db),
             upload: UploadRepository::init(db),
             newsletter: NewsletterRepository::init(db),
+            role: RoleRepository::init(db),
+            app_config: AppConfigRepository::init(db),
         }
     }
 }
