@@ -146,14 +146,3 @@ pub struct SaveProductCommand {
     pub price: i64,
     pub currency_identifier: String,
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct EmailMessage {
-    pub from_address: String,
-    pub from_name: String,
-    pub to_address: String,
-    pub to_name: String,
-    pub subject: String,
-    pub html_body: String,
-}

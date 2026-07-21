@@ -1,6 +1,5 @@
 use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
-use backoffice_payment_provider::paystack::PaystackClient;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
 
@@ -16,16 +15,18 @@ use backoffice_domain::{
 };
 use backoffice_infra::{
     database::repositories::{
-        base::Repository, country_repository::CountryRepository, email_repository::EmailRepository,
+        app_config_repository::AppConfigRepository, base::Repository,
+        country_repository::CountryRepository, email_repository::EmailRepository,
         invitation_repository::InvitationRepository, marketplace_repository::MarketplaceRepository,
         newsletter_repository::NewsletterRepository, product_repository::ProductRepository,
-        team_repository::TeamRepository, upload_repository::UploadRepository,
-        user_repository::UserRepository,
+        role_repository::RoleRepository, team_repository::TeamRepository,
+        upload_repository::UploadRepository, user_repository::UserRepository,
     },
     imagekit::ImagekitClient,
     jwt::JwtTokenService,
-    mailer::zepto_mailer::ZeptoMail,
+    mailer::smtp::SmtpEmailSender,
 };
+use backoffice_payment_provider::paystack::PaystackClient;
 
 #[derive(Clone)]
 pub struct Repositories {
@@ -38,11 +39,13 @@ pub struct Repositories {
     pub invitation: InvitationRepository,
     pub upload: UploadRepository,
     pub newsletter: NewsletterRepository,
+    pub role: RoleRepository,
+    pub app_config: AppConfigRepository,
 }
 
 #[derive(Clone)]
 pub struct Contracts {
-    pub email: ZeptoMail,
+    pub email: SmtpEmailSender,
     pub imagekit: ImagekitClient,
     pub paystack: PaystackClient,
 }
@@ -51,7 +54,7 @@ pub struct Contracts {
 pub struct ServicesState {
     pub user_service: UserService<UserRepository>,
     pub root_service: RootService,
-    pub auth_service: AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>,
+    pub auth_service: AuthenticationService<UserRepository, JwtTokenService, SmtpEmailSender>,
     pub marketplace_service: MarketplaceService<MarketplaceRepository>,
     pub product_service: ProductService<ProductRepository>,
     pub country_service: CountryService<CountryRepository>,
@@ -95,13 +98,21 @@ impl Repositories {
             invitation: InvitationRepository::init(db),
             upload: UploadRepository::init(db),
             newsletter: NewsletterRepository::init(db),
+            role: RoleRepository::init(db),
+            app_config: AppConfigRepository::init(db),
         }
     }
 }
 
 impl Contracts {
     pub fn new(app_config: &AppConfig) -> Result<Self, AppError> {
-        let email = ZeptoMail::new(app_config.email_api_key.clone());
+        let email = SmtpEmailSender::new(
+            &app_config.smtp_host,
+            app_config.smtp_port,
+            &app_config.smtp_username,
+            &app_config.smtp_password,
+        )
+        .map_err(|e| AppError::OperationFailed(e.to_string()))?;
 
         let paystack = PaystackClient::new(
             &app_config.paystack_api_secret,

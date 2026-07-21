@@ -1,13 +1,14 @@
-use backoffice_domain::{
-    errors::database_error::{self, DatabaseError},
-    models::newsletter,
-    ports::newsletter_repository::NewsletterRepositoryExt,
-};
 use sea_orm::{
     ActiveModelTrait, ActiveValue::Set, ColumnTrait, DatabaseConnection, DbErr, EntityTrait,
     QueryFilter,
 };
 use ulid::Ulid;
+
+use backoffice_domain::{
+    errors::database_error::{self, DatabaseError},
+    models::newsletter,
+    ports::newsletter_repository::NewsletterRepositoryExt,
+};
 
 use crate::database::repositories::base::Repository;
 

@@ -17,22 +17,13 @@ pub trait EmailRepositoryExt {
         identifier: &str,
     ) -> Result<emails::Model, DatabaseError>;
 
-    async fn find_all_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, DatabaseError>;
+    async fn find_all_emails(&self) -> Result<Vec<emails::Model>, DatabaseError>;
 
-    async fn find_emails_by_tag(
-        &self,
-        tag: &str,
-    ) -> Result<Vec<emails::Model>, DatabaseError>;
+    async fn find_emails_by_tag(&self, tag: &str) -> Result<Vec<emails::Model>, DatabaseError>;
 
-    async fn find_starred_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, DatabaseError>;
+    async fn find_starred_emails(&self) -> Result<Vec<emails::Model>, DatabaseError>;
 
-    async fn find_unread_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, DatabaseError>;
+    async fn find_unread_emails(&self) -> Result<Vec<emails::Model>, DatabaseError>;
 
     async fn update_email(
         &self,
@@ -40,10 +31,7 @@ pub trait EmailRepositoryExt {
         command: &UpdateEmailCommand,
     ) -> Result<emails::Model, DatabaseError>;
 
-    async fn delete_email(
-        &self,
-        identifier: &str,
-    ) -> Result<(), DatabaseError>;
+    async fn delete_email(&self, identifier: &str) -> Result<(), DatabaseError>;
 
     async fn count_emails(&self) -> Result<i64, DatabaseError>;
 

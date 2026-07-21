@@ -1,5 +1,3 @@
-use backoffice_domain::models::newsletter;
-use backoffice_domain::services::newsletter::NewsletterServiceExt;
 use seaography::itertools::Itertools;
 use seaography::{
     CustomFields,
@@ -7,6 +5,8 @@ use seaography::{
 };
 use validator::Validate;
 
+use backoffice_domain::models::newsletter;
+use backoffice_domain::services::newsletter::NewsletterServiceExt;
 use backoffice_domain::{errors::app_error::AppError, utils::error::format_validation_errors};
 
 use crate::graphql::types::newsletter::SubscribeToNewsletterInput;

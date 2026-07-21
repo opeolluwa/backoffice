@@ -1,2 +1,2 @@
-pub mod newsletter;
 pub mod emails;
+pub mod newsletter;

@@ -1,7 +1,6 @@
 use proc_macro::TokenStream;
-use syn::{Attribute, DeriveInput, LitStr, parse_quote_spanned};
-
 use quote::quote;
+use syn::{Attribute, DeriveInput, LitStr, parse_quote_spanned};
 
 use crate::utils::convert_snake_to_pascal;
 

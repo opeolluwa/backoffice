@@ -27,22 +27,13 @@ pub trait EmailsServiceExt {
         identifier: &str,
     ) -> Result<emails::Model, ServiceError>;
 
-    async fn find_all_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, ServiceError>;
+    async fn find_all_emails(&self) -> Result<Vec<emails::Model>, ServiceError>;
 
-    async fn find_emails_by_tag(
-        &self,
-        tag: &str,
-    ) -> Result<Vec<emails::Model>, ServiceError>;
+    async fn find_emails_by_tag(&self, tag: &str) -> Result<Vec<emails::Model>, ServiceError>;
 
-    async fn find_starred_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, ServiceError>;
+    async fn find_starred_emails(&self) -> Result<Vec<emails::Model>, ServiceError>;
 
-    async fn find_unread_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, ServiceError>;
+    async fn find_unread_emails(&self) -> Result<Vec<emails::Model>, ServiceError>;
 
     async fn update_email(
         &self,
@@ -50,10 +41,7 @@ pub trait EmailsServiceExt {
         command: &UpdateEmailCommand,
     ) -> Result<emails::Model, ServiceError>;
 
-    async fn delete_email(
-        &self,
-        identifier: &str,
-    ) -> Result<(), ServiceError>;
+    async fn delete_email(&self, identifier: &str) -> Result<(), ServiceError>;
 
     async fn count_emails(&self) -> Result<i64, ServiceError>;
 
@@ -75,28 +63,19 @@ impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> 
         Ok(self.repo.find_email_by_identifier(identifier).await?)
     }
 
-    async fn find_all_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, ServiceError> {
+    async fn find_all_emails(&self) -> Result<Vec<emails::Model>, ServiceError> {
         Ok(self.repo.find_all_emails().await?)
     }
 
-    async fn find_emails_by_tag(
-        &self,
-        tag: &str,
-    ) -> Result<Vec<emails::Model>, ServiceError> {
+    async fn find_emails_by_tag(&self, tag: &str) -> Result<Vec<emails::Model>, ServiceError> {
         Ok(self.repo.find_emails_by_tag(tag).await?)
     }
 
-    async fn find_starred_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, ServiceError> {
+    async fn find_starred_emails(&self) -> Result<Vec<emails::Model>, ServiceError> {
         Ok(self.repo.find_starred_emails().await?)
     }
 
-    async fn find_unread_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, ServiceError> {
+    async fn find_unread_emails(&self) -> Result<Vec<emails::Model>, ServiceError> {
         Ok(self.repo.find_unread_emails().await?)
     }
 
@@ -105,16 +84,10 @@ impl<R: EmailRepositoryExt + Send + Sync> EmailsServiceExt for EmailsService<R> 
         identifier: &str,
         command: &UpdateEmailCommand,
     ) -> Result<emails::Model, ServiceError> {
-        Ok(self
-            .repo
-            .update_email(identifier, command)
-            .await?)
+        Ok(self.repo.update_email(identifier, command).await?)
     }
 
-    async fn delete_email(
-        &self,
-        identifier: &str,
-    ) -> Result<(), ServiceError> {
+    async fn delete_email(&self, identifier: &str) -> Result<(), ServiceError> {
         Ok(self.repo.delete_email(identifier).await?)
     }
 
@@ -182,12 +155,7 @@ mod tests {
             .returning(move |_| Ok(email.clone()));
         let service = EmailsService::new(repo);
 
-        assert!(
-            service
-                .find_email_by_identifier("em-001")
-                .await
-                .is_ok()
-        );
+        assert!(service.find_email_by_identifier("em-001").await.is_ok());
     }
 
     #[tokio::test]

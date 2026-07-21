@@ -55,19 +55,14 @@ impl EmailRepositoryExt for EmailRepository {
             .ok_or_else(|| DatabaseError::NotFound("email not found".to_string()))
     }
 
-    async fn find_all_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, DatabaseError> {
+    async fn find_all_emails(&self) -> Result<Vec<emails::Model>, DatabaseError> {
         EmailEntity::find()
             .all(&self.db)
             .await
             .map_err(DatabaseError::from)
     }
 
-    async fn find_emails_by_tag(
-        &self,
-        tag: &str,
-    ) -> Result<Vec<emails::Model>, DatabaseError> {
+    async fn find_emails_by_tag(&self, tag: &str) -> Result<Vec<emails::Model>, DatabaseError> {
         EmailEntity::find()
             .filter(emails::Column::Tag.eq(tag))
             .all(&self.db)
@@ -75,9 +70,7 @@ impl EmailRepositoryExt for EmailRepository {
             .map_err(DatabaseError::from)
     }
 
-    async fn find_starred_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, DatabaseError> {
+    async fn find_starred_emails(&self) -> Result<Vec<emails::Model>, DatabaseError> {
         EmailEntity::find()
             .filter(emails::Column::IsStarred.eq(true))
             .all(&self.db)
@@ -85,9 +78,7 @@ impl EmailRepositoryExt for EmailRepository {
             .map_err(DatabaseError::from)
     }
 
-    async fn find_unread_emails(
-        &self,
-    ) -> Result<Vec<emails::Model>, DatabaseError> {
+    async fn find_unread_emails(&self) -> Result<Vec<emails::Model>, DatabaseError> {
         EmailEntity::find()
             .filter(emails::Column::IsRead.eq(false))
             .all(&self.db)
@@ -122,10 +113,7 @@ impl EmailRepositoryExt for EmailRepository {
         active.update(&self.db).await.map_err(DatabaseError::from)
     }
 
-    async fn delete_email(
-        &self,
-        identifier: &str,
-    ) -> Result<(), DatabaseError> {
+    async fn delete_email(&self, identifier: &str) -> Result<(), DatabaseError> {
         EmailEntity::delete_many()
             .filter(emails::Column::Identifier.eq(identifier))
             .exec(&self.db)
