@@ -17,7 +17,7 @@ pub struct SmtpEmailSender {
 impl SmtpEmailSender {
     pub fn new(
         host: &str,
-        port: u16,
+        _port: u16,
         username: &str,
         password: &str,
     ) -> Result<Self, EmailServiceError> {
