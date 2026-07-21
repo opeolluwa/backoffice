@@ -10,3 +10,4 @@ pub mod role_repository;
 pub mod team_repository;
 pub mod upload_repository;
 pub mod user_repository;
+pub mod orders_repository;

@@ -6,3 +6,5 @@ pub mod products;
 pub mod team;
 pub mod upload;
 pub mod user;
+
+pub mod orders;

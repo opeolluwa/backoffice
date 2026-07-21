@@ -31,6 +31,11 @@ const routes = [
   },
   {
     label: "Operations",
+  {
+    label: "Orders",
+    icon: "heroicons:puzzle-piece",
+    to: "/orders",
+  },
     type: "label" as const,
   },
   {
