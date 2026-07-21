@@ -2,13 +2,15 @@
 import type { FormSubmitEvent, TableColumn } from "@nuxt/ui";
 import * as v from "valibot";
 import api from "~/plugin/api";
-import { useorderstore } from "~/stores/orders";
+import { useOrdersStore } from "~/stores/orders";
 import { h, resolveComponent } from "vue";
 import type { Row } from "@tanstack/vue-table";
 import { getPaginationRowModel } from "@tanstack/vue-table";
-import type { OrdersInterface } from "@bindings/OrdersInterface";
+import type { OrdersInterface } from "~/bindings/OrdersInterface";
 
 useHead({ title: "Orders" });
+
+const ordersStore = useOrdersStore();
 
 definePageMeta({
   layout: "dashboard",
@@ -79,7 +81,6 @@ const columns: TableColumn<OrdersInterface>[] = [
 
 function getRowItems(row: Row<OrdersInterface>) {
   const router = useRouter();
-  const orderstore = useorderstore();
   const identifier = row.original.identifier;
 
   return [
@@ -107,7 +108,7 @@ function getRowItems(row: Row<OrdersInterface>) {
             description: "Orders deleted successfully.",
             color: "success",
           });
-          await orderstore.fetchorders();
+          await ordersStore.fetchOrders();
         } catch {
           toast.add({
             title: "Error",
@@ -138,7 +139,6 @@ const resetForm = () => {
   state.description = "";
 };
 
-const orderstore = useorderstore();
 const fetchingItems = ref(false);
 
 const items = ref<OrdersInterface[]>();
@@ -166,15 +166,15 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
     });
   } finally {
     loading.value = false;
-    await orderstore.fetchorders();
-    items.value = orderstore.orders;
+    await ordersStore.fetchOrders();
+    items.value = ordersStore.orders;
   }
 }
 
 onMounted(async () => {
   try {
-    await orderstore.fetchorders();
-    items.value = orderstore.orders;
+    await ordersStore.fetchOrders();
+    items.value = ordersStore.orders;
   } catch {
     toast.add({
       title: "Error",
@@ -191,10 +191,8 @@ const search = ref("");
 
 const filteredItems = computed(() => {
   const query = search.value.trim().toLowerCase();
-  return (items.value || []).filter((item) => {
-    const name = item.name?.toLowerCase() || "";
-    const description = item.description?.toLowerCase() || "";
-    return !query || name.includes(query) || description.includes(query);
+  return (items.value || []).filter(() => {
+    return !query;
   });
 });
 
@@ -215,7 +213,9 @@ const table = useTemplateRef("table");
     />
 
     <div v-else>
-      <div class="flex flex-col lg:flex-row gap-3 mb-5 px-4 py-3 border rounded border-accented items-end">
+      <div
+        class="flex flex-col lg:flex-row gap-3 mb-5 px-4 py-3 border rounded border-accented items-end"
+      >
         <UInput
           v-model="search"
           class="max-w-sm"
@@ -261,44 +261,6 @@ const table = useTemplateRef("table");
           :state="state"
           :on-submit="onSubmit"
         >
-          <UFormField
-            v-slot="{{ error }}"
-            label="Name"
-            name="name"
-            required
-            :ui="{{ error: 'text-red-500 text-sm mt-1' }}"
-          >
-            <UInput
-              v-model="state.name"
-              :ui="{{ base: 'py-4 px-6' }}"
-              :class="[
-                'w-full transition-colors',
-                error
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:border-black',
-              ]"
-            />
-          </UFormField>
-
-          <UFormField
-            v-slot="{{ error }}"
-            label="Description"
-            name="description"
-            required
-            :ui="{{ error: 'text-red-500 text-sm mt-1' }}"
-          >
-            <UInput
-              v-model="state.description"
-              :ui="{{ base: 'py-4 px-6' }}"
-              :class="[
-                'w-full transition-colors',
-                error
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:border-black',
-              ]"
-            />
-          </UFormField>
-
           <div class="flex justify-between items-center">
             <UButton
               type="submit"

@@ -31,12 +31,12 @@ const routes = [
   },
   {
     label: "Operations",
+    type: "label" as const,
+  },
   {
     label: "Orders",
     icon: "heroicons:puzzle-piece",
     to: "/orders",
-  },
-    type: "label" as const,
   },
   {
     label: "Marketplace",
