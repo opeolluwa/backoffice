@@ -17,14 +17,14 @@ pub struct SmtpEmailSender {
 impl SmtpEmailSender {
     pub fn new(
         host: &str,
-        port: u16,
+        _port: u16,
         username: &str,
         password: &str,
     ) -> Result<Self, EmailServiceError> {
         let creds = Credentials::new(username.to_string(), password.to_string());
 
-        let mailer = SmtpTransport::builder_dangerous(host)
-            .port(port)
+        let mailer = SmtpTransport::starttls_relay(host)
+            .unwrap()
             .credentials(creds)
             .build();
 
