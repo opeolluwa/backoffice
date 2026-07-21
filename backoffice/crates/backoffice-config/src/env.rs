@@ -28,9 +28,11 @@ pub struct AppConfig {
     #[serde(default = "default_allowed_origins")]
     pub allowed_origins: Vec<String>,
 
-    // Email
-    pub email_api_key: String,
-    pub email_api_user: String,
+    // Email (SMTP)
+    pub smtp_host: String,
+    pub smtp_port: u16,
+    pub smtp_username: String,
+    pub smtp_password: String,
 
     // Database
     pub database_url: SecretString,
@@ -99,9 +101,11 @@ impl AppConfig {
                 .map(ToOwned::to_owned)
                 .collect(),
 
-            // Email
-            email_api_user: extract_env("ZEPTO_EMAIL_API_USER")?,
-            email_api_key: extract_env("ZEPTO_EMAIL_API_KEY")?,
+            // Email (SMTP)
+            smtp_host: extract_env("SMTP_HOST")?,
+            smtp_port: extract_env("SMTP_PORT").unwrap_or(587),
+            smtp_username: extract_env("SMTP_AUTH_USERNAME")?,
+            smtp_password: extract_env("SMTP_AUTH_PASSWORD")?,
 
             // Database
             database_url: SecretString::new(database_url),

@@ -24,7 +24,7 @@ use backoffice_infra::{
     },
     imagekit::ImagekitClient,
     jwt::JwtTokenService,
-    mailer::zepto_mailer::ZeptoMail,
+    mailer::smtp::SmtpEmailSender,
 };
 
 #[derive(Clone)]
@@ -42,7 +42,7 @@ pub struct Repositories {
 
 #[derive(Clone)]
 pub struct Contracts {
-    pub email: ZeptoMail,
+    pub email: SmtpEmailSender,
     pub imagekit: ImagekitClient,
     pub paystack: PaystackClient,
 }
@@ -51,7 +51,7 @@ pub struct Contracts {
 pub struct ServicesState {
     pub user_service: UserService<UserRepository>,
     pub root_service: RootService,
-    pub auth_service: AuthenticationService<UserRepository, JwtTokenService, ZeptoMail>,
+    pub auth_service: AuthenticationService<UserRepository, JwtTokenService, SmtpEmailSender>,
     pub marketplace_service: MarketplaceService<MarketplaceRepository>,
     pub product_service: ProductService<ProductRepository>,
     pub country_service: CountryService<CountryRepository>,
@@ -101,7 +101,13 @@ impl Repositories {
 
 impl Contracts {
     pub fn new(app_config: &AppConfig) -> Result<Self, AppError> {
-        let email = ZeptoMail::new(app_config.email_api_key.clone());
+        let email = SmtpEmailSender::new(
+            &app_config.smtp_host,
+            app_config.smtp_port,
+            &app_config.smtp_username,
+            &app_config.smtp_password,
+        )
+        .map_err(|e| AppError::OperationFailed(e.to_string()))?;
 
         let paystack = PaystackClient::new(
             &app_config.paystack_api_secret,
