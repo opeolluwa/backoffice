@@ -35,3 +35,16 @@ pub enum InvitationStatus {
     #[sea_orm(string_value = "expired")]
     Expired,
 }
+#[derive(
+    Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ts_rs :: TS,
+)]
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "order_status")]
+#[ts(export)]
+pub enum OrderStatus {
+    #[sea_orm(string_value = "cancelled")]
+    Cancelled,
+    #[sea_orm(string_value = "fulfilled")]
+    Fulfilled,
+    #[sea_orm(string_value = "pending")]
+    Pending,
+}

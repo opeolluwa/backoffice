@@ -4,6 +4,7 @@ import { useMarketplaceStore } from "~/stores/marketplace";
 import { useTeamsStore } from "~/stores/teams";
 import { useUploadStore } from "~/stores/uploads";
 import api from "~/plugin/api";
+import type { OrderStatus } from "~/bindings/OrderStatus";
 
 useHead({ title: "Dashboard" });
 
@@ -20,6 +21,7 @@ const userStore = useUserInformationStore();
 const marketplaceStore = useMarketplaceStore();
 const teamsStore = useTeamsStore();
 const uploadStore = useUploadStore();
+const orderStore = useOrdersStore();
 
 const totalProducts = ref(0);
 
@@ -28,6 +30,8 @@ onMounted(async () => {
     marketplaceStore.fetchMarketplaces(),
     teamsStore.fetchAllMembers(),
     uploadStore.countUploads(),
+    // orderStore.countByStatus("Pending" as OrderStatus),
+    // orderStore.countByStatus("Pending" as OrderStatus),
   ]);
 
   let count = 0;
@@ -59,6 +63,16 @@ const stats = computed(() => [
   },
   {
     label: "Team Members",
+    value: teamsStore.members.length,
+    icon: "heroicons:users",
+  },
+  {
+    label: "Customers",
+    value: teamsStore.members.length,
+    icon: "heroicons:users",
+  },
+  {
+    label: "Pending Orders",
     value: teamsStore.members.length,
     icon: "heroicons:users",
   },

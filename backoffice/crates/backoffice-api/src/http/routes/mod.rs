@@ -10,3 +10,4 @@ pub mod router;
 pub mod teams;
 pub mod uploads;
 pub mod users;
+pub mod orders;

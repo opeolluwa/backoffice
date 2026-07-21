@@ -146,3 +146,13 @@ pub struct SaveProductCommand {
     pub price: i64,
     pub currency_identifier: String,
 }
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateOrdersCommand {
+
+}
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateOrdersCommand {
+
+}

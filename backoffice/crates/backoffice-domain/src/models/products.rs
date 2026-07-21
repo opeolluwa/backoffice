@@ -42,6 +42,8 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Marketplaces,
+    #[sea_orm(has_many = "super::orders::Entity")]
+    Orders,
     #[sea_orm(
         belongs_to = "super::users::Entity",
         from = "Column::CreatedByIdentifier",
@@ -64,6 +66,12 @@ impl Related<super::marketplaces::Entity> for Entity {
     }
 }
 
+impl Related<super::orders::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Orders.def()
+    }
+}
+
 impl Related<super::users::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Users.def()
@@ -78,6 +86,8 @@ pub enum RelatedEntity {
     Countries,
     #[sea_orm(entity = "super::marketplaces::Entity")]
     Marketplaces,
+    #[sea_orm(entity = "super::orders::Entity")]
+    Orders,
     #[sea_orm(entity = "super::users::Entity")]
     Users,
 }

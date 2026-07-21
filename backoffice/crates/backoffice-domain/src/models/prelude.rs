@@ -8,6 +8,7 @@ pub use super::emails::Entity as Emails;
 pub use super::invitation::Entity as Invitation;
 pub use super::marketplaces::Entity as Marketplaces;
 pub use super::newsletter::Entity as Newsletter;
+pub use super::orders::Entity as Orders;
 pub use super::products::Entity as Products;
 pub use super::teams::Entity as Teams;
 pub use super::uploads::Entity as Uploads;

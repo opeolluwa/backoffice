@@ -4,6 +4,7 @@ pub mod emails;
 pub mod invitation;
 pub mod marketplace;
 pub mod newsletter;
+pub mod orders;
 pub mod product;
 pub mod root;
 pub mod team;
