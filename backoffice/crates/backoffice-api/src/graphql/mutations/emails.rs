@@ -1,14 +1,13 @@
-use backoffice_domain::dto::CreateEmailCommand;
-use backoffice_domain::models;
-use backoffice_domain::services::emails::EmailsServiceExt;
 use seaography::itertools::Itertools;
 use seaography::{
     CustomFields,
     async_graphql::{self, Context},
 };
-
 use validator::Validate;
 
+use backoffice_domain::dto::CreateEmailCommand;
+use backoffice_domain::models;
+use backoffice_domain::services::emails::EmailsServiceExt;
 use backoffice_domain::{errors::app_error::AppError, utils::error::format_validation_errors};
 
 use crate::graphql::types::emails::SendEmailInput;

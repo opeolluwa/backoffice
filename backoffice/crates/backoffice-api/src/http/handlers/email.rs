@@ -40,11 +40,7 @@ pub async fn create_email(
     request: AuthenticatedRequest<CreateEmailRequest>,
 ) -> Result<ApiResponse<emails::Model>, ServiceError> {
     let command = to_create_command(&request.data);
-    let email = state
-        .services
-        .emails_service
-        .create_email(&command)
-        .await?;
+    let email = state.services.emails_service.create_email(&command).await?;
     Ok(ApiResponse::builder()
         .message("Email created successfully")
         .status_code(StatusCode::CREATED)
@@ -55,11 +51,7 @@ pub async fn create_email(
 pub async fn find_all_emails(
     State(state): State<Arc<AppState>>,
 ) -> Result<ApiResponse<Vec<emails::Model>>, ServiceError> {
-    let emails = state
-        .services
-        .emails_service
-        .find_all_emails()
-        .await?;
+    let emails = state.services.emails_service.find_all_emails().await?;
     Ok(ApiResponse::builder()
         .message("Emails fetched successfully")
         .data(emails)
@@ -99,11 +91,7 @@ pub async fn find_emails_by_tag(
 pub async fn find_starred_emails(
     State(state): State<Arc<AppState>>,
 ) -> Result<ApiResponse<Vec<emails::Model>>, ServiceError> {
-    let emails = state
-        .services
-        .emails_service
-        .find_starred_emails()
-        .await?;
+    let emails = state.services.emails_service.find_starred_emails().await?;
     Ok(ApiResponse::builder()
         .message("Starred emails fetched successfully")
         .data(emails)
@@ -113,11 +101,7 @@ pub async fn find_starred_emails(
 pub async fn find_unread_emails(
     State(state): State<Arc<AppState>>,
 ) -> Result<ApiResponse<Vec<emails::Model>>, ServiceError> {
-    let emails = state
-        .services
-        .emails_service
-        .find_unread_emails()
-        .await?;
+    let emails = state.services.emails_service.find_unread_emails().await?;
     Ok(ApiResponse::builder()
         .message("Unread emails fetched successfully")
         .data(emails)
@@ -158,11 +142,7 @@ pub async fn delete_email(
 pub async fn count_emails(
     State(state): State<Arc<AppState>>,
 ) -> Result<ApiResponse<i64>, ServiceError> {
-    let count = state
-        .services
-        .emails_service
-        .count_emails()
-        .await?;
+    let count = state.services.emails_service.count_emails().await?;
     Ok(ApiResponse::builder()
         .message("Emails counted successfully")
         .data(count)
@@ -172,11 +152,7 @@ pub async fn count_emails(
 pub async fn count_unread_emails(
     State(state): State<Arc<AppState>>,
 ) -> Result<ApiResponse<i64>, ServiceError> {
-    let count = state
-        .services
-        .emails_service
-        .count_unread_emails()
-        .await?;
+    let count = state.services.emails_service.count_unread_emails().await?;
     Ok(ApiResponse::builder()
         .message("Unread emails counted successfully")
         .data(count)

@@ -1,11 +1,12 @@
-use backoffice_domain::{
-    errors::email_service_error::EmailServiceError,
-    ports::email_sender::{EmailMessage, EmailSender},
-};
 use lettre::{
     Message, SmtpTransport, Transport,
     message::{MultiPart, SinglePart, header},
     transport::smtp::authentication::Credentials,
+};
+
+use backoffice_domain::{
+    errors::email_service_error::EmailServiceError,
+    ports::email_sender::{EmailMessage, EmailSender},
 };
 
 #[derive(Clone)]
@@ -14,7 +15,12 @@ pub struct SmtpEmailSender {
 }
 
 impl SmtpEmailSender {
-    pub fn new(host: &str, port: u16, username: &str, password: &str) -> Result<Self, EmailServiceError> {
+    pub fn new(
+        host: &str,
+        port: u16,
+        username: &str,
+        password: &str,
+    ) -> Result<Self, EmailServiceError> {
         let creds = Credentials::new(username.to_string(), password.to_string());
 
         let mailer = SmtpTransport::builder_dangerous(host)

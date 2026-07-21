@@ -1,6 +1,5 @@
 use async_graphql::dynamic::Schema;
 use axum::extract::FromRef;
-use backoffice_payment_provider::paystack::PaystackClient;
 use sea_orm::DatabaseConnection;
 use seaography::async_graphql;
 
@@ -27,6 +26,7 @@ use backoffice_infra::{
     jwt::JwtTokenService,
     mailer::smtp::SmtpEmailSender,
 };
+use backoffice_payment_provider::paystack::PaystackClient;
 
 #[derive(Clone)]
 pub struct Repositories {

@@ -1,4 +1,3 @@
-use backoffice_domain::models;
 use sanitizer::prelude::Sanitizer;
 use sanitizer::prelude::*;
 use sea_orm::ActiveValue::Set;
@@ -7,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use ulid::Ulid;
 use validator::Validate;
 
-
+use backoffice_domain::models;
 
 #[derive(Debug, Clone, Serialize, Deserialize, CustomInputType, Validate, Sanitizer)]
 #[serde(rename_all = "camelCase")]
@@ -25,7 +24,6 @@ pub struct SendEmailInput {
     pub recipient_email: String,
     pub tag: Option<String>,
     pub has_attachments: bool,
-  
 }
 
 impl From<SendEmailInput> for models::emails::ActiveModel {

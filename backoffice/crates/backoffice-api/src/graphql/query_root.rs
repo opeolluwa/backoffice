@@ -1,10 +1,10 @@
 use async_graphql::dynamic::*;
 use seaography::{Builder, BuilderContext, async_graphql, lazy_static::lazy_static};
 
-use super::types as Inputs;
 use backoffice_domain::models::*;
 
 use super::mutations;
+use super::types as Inputs;
 use crate::state::AppState;
 
 lazy_static! {
@@ -44,7 +44,6 @@ pub fn schema_builder(
             mutations::health_check::HealthCheck,
             mutations::emails::SendEmail
         ]
-        
     );
 
     builder
