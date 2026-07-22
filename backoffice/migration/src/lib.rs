@@ -20,7 +20,6 @@ mod m20260712_090843_creat_invitations_table;
 mod m20260719_094541_add_file_path_and_thumbname_to_uploads;
 mod m20260721_202604_create_orders_table;
 
-
 pub use sea_orm_migration::prelude::*;
 
 pub struct Migrator;

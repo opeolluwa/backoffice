@@ -6,6 +6,7 @@ authors.workspace = true
 description = "API layer: HTTP handlers, GraphQL, middleware, and extractors"
 
 [dependencies]
+async-graphql.workspace = true
 async-graphql-axum.workspace = true
 axum = { workspace = true, features = ["macros"] }
 axum-extra.workspace = true
@@ -17,6 +18,7 @@ backoffice-payment-provider.workspace = true
 chrono.workspace = true
 dotenvy = "0.15.7"
 jsonwebtoken.workspace = true
+rust_decimal.workspace = true
 sanitizer = { version = "1.0.0", features = ["derive"] }
 sea-orm.workspace = true
 seaography = { workspace = true, features = ["field-camel-case", "serde"] }

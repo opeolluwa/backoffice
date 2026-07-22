@@ -5,7 +5,7 @@ use axum::{
     http::StatusCode,
 };
 
-use backoffice_domain::dto::CreateOrdersCommand;
+use backoffice_domain::dto::PlaceOrderCommand;
 use backoffice_domain::errors::api_response::ApiResponse;
 use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::models::orders;
@@ -15,20 +15,24 @@ use crate::http::dto::{api_request::AuthenticatedRequest, jwt::Claims};
 use crate::http::extractors::orders::CreateOrdersRequest;
 use crate::state::AppState;
 
-fn to_command(req: &CreateOrdersRequest) -> CreateOrdersCommand {
-    CreateOrdersCommand {}
+fn to_command(req: &CreateOrdersRequest) -> PlaceOrderCommand {
+    PlaceOrderCommand {
+        items: vec![backoffice_domain::dto::PlaceOrderItem {
+            product_identifier: req.product_identifier.clone(),
+            quantity: req.quantity,
+        }],
+    }
 }
 
 pub async fn create_orders(
     State(state): State<Arc<AppState>>,
     request: AuthenticatedRequest<CreateOrdersRequest>,
-) -> Result<ApiResponse<orders::Model>, ServiceError> {
+) -> Result<
+    ApiResponse<Vec<(orders::Model, backoffice_domain::models::products::Model)>>,
+    ServiceError,
+> {
     let command = to_command(&request.data);
-    let result = state
-        .services
-        .orders_service
-        .create_orders(&command)
-        .await?;
+    let result = state.services.orders_service.place_orders(&command).await?;
 
     Ok(ApiResponse::builder()
         .message("Orders created successfully")

@@ -1,13 +1,17 @@
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
-    Set,
+    Set, TransactionTrait,
 };
 use ulid::Ulid;
 
 use backoffice_domain::errors::database_error::DatabaseError;
 use backoffice_domain::{
-    dto::CreateOrdersCommand,
-    models::orders::{self, Entity as OrdersEntity},
+    dto::PlaceOrderCommand,
+    models::{
+        orders::{self, Entity as OrdersEntity},
+        products::{self, Entity as ProductEntity},
+        sea_orm_active_enums::OrderStatus,
+    },
     ports::orders_repository::OrdersRepositoryExt,
 };
 
@@ -25,16 +29,53 @@ impl Repository for OrdersRepository {
 }
 
 impl OrdersRepositoryExt for OrdersRepository {
-    async fn create_orders(
+    async fn place_orders(
         &self,
-        command: &CreateOrdersCommand,
-    ) -> Result<orders::Model, DatabaseError> {
-        let model = orders::ActiveModel {
-            identifier: Set(Ulid::new().to_string()),
-            ..Default::default()
-        };
-        let result = model.insert(&self.db).await.map_err(DatabaseError::from)?;
-        Ok(result)
+        command: &PlaceOrderCommand,
+    ) -> Result<Vec<(orders::Model, products::Model)>, DatabaseError> {
+        let txn = self.db.begin().await.map_err(DatabaseError::from)?;
+        let mut created_identifiers = Vec::new();
+
+        for item in &command.items {
+            let product = ProductEntity::find()
+                .filter(products::Column::Identifier.eq(&item.product_identifier))
+                .one(&txn)
+                .await
+                .map_err(DatabaseError::from)?
+                .ok_or_else(|| {
+                    DatabaseError::NotFound(format!(
+                        "product not found: {}",
+                        item.product_identifier
+                    ))
+                })?;
+
+            let model = orders::ActiveModel {
+                identifier: Set(Ulid::new().to_string()),
+                product_identifier: Set(product.identifier),
+                quantity: Set(item.quantity),
+                status: Set(Some(OrderStatus::Pending)),
+                ..Default::default()
+            };
+
+            let result = model.insert(&txn).await.map_err(DatabaseError::from)?;
+            created_identifiers.push(result.identifier);
+        }
+
+        let results = OrdersEntity::find()
+            .filter(orders::Column::Identifier.is_in(created_identifiers))
+            .find_also_related(ProductEntity)
+            .all(&txn)
+            .await
+            .map_err(DatabaseError::from)?;
+
+        txn.commit().await.map_err(DatabaseError::from)?;
+
+        let pairs = results
+            .into_iter()
+            .filter_map(|(order, product)| product.map(|p| (order, p)))
+            .collect();
+
+        Ok(pairs)
     }
 
     async fn find_orders_by_identifier(
@@ -59,7 +100,7 @@ impl OrdersRepositoryExt for OrdersRepository {
     async fn update_orders_by_identifier(
         &self,
         identifier: &str,
-        command: &CreateOrdersCommand,
+        command: &PlaceOrderCommand,
     ) -> Result<orders::Model, DatabaseError> {
         let existing = OrdersEntity::find()
             .filter(orders::Column::Identifier.eq(identifier))
@@ -69,15 +110,15 @@ impl OrdersRepositoryExt for OrdersRepository {
             .ok_or_else(|| DatabaseError::NotFound("orders not found".to_string()))?;
 
         let mut active: orders::ActiveModel = existing.into();
-        //TODO: active.updated_at = Set(Some(chrono::Dat)));
+        if let Some(first) = command.items.first() {
+            active.product_identifier = Set(first.product_identifier.clone());
+            active.quantity = Set(first.quantity);
+        }
 
         active.update(&self.db).await.map_err(DatabaseError::from)
     }
 
-    async fn delete_orders_by_identifier(
-        &self,
-        identifier: &str,
-    ) -> Result<(), DatabaseError> {
+    async fn delete_orders_by_identifier(&self, identifier: &str) -> Result<(), DatabaseError> {
         OrdersEntity::delete_many()
             .filter(orders::Column::Identifier.eq(identifier))
             .exec(&self.db)

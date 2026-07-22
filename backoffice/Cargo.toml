@@ -25,6 +25,7 @@ edition = "2024"
 
 [workspace.dependencies]
 askama = "0.15.6"
+async-graphql = "7.0"
 async-graphql-axum = "7.0"
 axum = "0.8.3"
 axum-extra = { version = "0.12.1", features = ["typed-header"] }

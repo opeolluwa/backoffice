@@ -34,7 +34,8 @@ pub fn schema_builder(
         builder,
         [
             Inputs::newsletter::SubscribeToNewsletterInput,
-            Inputs::emails::SendEmailInput
+            Inputs::emails::SendEmailInput,
+            Inputs::orders::PlaceOrderItemInput
         ]
     );
     seaography::register_custom_mutations!(
@@ -42,7 +43,8 @@ pub fn schema_builder(
         [
             mutations::newsletter::SubscribeNewsletter,
             mutations::health_check::HealthCheck,
-            mutations::emails::SendEmail
+            mutations::emails::SendEmail,
+            mutations::orders::PlaceOrders
         ]
     );
 

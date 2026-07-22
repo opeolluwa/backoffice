@@ -148,11 +148,13 @@ pub struct SaveProductCommand {
 }
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateOrdersCommand {
-
+pub struct PlaceOrderItem {
+    pub product_identifier: String,
+    pub quantity: i32,
 }
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateOrdersCommand {
-
+pub struct PlaceOrderCommand {
+    pub items: Vec<PlaceOrderItem>,
 }

@@ -27,6 +27,8 @@ pub trait ProductServiceStateExt {
         product_identifier: &str,
         user_identifier: &str,
     ) -> Result<Product, ServiceError>;
+
+    async fn find_product_by_identifier(&self, identifier: &str) -> Result<Product, ServiceError>;
 }
 
 impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductService<R> {
@@ -49,6 +51,11 @@ impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductSe
             .retrieve_product(user_identifier, product_identifier)
             .await?;
 
+        Ok(product)
+    }
+
+    async fn find_product_by_identifier(&self, identifier: &str) -> Result<Product, ServiceError> {
+        let product = self.repo.find_product_by_identifier(identifier).await?;
         Ok(product)
     }
 }

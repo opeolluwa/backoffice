@@ -56,4 +56,16 @@ impl ProductRepositoryExt for ProductRepository {
             .map_err(DatabaseError::from)?
             .ok_or_else(|| DatabaseError::NotFound("product not found".to_string()))
     }
+
+    async fn find_product_by_identifier(
+        &self,
+        identifier: &str,
+    ) -> Result<products::Model, DatabaseError> {
+        ProductEntity::find()
+            .filter(products::Column::Identifier.eq(identifier))
+            .one(&self.db)
+            .await
+            .map_err(DatabaseError::from)?
+            .ok_or_else(|| DatabaseError::NotFound("product not found".to_string()))
+    }
 }

@@ -15,4 +15,9 @@ pub trait ProductRepositoryExt {
         identifier: &str,
         user_identifier: &str,
     ) -> Result<products::Model, DatabaseError>;
+
+    async fn find_product_by_identifier(
+        &self,
+        identifier: &str,
+    ) -> Result<products::Model, DatabaseError>;
 }
