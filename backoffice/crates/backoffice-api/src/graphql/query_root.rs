@@ -4,7 +4,7 @@ use seaography::{Builder, BuilderContext, async_graphql, lazy_static::lazy_stati
 use backoffice_domain::models::*;
 
 use super::mutations;
-use super::types as Inputs;
+use super::types as GraphQLTypes;
 use crate::state::AppState;
 
 lazy_static! {
@@ -33,11 +33,14 @@ pub fn schema_builder(
     seaography::register_custom_inputs!(
         builder,
         [
-            Inputs::newsletter::SubscribeToNewsletterInput,
-            Inputs::emails::SendEmailInput,
-            Inputs::orders::PlaceOrderItemInput
+            GraphQLTypes::newsletter::SubscribeToNewsletterInput,
+            GraphQLTypes::emails::SendEmailInput,
+            GraphQLTypes::orders::PlaceOrderItemInput
         ]
     );
+
+    seaography::register_custom_outputs!(builder, [GraphQLTypes::orders::PlaceOrderOrderResponse]);
+
     seaography::register_custom_mutations!(
         builder,
         [

@@ -36,6 +36,7 @@ CMD ["cargo", "watch", \
      "-w", "src", \
      "-w", "Cargo.toml", \
      "-w", "migration", \
+     "-w", "crates", \
      "-w", "crates/backoffice-api", \
      "-w", "crates/backoffice-cli", \
      "-w", "crates/backoffice-config", \

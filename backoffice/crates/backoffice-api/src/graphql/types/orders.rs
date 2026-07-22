@@ -12,7 +12,8 @@ pub struct PlaceOrderItemInput {
     pub quantity: i32,
 }
 
-#[derive(Debug, Clone, CustomOutputType)]
+#[derive(Debug, Clone, CustomOutputType, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PlaceOrderOrderResponse {
     pub quantity: i32,
     pub status: Option<OrderStatus>,
