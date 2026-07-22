@@ -114,7 +114,7 @@ mod tests {
         let service = ProductService::new(repo);
 
         let cmd = SaveProductCommand {
-            picture: "https://example.com/widget.jpg".to_string(),
+            picture: Some("https://example.com/widget.jpg".to_string()),
             name: "Widget".to_string(),
             description: "A fine widget".to_string(),
             price: 2999,

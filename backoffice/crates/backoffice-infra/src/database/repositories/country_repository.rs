@@ -19,7 +19,7 @@ impl Repository for CountryRepository {
 
 impl CountryRepositoryExt for CountryRepository {
     async fn fetch_all_countries(&self) -> Result<Vec<countries::Model>, DatabaseError> {
-        let countries = CountryEntity::find()
+        let countries = CountryEntity::find() 
             .all(&self.db)
             .await
             .map_err(DatabaseError::from)?;

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useProductStore } from "~/stores/products";
 import { useCountryStore } from "~/stores/country";
+import { useUploadStore } from "~/stores/uploads";
+import type { UploadsInterface } from "~/bindings/UploadsInterface";
 import { z } from "zod";
 
 useHead({ title: "Products" });
@@ -16,19 +18,28 @@ definePageMeta({
 
 const productStore = useProductStore();
 const countryStore = useCountryStore();
+const uploadStore = useUploadStore();
 const toast = useToast();
 
 const isFetching = ref(true);
 const openForm = ref(false);
 const loading = ref(false);
 
+type ImageSource = "upload" | "library";
+const imageSource = ref<ImageSource>("upload");
+const newFile = ref<File | null>(null);
+const selectedUpload = ref<UploadsInterface | null>(null);
+
 const hasProducts = computed(() => productStore.products.length > 0);
+
+const imageUploads = computed(() =>
+  uploadStore.uploads.filter((u) => u.fileType === "Image"),
+);
 
 const state = reactive({
   name: "",
   description: "",
   price: 0,
-  picture: null as File | null,
   currencyIdentifier: "",
 });
 
@@ -36,39 +47,64 @@ const schema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   price: z.number().min(1, "Price is required"),
-  picture: z.any().optional(),
   currencyIdentifier: z.string().min(1, "Currency is required"),
 });
 
 const currencyOptions = computed(() =>
   countryStore.countries.map((c) => ({
-    label: `${c.currency} (${c.country})`,
-    value: c.identifier,
+    label: `${c.currencyCode} ${c.country}`,
     avatar: c.flag ? { src: c.flag } : undefined,
+    value: c.identifier,
   })),
 );
+
+function getUploadUrl(uploadId: string): string | null {
+  const upload = uploadStore.uploads.find((u) => u.identifier === uploadId);
+  return upload?.url || null;
+}
 
 function resetForm() {
   state.name = "";
   state.description = "";
   state.price = 0;
-  state.picture = null;
   state.currencyIdentifier = "";
+  newFile.value = null;
+  selectedUpload.value = null;
+  imageSource.value = "upload";
+}
+
+function selectUpload(upload: UploadsInterface) {
+  selectedUpload.value =
+    selectedUpload.value?.identifier === upload.identifier ? null : upload;
 }
 
 async function onSubmit() {
   loading.value = true;
   try {
-    const formData = new FormData();
-    formData.append("name", state.name);
-    formData.append("description", state.description);
-    formData.append("price", state.price.toString());
-    formData.append("currencyIdentifier", state.currencyIdentifier);
-    if (state.picture) {
-      formData.append("picture", state.picture);
+    let pictureId: string | undefined;
+
+    if (imageSource.value === "upload" && newFile.value) {
+      const formData = new FormData();
+      formData.append("file", newFile.value);
+      formData.append("name", newFile.value.name);
+      const created = await uploadStore.createUpload({
+        file: newFile.value,
+        name: newFile.value.name,
+      });
+      if (created && "identifier" in created) {
+        pictureId = created.identifier;
+      }
+    } else if (imageSource.value === "library" && selectedUpload.value) {
+      pictureId = selectedUpload.value.identifier;
     }
 
-    await productStore.createProduct(formData);
+    await productStore.createProduct({
+      picture: pictureId,
+      name: state.name,
+      description: state.description,
+      price: state.price,
+      currencyIdentifier: state.currencyIdentifier,
+    });
     resetForm();
     openForm.value = false;
     toast.add({ title: "Product created", color: "success" });
@@ -88,6 +124,7 @@ onMounted(async () => {
     await Promise.all([
       productStore.fetchProducts(),
       countryStore.fetchCountries(),
+      uploadStore.findAllUploads(),
     ]);
   } catch (error) {
     console.error(error);
@@ -126,8 +163,8 @@ onMounted(async () => {
         >
           <div class="aspect-video bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
             <img
-              v-if="product.picture"
-              :src="product.picture"
+              v-if="product.picture && getUploadUrl(product.picture)"
+              :src="getUploadUrl(product.picture)"
               :alt="product.name"
               class="w-full h-full object-cover"
             />
@@ -168,103 +205,114 @@ onMounted(async () => {
           :state="state"
           :on-submit="onSubmit"
         >
-          <UFileUpload v-model="state.picture" class="w-full min-h-48" />
+          <div class="space-y-3">
+            <label class="text-xs font-medium text-gray-600 dark:text-gray-400">
+              Image
+            </label>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+                :class="
+                  imageSource === 'upload'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/10'
+                "
+                @click="imageSource = 'upload'"
+              >
+                Upload new
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+                :class="
+                  imageSource === 'library'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/10'
+                "
+                @click="imageSource = 'library'"
+              >
+                Choose from library
+              </button>
+            </div>
 
-          <UFormField
-            v-slot="{ error }"
+            <div v-if="imageSource === 'upload'">
+              <UFileUpload v-model="newFile" class="w-full min-h-48" />
+            </div>
+
+            <div v-else>
+              <div
+                v-if="imageUploads.length === 0"
+                class="text-sm text-gray-400 dark:text-white/30 text-center py-8"
+              >
+                No images in library. Upload some first.
+              </div>
+              <div
+                v-else
+                class="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-64 overflow-y-auto"
+              >
+                <button
+                  v-for="upload in imageUploads"
+                  :key="upload.identifier"
+                  type="button"
+                  class="aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer"
+                  :class="
+                    selectedUpload?.identifier === upload.identifier
+                      ? 'border-black dark:border-white ring-2 ring-black/20 dark:ring-white/20'
+                      : 'border-transparent hover:border-gray-300 dark:hover:border-white/20'
+                  "
+                  @click="selectUpload(upload)"
+                >
+                  <img
+                    :src="upload.url"
+                    :alt="upload.name"
+                    class="w-full h-full object-cover"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <AppInput
+            v-model="state.name"
             label="Name"
             name="name"
-            required
-            :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <UInput
-              v-model="state.name"
-              :ui="{ base: 'py-4 px-6' }"
-              :class="[
-                'w-full transition-colors',
-                error
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:border-black',
-              ]"
-            />
-          </UFormField>
+            placeholder="Product name"
+          />
 
-          <UFormField
-            v-slot="{ error }"
+          <AppInput
+            v-model="state.description"
             label="Description"
             name="description"
-            required
-            :ui="{ error: 'text-red-500 text-sm mt-1' }"
-          >
-            <UInput
-              v-model="state.description"
-              :ui="{ base: 'py-4 px-6' }"
-              :class="[
-                'w-full transition-colors',
-                error
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:border-black',
-              ]"
-            />
-          </UFormField>
+            placeholder="Product description"
+          />
 
           <div class="flex justify-between gap-x-2">
-            <UFormField
-              v-slot="{ error }"
+            <AppNumberInput
+              v-model="state.price"
               label="Price"
               name="price"
-              required
-              :ui="{ error: 'text-red-500 text-sm mt-1' }"
-            >
-              <UInputNumber
-                v-model="state.price"
-                :ui="{ base: 'py-4 px-6' }"
-                :class="[
-                  'w-full transition-colors',
-                  error
-                    ? 'border-red-500 focus:border-red-500'
-                    : 'border-gray-300 focus:border-black',
-                ]"
-              />
-            </UFormField>
-            <UFormField
-              v-slot="{ error }"
+              placeholder="0"
+              class="w-full"
+            />
+            <AppSelect
+              v-model="state.currencyIdentifier"
               label="Currency"
               name="currencyIdentifier"
+              :items="currencyOptions"
+              placeholder="Select currency"
               required
               class="w-full"
-              :ui="{ error: 'text-red-500 text-sm mt-1' }"
-            >
-              <USelect
-                v-model="state.currencyIdentifier"
-                :items="currencyOptions"
-                :ui="{ base: 'py-4 px-6', viewport: '', content: 'w-60' }"
-                :class="[
-                  'w-full transition-colors',
-                  error
-                    ? 'border-red-500 focus:border-red-500'
-                    : 'border-gray-300 focus:border-black',
-                ]"
-              />
-            </UFormField>
+            />
           </div>
 
           <div class="flex justify-between items-center">
-            <UButton
-              type="submit"
-              class="dark:text-white/90 py-3 px-4"
-              :loading="loading"
-              :disabled="loading"
-            >
+            <AppButton type="submit" :loading="loading" :disabled="loading">
               Create
-            </UButton>
-            <UButton
-              variant="subtle"
-              class="dark:text-white/90 py-3 px-4"
-              @click="resetForm"
-            >
+            </AppButton>
+            <AppButton color="error" @click="resetForm">
               Clear form
-            </UButton>
+            </AppButton>
           </div>
         </UForm>
       </template>

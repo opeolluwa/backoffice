@@ -30,7 +30,7 @@ impl ProductRepositoryExt for ProductRepository {
         let model = products::ActiveModel {
             identifier: Set(Ulid::new().to_string()),
             name: Set(command.name.clone()),
-            picture: Set(Some(command.picture.clone())),
+            picture: Set(command.picture.clone()),
             price: Set(Decimal::from(command.price)),
             description: Set(command.description.clone()),
             currency_identifier: Set(Some(command.currency_identifier.clone())),

@@ -7,9 +7,8 @@ defineProps<{
   trailingIcon?: string;
   placeholder?: string;
   hint?: string;
-  avatar?: string;
   disabled?: boolean;
-  items: string[] | { label: string; value: string }[];
+  items: string[] | { label: string; value: string; avatar?: { src: string } }[];
 }>();
 
 const model = defineModel<string>();
@@ -33,7 +32,7 @@ const model = defineModel<string>();
       :icon="icon"
       :trailing-icon="trailingIcon"
       value-key="value"
-      :avatar="{ src: avatar, loading: 'lazy' }"
+      label-key="label"
       :disabled="disabled"
       :placeholder="placeholder"
       :ui="{
@@ -46,6 +45,14 @@ const model = defineModel<string>();
           ? 'border-red-500 focus-within:border-red-500'
           : 'border-gray-300 dark:border-gray-600 focus-within:border-black dark:focus-within:border-gray-400',
       ]"
-    />
+    >
+      <template #leading="{ item }">
+        <UAvatar
+          v-if="item.avatar"
+          :src="item.avatar.src"
+          size="xs"
+        />
+      </template>
+    </USelectMenu>
   </UFormField>
 </template>

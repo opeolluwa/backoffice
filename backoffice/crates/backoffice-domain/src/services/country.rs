@@ -25,7 +25,9 @@ pub trait CountryServiceExt {
 
 impl<R: CountryRepositoryExt + Send + Sync> CountryServiceExt for CountryService<R> {
     async fn get_all_countries(&self) -> Result<Vec<countries::Model>, ServiceError> {
-        Ok(self.repo.fetch_all_countries().await?)
+        let countries = self.repo.fetch_all_countries().await?;
+        dbg!("{:#?}", &countries);
+        Ok(countries)
     }
 
     async fn get_country_by_identifier(

@@ -2,6 +2,14 @@ import { defineStore } from "pinia";
 import api from "~/plugin/api";
 import type { ProductsInterface as Product } from "~/bindings/ProductsInterface";
 
+interface CreateProductPayload {
+  picture?: string;
+  name: string;
+  description: string;
+  price: number;
+  currencyIdentifier: string;
+}
+
 const useProductStore = defineStore("products", {
   state: () => ({
     products: [] as Array<Product>,
@@ -16,10 +24,8 @@ const useProductStore = defineStore("products", {
       this.count = this.products.length;
     },
 
-    async createProduct(formData: FormData) {
-      const res = await api.post("/products", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    async createProduct(payload: CreateProductPayload) {
+      const res = await api.post("/products", payload);
       const created = res.data?.data as Product;
       this.products.unshift(created);
       this.count++;
@@ -45,3 +51,4 @@ const useProductStore = defineStore("products", {
 });
 
 export { useProductStore };
+export type { CreateProductPayload };

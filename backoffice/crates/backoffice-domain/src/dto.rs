@@ -132,7 +132,7 @@ pub struct UpdateUploadCommand {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveProductCommand {
-    pub picture: String,
+    pub picture: Option<String>,
     pub name: String,
     pub description: String,
     pub price: i64,
