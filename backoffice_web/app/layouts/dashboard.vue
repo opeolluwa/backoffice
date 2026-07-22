@@ -44,11 +44,6 @@ const routes = [
     to: "/products",
   },
   {
-    label: "Marketplace",
-    icon: "heroicons:building-storefront",
-    to: "/marketplace",
-  },
-  {
     label: "Emails",
     icon: "heroicons:envelope",
     to: "/emails",
@@ -58,11 +53,7 @@ const routes = [
     icon: "heroicons:banknotes",
     to: "/revenue",
   },
-  // {
-  //   label: "Calendar",
-  //   icon: "heroicons:calendar",
-  //   to: "/calendar",
-  // },
+
   {
     label: "Uploads",
     icon: "heroicons:arrow-up-tray",
@@ -109,7 +100,7 @@ const logout = async () => useLogout();
   <UDashboardGroup>
     <UDashboardSidebar
       collapsible
-      :toggle="{ color: 'white', variant: 'ghost' }"
+      :toggle="{ variant: 'ghost' }"
       class="bg-primary-500 border-r-0"
       :ui="{
         root: 'bg-primary-500 border-r-0',
