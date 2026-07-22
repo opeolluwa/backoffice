@@ -59,6 +59,7 @@ const schema = z.object({
 const currencyOptions = computed(() =>
   countryStore.countries.map((c) => ({
     label: `${c.currencyCode} ${c.country}`,
+    avatar: c.flag ? c.flag : undefined,
     value: c.identifier,
   })),
 );
@@ -207,10 +208,10 @@ defineExpose({ reset });
         </div>
 
         <div class="flex justify-between items-center">
+          <AppButton color="error" @click="reset"> Clear form </AppButton>
           <AppButton type="submit" :loading="loading" :disabled="loading">
             Create
           </AppButton>
-          <AppButton color="error" @click="reset"> Clear form </AppButton>
         </div>
       </UForm>
     </template>
@@ -221,13 +222,14 @@ defineExpose({ reset });
     title="Choose image"
     description="Select an image from your uploads"
     close-icon="heroicons:x-mark"
+    size="xl"
   >
     <template #body>
       <AppLightBox v-model="selectedUploadId" :images="imageUploads" />
     </template>
     <template #footer>
       <div class="flex justify-end gap-2">
-        <AppButton color="secondary" @click="openLibrary = false">
+        <AppButton color="error" @click="openLibrary = false">
           Cancel
         </AppButton>
         <AppButton :disabled="!selectedUploadId" @click="confirmLibrary">

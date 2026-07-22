@@ -30,7 +30,7 @@ function toggle(id: string) {
       label="Search"
       placeholder="Search images..."
     />
-
+{{images}}
     <div
       v-if="filtered.length === 0"
       class="text-sm text-gray-400 dark:text-white/30 text-center py-8"
