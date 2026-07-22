@@ -15,41 +15,20 @@ impl<R: ProductRepositoryExt> ProductService<R> {
 }
 
 pub trait ProductServiceStateExt {
-    async fn add_product(
-        &self,
-        command: &SaveProductCommand,
-        user_identifier: &str,
-        marketplace_identifier: &str,
-    ) -> Result<Product, ServiceError>;
+    async fn add_product(&self, command: &SaveProductCommand) -> Result<Product, ServiceError>;
 
-    async fn fetch_product(
-        &self,
-        product_identifier: &str,
-        user_identifier: &str,
-    ) -> Result<Product, ServiceError>;
+    async fn fetch_product(&self, product_identifier: &str) -> Result<Product, ServiceError>;
 
     async fn find_product_by_identifier(&self, identifier: &str) -> Result<Product, ServiceError>;
 }
 
 impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductService<R> {
-    async fn add_product(
-        &self,
-        _command: &SaveProductCommand,
-        _user_identifier: &str,
-        _marketplace_identifier: &str,
-    ) -> Result<Product, ServiceError> {
+    async fn add_product(&self, _command: &SaveProductCommand) -> Result<Product, ServiceError> {
         todo!("implement file upload")
     }
 
-    async fn fetch_product(
-        &self,
-        product_identifier: &str,
-        user_identifier: &str,
-    ) -> Result<Product, ServiceError> {
-        let product = self
-            .repo
-            .retrieve_product(user_identifier, product_identifier)
-            .await?;
+    async fn fetch_product(&self, product_identifier: &str) -> Result<Product, ServiceError> {
+        let product = self.repo.retrieve_product(product_identifier).await?;
 
         Ok(product)
     }
@@ -74,8 +53,6 @@ mod tests {
             picture: Some("https://example.com/widget.jpg".to_string()),
             price: dec!(29.99),
             description: "A fine widget".to_string(),
-            created_by_identifier: Some("user-001".to_string()),
-            marketplace_identifier: Some("mp-001".to_string()),
             created_at: Utc::now().naive_utc().and_utc().into(),
             updated_at: None,
             currency_identifier: Some("NG".to_string()),
@@ -90,7 +67,7 @@ mod tests {
             .returning(move |_, _| Ok(product.clone()));
         let service = ProductService::new(repo);
 
-        let result = service.fetch_product("prod-001", "user-001").await;
+        let result = service.fetch_product("prod-001").await;
         assert!(result.is_ok());
         assert_eq!(result.unwrap().name, "Widget");
     }
@@ -105,7 +82,7 @@ mod tests {
         });
         let service = ProductService::new(repo);
 
-        let result = service.fetch_product("nonexistent", "user-001").await;
+        let result = service.fetch_product("nonexistent").await;
         assert!(result.is_err());
     }
 }

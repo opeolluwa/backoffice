@@ -86,14 +86,6 @@ pub struct RefreshTokenResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateMarketplaceCommand {
-    pub name: String,
-    pub description: String,
-    pub slug: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct CreateEmailCommand {
     pub subject: String,
     pub body: String,

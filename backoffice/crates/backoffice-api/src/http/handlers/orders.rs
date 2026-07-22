@@ -43,7 +43,7 @@ pub async fn create_orders(
 
 pub async fn find_orders_by_identifier(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
+    _claims: Claims,
     Path(identifier): axum::extract::Path<String>,
 ) -> Result<ApiResponse<orders::Model>, ServiceError> {
     let result = state
@@ -60,7 +60,7 @@ pub async fn find_orders_by_identifier(
 
 pub async fn find_all_orders(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
+    _claims: Claims,
 ) -> Result<ApiResponse<Vec<orders::Model>>, ServiceError> {
     let results = state.services.orders_service.find_all_orders().await?;
 
@@ -72,7 +72,7 @@ pub async fn find_all_orders(
 
 pub async fn count_orders(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
+    _claims: Claims,
 ) -> Result<ApiResponse<i64>, ServiceError> {
     let count = state.services.orders_service.count_orders().await?;
 
@@ -85,7 +85,7 @@ pub async fn count_orders(
 pub async fn update_orders_by_identifier(
     State(state): State<Arc<AppState>>,
     Path(identifier): Path<String>,
-    AuthenticatedRequest { data, claims }: AuthenticatedRequest<CreateOrdersRequest>,
+    AuthenticatedRequest { data, .. }: AuthenticatedRequest<CreateOrdersRequest>,
 ) -> Result<ApiResponse<orders::Model>, ServiceError> {
     let command = to_command(&data);
     let result = state
@@ -102,7 +102,7 @@ pub async fn update_orders_by_identifier(
 
 pub async fn delete_orders_by_identifier(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
+    _claims: Claims,
     Path(identifier): Path<String>,
 ) -> Result<ApiResponse<()>, ServiceError> {
     state

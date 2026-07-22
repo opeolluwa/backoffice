@@ -3,7 +3,6 @@ pub mod base;
 pub mod country_repository;
 pub mod email_repository;
 pub mod invitation_repository;
-pub mod marketplace_repository;
 pub mod newsletter_repository;
 pub mod orders_repository;
 pub mod product_repository;

@@ -5,9 +5,8 @@ use tower_http::services::{ServeDir, ServeFile};
 
 use crate::http::routes::{
     auth::authentication_routes, country::country_routes, email::email_routes,
-    invitation::invitation_routes, marketplace::marketplace_routes, orders::orders_routes,
-    products::product_routes, public::public_routes, teams::team_routes, uploads::upload_routes,
-    users::user_routes,
+    invitation::invitation_routes, orders::orders_routes, products::product_routes,
+    public::public_routes, teams::team_routes, uploads::upload_routes, users::user_routes,
 };
 use crate::state::AppState;
 
@@ -23,7 +22,6 @@ pub fn load_routes(app_state: AppState) -> Router {
                 .merge(country_routes(Arc::clone(&state)))
                 .merge(public_routes(Arc::clone(&state)))
                 .merge(authentication_routes(Arc::clone(&state)))
-                .merge(marketplace_routes(Arc::clone(&state)))
                 .merge(product_routes(Arc::clone(&state)))
                 .merge(team_routes(Arc::clone(&state)))
                 .merge(email_routes(Arc::clone(&state)))

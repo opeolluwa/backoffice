@@ -1,8 +1,9 @@
-use backoffice_domain::models::sea_orm_active_enums::OrderStatus;
 use rust_decimal::Decimal;
 use seaography::{CustomInputType, CustomOutputType};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+
+use backoffice_domain::models::sea_orm_active_enums::OrderStatus;
 
 #[derive(Debug, Clone, Serialize, Deserialize, CustomInputType, Validate)]
 #[serde(rename_all = "camelCase")]

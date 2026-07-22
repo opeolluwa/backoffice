@@ -3,7 +3,6 @@ pub mod collections;
 pub mod country;
 pub mod email;
 pub mod invitation;
-pub mod marketplace;
 pub mod orders;
 pub mod products;
 pub mod public;

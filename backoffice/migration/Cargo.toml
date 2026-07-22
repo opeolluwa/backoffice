@@ -9,6 +9,7 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
+sea-orm = { workspace = true, features = ["rbac"] }
 sea-orm-migration.workspace = true
 tokio.workspace = true
 

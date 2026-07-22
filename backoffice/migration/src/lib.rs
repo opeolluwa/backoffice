@@ -19,6 +19,11 @@ mod m20260706_222817_update_uploads_table;
 mod m20260712_090843_creat_invitations_table;
 mod m20260719_094541_add_file_path_and_thumbname_to_uploads;
 mod m20260721_202604_create_orders_table;
+mod m20260722_131248_do_rabc;
+mod m20260722_133642_define_rbac_rules;
+mod m20260722_134014_define_rbac_roles;
+mod m20260722_140000_drop_created_by_from_products;
+mod m20260722_150000_drop_marketplace;
 
 pub use sea_orm_migration::prelude::*;
 
@@ -52,6 +57,11 @@ impl MigratorTrait for Migrator {
             Box::new(m20260712_090843_creat_invitations_table::Migration),
             Box::new(m20260719_094541_add_file_path_and_thumbname_to_uploads::Migration),
             Box::new(m20260721_202604_create_orders_table::Migration),
+            Box::new(m20260722_140000_drop_created_by_from_products::Migration),
+            Box::new(m20260722_131248_do_rabc::Migration),
+            Box::new(m20260722_133642_define_rbac_rules::Migration),
+            Box::new(m20260722_134014_define_rbac_roles::Migration),
+            Box::new(m20260722_150000_drop_marketplace::Migration),
         ]
     }
 }

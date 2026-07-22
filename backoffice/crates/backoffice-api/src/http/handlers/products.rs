@@ -13,10 +13,9 @@ use backoffice_domain::services::product::ProductServiceStateExt;
 use crate::http::dto::jwt::Claims;
 use crate::state::AppState;
 
-pub async fn add_product_to_marketplace(
+pub async fn create_product(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
-    Path(marketplace_identifier): Path<String>,
+    _claims: Claims,
     _request: axum_typed_multipart::TypedMultipart<
         crate::http::extractors::products::CreateProductRequest,
     >,
@@ -24,17 +23,13 @@ pub async fn add_product_to_marketplace(
     let product = state
         .services
         .product_service
-        .add_product(
-            &backoffice_domain::dto::SaveProductCommand {
-                picture: String::new(),
-                name: String::new(),
-                description: String::new(),
-                price: 0,
-                currency_identifier: String::new(),
-            },
-            &claims.identifier,
-            &marketplace_identifier,
-        )
+        .add_product(&backoffice_domain::dto::SaveProductCommand {
+            picture: String::new(),
+            name: String::new(),
+            description: String::new(),
+            price: 0,
+            currency_identifier: String::new(),
+        })
         .await?;
 
     Ok(ApiResponse::builder()
@@ -44,19 +39,18 @@ pub async fn add_product_to_marketplace(
         .build())
 }
 
-pub async fn retrieve_product_from_marketplace(
+pub async fn find_product(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
     Path(product_identifier): Path<String>,
 ) -> Result<ApiResponse<Product>, ServiceError> {
     let product = state
         .services
         .product_service
-        .fetch_product(&product_identifier, &claims.identifier)
+        .fetch_product(&product_identifier)
         .await?;
 
     Ok(ApiResponse::builder()
         .data(product)
-        .message("marketplace product")
+        .message("product fetched successfully")
         .build())
 }
