@@ -1,0 +1,31 @@
+query fetchProducts {
+    products {
+        nodes {
+            identifier
+            name
+            picture
+            price
+            description
+            currencyIdentifier
+            createdAt
+            updatedAt
+        }
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+        }
+    }
+}
+
+query fetchProductByIdentifier {
+    product(identifier: "prod_01HZXM1EXAMPLE1") {
+        identifier
+        name
+        picture
+        price
+        description
+        currencyIdentifier
+        createdAt
+        updatedAt
+    }
+}

@@ -4,7 +4,6 @@ pub mod email_repository;
 pub mod email_sender;
 pub mod image_uploader;
 pub mod invitation_repository;
-pub mod marketplace_repository;
 pub mod newsletter_repository;
 pub mod orders_repository;
 pub mod product_repository;

@@ -7,6 +7,7 @@ defineProps<{
   trailingIcon?: string;
   placeholder?: string;
   hint?: string;
+  avatar?: string;
   disabled?: boolean;
   items: string[] | { label: string; value: string }[];
 }>();
@@ -21,7 +22,7 @@ const model = defineModel<string>();
     :hint="hint"
     :ui="{
       error: 'text-red-500 mt-1',
-      label: 'text-xs font-medium text-gray-600 dark:text-gray-400',
+      label: 'text-xs font-medium text-gray-600 dark:text-gray-400 capitalize',
       hint: 'mr-auto text-gray-400 dark:text-gray-600 font-normal ml-1',
       root: 'lowercase',
     }"
@@ -32,6 +33,7 @@ const model = defineModel<string>();
       :icon="icon"
       :trailing-icon="trailingIcon"
       value-key="value"
+      :avatar="{ src: avatar, loading: 'lazy' }"
       :disabled="disabled"
       :placeholder="placeholder"
       :ui="{

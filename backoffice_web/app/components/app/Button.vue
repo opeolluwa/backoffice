@@ -42,7 +42,7 @@ defineProps({
   },
   size: {
     type: String as PropType<"xs" | "sm" | "md" | "lg" | "xl">,
-    default: "lg",
+    default: "sm",
   },
 });
 </script>

@@ -1,7 +1,5 @@
 {
-  "userWords": [
-    "backoffice"
-  ],
+  "userWords": ["backoffice"],
   "words": [
     "backoffice",
     "healthcheck",
@@ -10,6 +8,37 @@
     "seaorm",
     "Zepto",
     "smtp",
-    "paystack"
+    "paystack",
+    "ASBH",
+    "backoffice",
+    "bson",
+    "chrono",
+    "Datelike",
+    "dialoguer",
+    "dotenv",
+    "DQJEZDW",
+    "gjolpf",
+    "heroicons",
+    "Iden",
+    "Imagekit",
+    "jsonwebtoken",
+    "lettre",
+    "lucide",
+    "middlename",
+    "Nuxt",
+    "oneshot",
+    "ormlite",
+    "pkce",
+    "proto",
+    "pswd",
+    "reqwest",
+    "seaography",
+    "singlepart",
+    "sqlx",
+    "tbody",
+    "thiserror",
+    "tinytemplate",
+    "TOTP",
+    "valibot"
   ]
 }

@@ -17,8 +17,6 @@ pub struct Model {
     pub price: Decimal,
     #[sea_orm(column_type = "Text")]
     pub description: String,
-    pub created_by_identifier: Option<String>,
-    pub marketplace_identifier: Option<String>,
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: Option<DateTimeWithTimeZone>,
     pub currency_identifier: Option<String>,
@@ -34,35 +32,13 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Countries,
-    #[sea_orm(
-        belongs_to = "super::marketplaces::Entity",
-        from = "Column::MarketplaceIdentifier",
-        to = "super::marketplaces::Column::Identifier",
-        on_update = "NoAction",
-        on_delete = "NoAction"
-    )]
-    Marketplaces,
     #[sea_orm(has_many = "super::orders::Entity")]
     Orders,
-    #[sea_orm(
-        belongs_to = "super::users::Entity",
-        from = "Column::CreatedByIdentifier",
-        to = "super::users::Column::Identifier",
-        on_update = "NoAction",
-        on_delete = "NoAction"
-    )]
-    Users,
 }
 
 impl Related<super::countries::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Countries.def()
-    }
-}
-
-impl Related<super::marketplaces::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Marketplaces.def()
     }
 }
 
@@ -72,22 +48,12 @@ impl Related<super::orders::Entity> for Entity {
     }
 }
 
-impl Related<super::users::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Users.def()
-    }
-}
-
 impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
 pub enum RelatedEntity {
     #[sea_orm(entity = "super::countries::Entity")]
     Countries,
-    #[sea_orm(entity = "super::marketplaces::Entity")]
-    Marketplaces,
     #[sea_orm(entity = "super::orders::Entity")]
     Orders,
-    #[sea_orm(entity = "super::users::Entity")]
-    Users,
 }

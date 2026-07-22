@@ -6,8 +6,6 @@ export type ProductsInterface = {
   picture: string | null;
   price: number;
   description: string;
-  createdByIdentifier: string | null;
-  marketplaceIdentifier: string | null;
   createdAt: string;
   updatedAt: string | null;
   currencyIdentifier: string | null;

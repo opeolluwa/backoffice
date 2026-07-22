@@ -1,0 +1,16 @@
+mutation placeOrders {
+    place_orders(
+        input: [
+            { productIdentifier: "prod_01HZXM1EXAMPLE1", quantity: 2 }
+            { productIdentifier: "prod_01HZXM1EXAMPLE2", quantity: 1 }
+        ]
+    ) {
+        quantity
+        status
+        name
+        description
+        price
+        currencyIdentifier
+        picture
+    }
+}

@@ -5,8 +5,8 @@ use axum::routing::{delete, post, put};
 use axum::{Router, routing::get};
 
 use crate::http::handlers::orders::{
-    count_orders, create_orders, delete_orders_by_identifier,
-    find_all_orders, find_orders_by_identifier, update_orders_by_identifier,
+    count_orders, create_orders, delete_orders_by_identifier, find_all_orders,
+    find_orders_by_identifier, update_orders_by_identifier,
 };
 use crate::http::middlewares::auth::authenticate;
 use crate::state::AppState;

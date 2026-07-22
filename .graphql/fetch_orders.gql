@@ -1,0 +1,33 @@
+query fetchOrders {
+    orders {
+        nodes {
+            identifier
+            productIdentifier
+            quantity
+            status
+            createdAt
+            updatedAt
+        }
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+        }
+    }
+}
+
+query fetchOrderByIdentifier {
+    order(identifier: "ord_01HZXM1EXAMPLE1") {
+        identifier
+        productIdentifier
+        quantity
+        status
+        createdAt
+        updatedAt
+        product {
+            identifier
+            name
+            price
+            description
+        }
+    }
+}

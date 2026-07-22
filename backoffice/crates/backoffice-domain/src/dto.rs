@@ -86,14 +86,6 @@ pub struct RefreshTokenResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateMarketplaceCommand {
-    pub name: String,
-    pub description: String,
-    pub slug: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct CreateEmailCommand {
     pub subject: String,
     pub body: String,
@@ -140,7 +132,7 @@ pub struct UpdateUploadCommand {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveProductCommand {
-    pub picture: String,
+    pub picture: Option<String>,
     pub name: String,
     pub description: String,
     pub price: i64,
@@ -148,11 +140,13 @@ pub struct SaveProductCommand {
 }
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateOrdersCommand {
-
+pub struct PlaceOrderItem {
+    pub product_identifier: String,
+    pub quantity: i32,
 }
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateOrdersCommand {
-
+pub struct PlaceOrderCommand {
+    pub items: Vec<PlaceOrderItem>,
 }

@@ -27,10 +27,6 @@ pub enum Relation {
     Activities,
     #[sea_orm(has_many = "super::emails::Entity")]
     Emails,
-    #[sea_orm(has_many = "super::marketplaces::Entity")]
-    Marketplaces,
-    #[sea_orm(has_many = "super::products::Entity")]
-    Products,
     #[sea_orm(
         belongs_to = "super::user_roles::Entity",
         from = "Column::RoleIdentifier",
@@ -53,18 +49,6 @@ impl Related<super::emails::Entity> for Entity {
     }
 }
 
-impl Related<super::marketplaces::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Marketplaces.def()
-    }
-}
-
-impl Related<super::products::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Products.def()
-    }
-}
-
 impl Related<super::user_roles::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::UserRoles.def()
@@ -79,10 +63,6 @@ pub enum RelatedEntity {
     Activities,
     #[sea_orm(entity = "super::emails::Entity")]
     Emails,
-    #[sea_orm(entity = "super::marketplaces::Entity")]
-    Marketplaces,
-    #[sea_orm(entity = "super::products::Entity")]
-    Products,
     #[sea_orm(entity = "super::user_roles::Entity")]
     UserRoles,
 }

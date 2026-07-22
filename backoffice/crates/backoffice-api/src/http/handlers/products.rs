@@ -3,6 +3,7 @@ use std::sync::Arc;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
+    Json,
 };
 
 use backoffice_domain::errors::api_response::ApiResponse;
@@ -11,30 +12,24 @@ use backoffice_domain::models::products::Model as Product;
 use backoffice_domain::services::product::ProductServiceStateExt;
 
 use crate::http::dto::jwt::Claims;
+use crate::http::extractors::products::CreateProductRequest;
 use crate::state::AppState;
 
-pub async fn add_product_to_marketplace(
+pub async fn create_product(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
-    Path(marketplace_identifier): Path<String>,
-    _request: axum_typed_multipart::TypedMultipart<
-        crate::http::extractors::products::CreateProductRequest,
-    >,
+    _claims: Claims,
+    Json(req): Json<CreateProductRequest>,
 ) -> Result<ApiResponse<Product>, ServiceError> {
     let product = state
         .services
         .product_service
-        .add_product(
-            &backoffice_domain::dto::SaveProductCommand {
-                picture: String::new(),
-                name: String::new(),
-                description: String::new(),
-                price: 0,
-                currency_identifier: String::new(),
-            },
-            &claims.identifier,
-            &marketplace_identifier,
-        )
+        .add_product(&backoffice_domain::dto::SaveProductCommand {
+            picture: req.picture,
+            name: req.name,
+            description: req.description,
+            price: req.price,
+            currency_identifier: req.currency_identifier,
+        })
         .await?;
 
     Ok(ApiResponse::builder()
@@ -44,19 +39,33 @@ pub async fn add_product_to_marketplace(
         .build())
 }
 
-pub async fn retrieve_product_from_marketplace(
+pub async fn find_all_products(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
+) -> Result<ApiResponse<Vec<Product>>, ServiceError> {
+    let products = state
+        .services
+        .product_service
+        .fetch_all_products()
+        .await?;
+
+    Ok(ApiResponse::builder()
+        .data(products)
+        .message("products fetched successfully")
+        .build())
+}
+
+pub async fn find_product(
+    State(state): State<Arc<AppState>>,
     Path(product_identifier): Path<String>,
 ) -> Result<ApiResponse<Product>, ServiceError> {
     let product = state
         .services
         .product_service
-        .fetch_product(&product_identifier, &claims.identifier)
+        .fetch_product(&product_identifier)
         .await?;
 
     Ok(ApiResponse::builder()
         .data(product)
-        .message("marketplace product")
+        .message("product fetched successfully")
         .build())
 }

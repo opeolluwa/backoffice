@@ -1,8 +1,9 @@
 use crate::errors::service_error::ServiceError;
 use crate::{
-    dto::CreateOrdersCommand, models::orders, ports::orders_repository::OrdersRepositoryExt,
+    dto::PlaceOrderCommand,
+    models::{orders, products},
+    ports::orders_repository::OrdersRepositoryExt,
 };
-// use backoffice_domain::services::orders::OrderServiceExt;
 
 #[derive(Clone)]
 pub struct OrderService<R: OrdersRepositoryExt> {
@@ -16,10 +17,10 @@ impl<R: OrdersRepositoryExt> OrderService<R> {
 }
 
 pub trait OrderServiceExt {
-    async fn create_orders(
+    async fn place_orders(
         &self,
-        command: &CreateOrdersCommand,
-    ) -> Result<orders::Model, ServiceError>;
+        command: &PlaceOrderCommand,
+    ) -> Result<Vec<(orders::Model, products::Model)>, ServiceError>;
 
     async fn find_orders_by_identifier(
         &self,
@@ -31,7 +32,7 @@ pub trait OrderServiceExt {
     async fn update_orders_by_identifier(
         &self,
         identifier: &str,
-        command: &CreateOrdersCommand,
+        command: &PlaceOrderCommand,
     ) -> Result<orders::Model, ServiceError>;
 
     async fn delete_orders_by_identifier(&self, identifier: &str) -> Result<(), ServiceError>;
@@ -40,11 +41,11 @@ pub trait OrderServiceExt {
 }
 
 impl<R: OrdersRepositoryExt + Send + Sync> OrderServiceExt for OrderService<R> {
-    async fn create_orders(
+    async fn place_orders(
         &self,
-        command: &CreateOrdersCommand,
-    ) -> Result<orders::Model, ServiceError> {
-        Ok(self.repo.create_orders(command).await?)
+        command: &PlaceOrderCommand,
+    ) -> Result<Vec<(orders::Model, products::Model)>, ServiceError> {
+        Ok(self.repo.place_orders(command).await?)
     }
 
     async fn find_orders_by_identifier(
@@ -61,7 +62,7 @@ impl<R: OrdersRepositoryExt + Send + Sync> OrderServiceExt for OrderService<R> {
     async fn update_orders_by_identifier(
         &self,
         identifier: &str,
-        command: &CreateOrdersCommand,
+        command: &PlaceOrderCommand,
     ) -> Result<orders::Model, ServiceError> {
         Ok(self
             .repo
