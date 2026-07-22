@@ -16,19 +16,28 @@ use crate::state::AppState;
 pub async fn create_product(
     State(state): State<Arc<AppState>>,
     _claims: Claims,
-    _request: axum_typed_multipart::TypedMultipart<
+    request: axum_typed_multipart::TypedMultipart<
         crate::http::extractors::products::CreateProductRequest,
     >,
 ) -> Result<ApiResponse<Product>, ServiceError> {
+    let req = request.0;
+
+    let picture_path = req
+        .picture
+        .contents
+        .path()
+        .to_string_lossy()
+        .to_string();
+
     let product = state
         .services
         .product_service
         .add_product(&backoffice_domain::dto::SaveProductCommand {
-            picture: String::new(),
-            name: String::new(),
-            description: String::new(),
-            price: 0,
-            currency_identifier: String::new(),
+            picture: picture_path,
+            name: req.name,
+            description: req.description,
+            price: req.price,
+            currency_identifier: req.currency_identifier,
         })
         .await?;
 
@@ -36,6 +45,21 @@ pub async fn create_product(
         .data(product)
         .message("product created successfully")
         .status_code(StatusCode::CREATED)
+        .build())
+}
+
+pub async fn find_all_products(
+    State(state): State<Arc<AppState>>,
+) -> Result<ApiResponse<Vec<Product>>, ServiceError> {
+    let products = state
+        .services
+        .product_service
+        .fetch_all_products()
+        .await?;
+
+    Ok(ApiResponse::builder()
+        .data(products)
+        .message("products fetched successfully")
         .build())
 }
 

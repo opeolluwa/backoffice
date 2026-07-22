@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { useUserInformationStore } from "~/stores/users";
-import { useMarketplaceStore } from "~/stores/marketplace";
 import { useTeamsStore } from "~/stores/teams";
 import { useUploadStore } from "~/stores/uploads";
-import api from "~/plugin/api";
-import type { OrderStatus } from "~/bindings/OrderStatus";
 
 useHead({ title: "Dashboard" });
 
@@ -18,49 +15,19 @@ definePageMeta({
   },
 });
 const userStore = useUserInformationStore();
-const marketplaceStore = useMarketplaceStore();
 const teamsStore = useTeamsStore();
 const uploadStore = useUploadStore();
-const orderStore = useOrdersStore();
-
-const totalProducts = ref(0);
 
 onMounted(async () => {
   await Promise.all([
-    marketplaceStore.fetchMarketplaces(),
     teamsStore.fetchAllMembers(),
     uploadStore.countUploads(),
-    // orderStore.countByStatus("Pending" as OrderStatus),
-    // orderStore.countByStatus("Pending" as OrderStatus),
   ]);
-
-  let count = 0;
-  for (const mp of marketplaceStore.marketplaces) {
-    try {
-      const { data } = await api.get(`/marketplaces/${mp.identifier}/products`);
-      count += data?.products?.length ?? 0;
-    } catch {
-      /* skip failed */
-    }
-  }
-  totalProducts.value = count;
 });
 
 const firstName = computed(() => userStore.userFirstName || "there");
-const marketplaces = computed(() => marketplaceStore.marketplaces);
-const totalMarketplaces = computed(() => marketplaces.value.length);
 
 const stats = computed(() => [
-  {
-    label: "Marketplaces",
-    value: totalMarketplaces.value,
-    icon: "heroicons:building-storefront",
-  },
-  {
-    label: "Total Products",
-    value: totalProducts.value,
-    icon: "heroicons:tag",
-  },
   {
     label: "Team Members",
     value: teamsStore.members.length,
@@ -92,30 +59,7 @@ function barHeight(val: number) {
   return Math.round((val / chartMax) * 100);
 }
 
-// Quick links
-const quickLinks = [
-  {
-    label: "Marketplace",
-    path: "/marketplace",
-    icon: "heroicons:building-storefront",
-  },
-  { label: "Uploads", path: "/uploads", icon: "heroicons:arrow-up-tray" },
-  { label: "Team", path: "/teams", icon: "heroicons:users" },
-  { label: "Metrics", path: "/metrics", icon: "heroicons:chart-bar-square" },
-  { label: "Calendar", path: "/calendar", icon: "heroicons:calendar-days" },
-  { label: "Settings", path: "/settings", icon: "heroicons:cog-6-tooth" },
-];
 
-// Recent marketplaces — latest 5
-const recentMarketplaces = computed(() =>
-  [...marketplaces.value]
-    .sort((a, b) => {
-      const da = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const db = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return db - da;
-    })
-    .slice(0, 5),
-);
 </script>
 
 <template>

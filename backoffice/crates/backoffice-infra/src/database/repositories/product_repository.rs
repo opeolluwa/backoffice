@@ -39,6 +39,13 @@ impl ProductRepositoryExt for ProductRepository {
         model.insert(&self.db).await.map_err(DatabaseError::from)
     }
 
+    async fn find_all_products(&self) -> Result<Vec<products::Model>, DatabaseError> {
+        ProductEntity::find()
+            .all(&self.db)
+            .await
+            .map_err(DatabaseError::from)
+    }
+
     async fn retrieve_product(&self, identifier: &str) -> Result<products::Model, DatabaseError> {
         ProductEntity::find()
             .filter(products::Column::Identifier.eq(identifier))

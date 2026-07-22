@@ -1,35 +1,36 @@
-<script lang="ts" setup>
-import api from "~/plugin/api";
-import type { MarketplaceWithProducts } from "@bindings/MarketplaceWithProducts";
+<script setup lang="ts">
+import { useProductStore } from "~/stores/products";
 import { useCountryStore } from "~/stores/country";
-
 import { z } from "zod";
 
-const route = useRoute();
-const identifier = route.params.identifier;
-const toast = useToast();
+useHead({ title: "Products" });
 
-const openForm = ref(false);
-const state = reactive({
-  name: "",
-  price: 0,
-  description: "",
-  picture: null,
-  currencyIdentifier: "",
+definePageMeta({
+  layout: "dashboard",
+  breadcrumb: {
+    icon: "heroicons:cube",
+    ariaLabel: "Products",
+    title: "Products",
+  },
 });
 
-const currencyOptions = computed(
-  () =>
-    countries.value.map((country) => ({
-      label: `${country.currency} (${country.country})`,
-      value: country.identifier,
-      avatar: { src: country.flag },
-    })) as Array<{ label: string; value: string; avatar: { src: string } }>,
-);
-
+const productStore = useProductStore();
 const countryStore = useCountryStore();
+const toast = useToast();
 
+const isFetching = ref(true);
+const openForm = ref(false);
 const loading = ref(false);
+
+const hasProducts = computed(() => productStore.products.length > 0);
+
+const state = reactive({
+  name: "",
+  description: "",
+  price: 0,
+  picture: null as File | null,
+  currencyIdentifier: "",
+});
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -39,26 +40,23 @@ const schema = z.object({
   currencyIdentifier: z.string().min(1, "Currency is required"),
 });
 
-const resetForm = () => {
+const currencyOptions = computed(() =>
+  countryStore.countries.map((c) => ({
+    label: `${c.currency} (${c.country})`,
+    value: c.identifier,
+    avatar: c.flag ? { src: c.flag } : undefined,
+  })),
+);
+
+function resetForm() {
   state.name = "";
   state.description = "";
   state.price = 0;
   state.picture = null;
   state.currencyIdentifier = "";
-};
+}
 
-useHead({ title: "Products" });
-
-definePageMeta({
-  layout: "dashboard",
-  breadcrumb: {
-    icon: "heroicons:cube",
-    ariaLabel: "Marketplace Products",
-    title: "Marketplace Products",
-  },
-});
-
-const onSubmit = async () => {
+async function onSubmit() {
   loading.value = true;
   try {
     const formData = new FormData();
@@ -70,13 +68,7 @@ const onSubmit = async () => {
       formData.append("picture", state.picture);
     }
 
-    const { data: response, status } = await api.post(
-      `/marketplaces/${identifier}/products`,
-      formData,
-    );
-    if (status !== 201) {
-      throw new Error(response?.message || "Product creation failed");
-    }
+    await productStore.createProduct(formData);
     resetForm();
     openForm.value = false;
     toast.add({ title: "Product created", color: "success" });
@@ -89,84 +81,84 @@ const onSubmit = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const marketplaceWithProducts = ref<MarketplaceWithProducts>();
+}
 
 onMounted(async () => {
   try {
-    await countryStore.fetchCountries();
-
-    const { data: response, status } = await api.get(
-      `/marketplaces/${identifier}/products`,
-    );
-    if (status !== 200) {
-      throw new Error(response?.message || "Login failed");
-    }
-    marketplaceWithProducts.value = response.data;
-    return;
+    await Promise.all([
+      productStore.fetchProducts(),
+      countryStore.fetchCountries(),
+    ]);
   } catch (error) {
-    console.log({ error });
+    console.error(error);
+  } finally {
+    isFetching.value = false;
   }
 });
-
-const countries = computed(() => countryStore.countries);
 </script>
 
 <template>
-  <div class="space-y-4 space-x-4 flex flex-wrap">
-    <!-- <h1>Products for {{ identifier }} {{ marketplaceWithProducts }}</h1> -->
-    <UPageCard
-      v-for="value in marketplaceWithProducts?.products"
-      :key="value.identifier"
-      class="w-64 bg-white rounded-xl shadow-sm p-2 hover:shadow-md transition"
-    >
-      <template #default>
-        <div class="flex flex-col gap-3">
-          <!-- Product Image -->
-          <div
-            class="bg-gray-100 rounded-xl flex items-center justify-center p-2"
-          >
+  <div class="space-y-6">
+    <PageLoader v-if="isFetching" />
+
+    <AppEmptyState
+      v-else-if="!hasProducts"
+      icon="heroicons:cube"
+      title="No products yet"
+      description="Create your first product to get started."
+      action-label="Create product"
+      @action="openForm = true"
+    />
+
+    <template v-else>
+      <AppPageHeader
+        title="Products"
+        subtitle="Manage your products"
+        cta-text="Create product"
+        @cta="openForm = true"
+      />
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div
+          v-for="product in productStore.products"
+          :key="product.identifier"
+          class="border border-gray-100 dark:border-white/5 rounded-2xl overflow-hidden hover:shadow-md transition"
+        >
+          <div class="aspect-video bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
             <img
-              :src="String(value.picture)"
-              class="rounded-xl w-40 h-32 object-cover"
+              v-if="product.picture"
+              :src="product.picture"
+              :alt="product.name"
+              class="w-full h-full object-cover"
+            />
+            <UIcon
+              v-else
+              name="heroicons:photo"
+              class="size-10 text-gray-300 dark:text-white/20"
             />
           </div>
 
-          <!-- Name -->
-          <p class="text-gray-900 font-semibold text-base truncate">
-            {{ value.name }}
-          </p>
-
-          <!-- Category (use your description or static category) -->
-          <p class="text-gray-500 text-sm -mt-2">
-            {{ value.description }}
-          </p>
-
-          <!-- Price Row -->
-          <div class="flex justify-between items-center mt-1">
-            <p class="text-gray-900 font-bold text-lg">
-              {{ value.price }}
+          <div class="p-4 space-y-2">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+              {{ product.name }}
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-white/40 line-clamp-2">
+              {{ product.description }}
             </p>
-
-            <div class="flex items-center gap-1">
-              <span class="text-gray-700 text-sm">
-                {{ value.currencyCode }}
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-lg font-bold text-gray-900 dark:text-white">
+                {{ product.price }}
               </span>
-              <img
-                :src="String(value.flag)"
-                class="h-4 w-4 rounded-sm object-cover"
-              />
             </div>
           </div>
         </div>
-      </template>
-    </UPageCard>
+      </div>
+    </template>
 
     <UModal
       v-model:open="openForm"
-      title="Create store"
-      description="A store lets you manage your goods"
+      title="Create product"
+      description="Add a new product to your catalog"
       close-icon="heroicons:x-mark"
     >
       <template #body>
@@ -219,8 +211,8 @@ const countries = computed(() => countryStore.countries);
           <div class="flex justify-between gap-x-2">
             <UFormField
               v-slot="{ error }"
-              label="Pice"
-              name="Price"
+              label="Price"
+              name="price"
               required
               :ui="{ error: 'text-red-500 text-sm mt-1' }"
             >
@@ -238,7 +230,7 @@ const countries = computed(() => countryStore.countries);
             <UFormField
               v-slot="{ error }"
               label="Currency"
-              name="currency"
+              name="currencyIdentifier"
               required
               class="w-full"
               :ui="{ error: 'text-red-500 text-sm mt-1' }"
@@ -264,7 +256,7 @@ const countries = computed(() => countryStore.countries);
               :loading="loading"
               :disabled="loading"
             >
-              Continue
+              Create
             </UButton>
             <UButton
               variant="subtle"
@@ -277,10 +269,5 @@ const countries = computed(() => countryStore.countries);
         </UForm>
       </template>
     </UModal>
-
-    <AppContentButton
-      class="fixed bottom-12 right-20"
-      @click="openForm = true"
-    />
   </div>
 </template>

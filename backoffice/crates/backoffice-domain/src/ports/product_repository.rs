@@ -8,6 +8,8 @@ pub trait ProductRepositoryExt {
         command: &SaveProductCommand,
     ) -> Result<products::Model, DatabaseError>;
 
+    async fn find_all_products(&self) -> Result<Vec<products::Model>, DatabaseError>;
+
     async fn retrieve_product(&self, identifier: &str) -> Result<products::Model, DatabaseError>;
 
     async fn find_product_by_identifier(

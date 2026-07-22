@@ -39,6 +39,11 @@ const routes = [
     to: "/orders",
   },
   {
+    label: "Products",
+    icon: "heroicons:cube",
+    to: "/products",
+  },
+  {
     label: "Marketplace",
     icon: "heroicons:building-storefront",
     to: "/marketplace",
