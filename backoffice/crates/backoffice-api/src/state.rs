@@ -25,6 +25,7 @@ use backoffice_infra::{
     imagekit::ImagekitClient,
     jwt::JwtTokenService,
     mailer::smtp::SmtpEmailSender,
+    redis::client::RedisClient,
 };
 use backoffice_payment_provider::paystack::PaystackClient;
 
@@ -84,6 +85,7 @@ pub struct AppState {
     pub services: ServicesState,
     pub database_connection: DatabaseConnection,
     pub app_config: AppConfig,
+    pub redis: RedisClient,
 }
 
 impl Repositories {
@@ -189,10 +191,14 @@ impl AppState {
 
         let services = ServicesState::new(repositories, contracts);
 
+        let redis = RedisClient::new(&app_config)
+            .map_err(|e| AppError::OperationFailed(format!("Failed to connect to Redis: {}", e)))?;
+
         Ok(Self {
             services,
             database_connection: db.clone(),
             app_config,
+            redis,
         })
     }
 }
