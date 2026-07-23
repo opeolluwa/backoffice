@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNuxtApp } from "#app";
-const toast = useToast();
+import { ToasterProps } from "@nuxt/ui";
 
 const { $viewport } = useNuxtApp();
 
@@ -27,7 +27,7 @@ watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
       </p>
     </div>
     <div v-else>
-      <UApp :toaster="{ position: 'top-right', progress: true }">
+      <UApp :toaster="{ position: 'top-right', progress: true, vax:'' }">
         <NuxtLoadingIndicator />
         <NuxtLayout>
           <NuxtPage />

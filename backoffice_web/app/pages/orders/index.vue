@@ -207,9 +207,7 @@ const table = useTemplateRef("table");
       v-if="nullItems"
       icon="heroicons:puzzle-piece"
       title="No orders yet"
-      description="Create your first orders to get started."
-      action-label="Create first orders"
-      @action="openForm = true"
+      description="Orders will appear once they are made"
     />
 
     <div v-else>
