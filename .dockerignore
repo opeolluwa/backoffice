@@ -1,17 +1,13 @@
-# Exclude everything by default
 **
-
-# Include source directories
 !backoffice/
 !backoffice/**
-!backoffice-macros/
-!backoffice-macros/**
 !backoffice_web/
 !backoffice_web/**
 
-# Exclude build artifacts, secrets, and temp files within backoffice
 backoffice/target/
 backoffice/.env
 backoffice/.env.*
 backoffice/tmp/
-backoffice/**/.DS_Store
+**/node_modules/
+**/.DS_Store
+**/.git/
