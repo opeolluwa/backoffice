@@ -1,5 +1,7 @@
 pub mod app_config_repository;
+pub mod complaint_repository;
 pub mod country_repository;
+pub mod customer_repository;
 pub mod email_repository;
 pub mod email_sender;
 pub mod image_uploader;

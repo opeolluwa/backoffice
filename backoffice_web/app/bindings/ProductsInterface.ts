@@ -4,7 +4,7 @@ export type ProductsInterface = {
   identifier: string;
   name: string;
   picture: string | null;
-  price: number;
+  price: bigint;
   description: string;
   createdAt: string;
   updatedAt: string | null;

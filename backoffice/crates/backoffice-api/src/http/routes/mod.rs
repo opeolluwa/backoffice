@@ -1,6 +1,8 @@
 pub mod auth;
 pub mod collections;
+pub mod complaint;
 pub mod country;
+pub mod customer;
 pub mod email;
 pub mod invitation;
 pub mod orders;

@@ -15,6 +15,7 @@ use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
 use backoffice_domain::shared::extract_env::extract_env;
 
 use crate::http::dto::jwt::{Claims, Keys};
+use backoffice_infra::redis::client::RedisClient;
 
 fn jwt_validation() -> Validation {
     let mut validation = Validation::new(Algorithm::HS256);
@@ -33,12 +34,10 @@ where
             extract_env::<String>("JWT_SIGNING_KEY").map_err(AuthenticationServiceError::from)?;
 
         let decoding_key = Keys::new(secret.as_bytes()).decoding;
-        // Extract the token from the authorization header
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()
             .await
             .map_err(|_| AuthenticationServiceError::MissingCredentials)?;
-        // Decode the user data
         let token_data = decode::<Claims>(bearer.token(), &decoding_key, &jwt_validation())
             .map_err(|_| AuthenticationServiceError::InvalidToken)?;
 
@@ -61,12 +60,28 @@ pub async fn authenticate(
         .await
         .map_err(|_| AuthenticationServiceError::MissingCredentials)?;
 
-    let token_data = decode::<Claims>(bearer.token(), &decoding_key, &jwt_validation())
+    let token = bearer.token();
+
+    if let Some(redis) = parts.extensions.get::<RedisClient>() {
+        let is_blacklisted = redis
+            .is_token_blacklisted(token)
+            .map_err(|e| AuthenticationServiceError::OperationFailed(e.to_string()))?;
+
+        if is_blacklisted {
+            return Err(AuthenticationServiceError::InvalidToken);
+        }
+    }
+
+    let token_data = decode::<Claims>(token, &decoding_key, &jwt_validation())
         .map_err(|_| AuthenticationServiceError::InvalidToken)?;
 
     request = Request::from_parts(parts, body);
 
     request.extensions_mut().insert(token_data.claims);
+    request.extensions_mut().insert(RawToken(token.to_string()));
 
     Ok(next.run(request).await)
 }
+
+#[derive(Clone)]
+pub struct RawToken(pub String);

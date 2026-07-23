@@ -5,7 +5,6 @@
       :name="userStore.fullName"
       color="primary"
       class="squircle"
-      size="xl"
     />
     <div class="flex flex-col">
       <span>{{ userStore.fullName }}</span>

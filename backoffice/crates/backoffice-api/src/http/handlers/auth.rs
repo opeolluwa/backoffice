@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use axum::extract::State;
+use axum::extract::{Request, State};
 use axum::http::StatusCode;
 
 use backoffice_domain::dto::{
@@ -12,11 +12,12 @@ use backoffice_domain::errors::api_response::ApiResponseBuilder;
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
 use backoffice_domain::services::auth::AuthenticationServiceTrait;
 
-use crate::http::dto::jwt::Claims;
+use crate::http::dto::jwt::{Claims, REFRESH_TOKEN_DURATION};
 use crate::http::extractors::auth::{
     CreateUserRequest, ForgottenPasswordRequest, LoginRequest, SetNewPasswordRequest,
     VerifyAccountRequest,
 };
+use crate::http::middlewares::auth::RawToken;
 use crate::http::middlewares::validator::ValidatedRequest;
 use crate::state::AppState;
 
@@ -137,5 +138,27 @@ pub async fn request_refresh_token(
     Ok(ApiResponseBuilder::new()
         .data(refresh_token_response)
         .message("token updated successfully")
+        .build())
+}
+
+pub async fn logout(
+    State(state): State<Arc<AppState>>,
+    request: Request,
+) -> Result<ApiResponse<()>, AuthenticationServiceError> {
+    let raw_token = request
+        .extensions()
+        .get::<RawToken>()
+        .cloned()
+        .ok_or(AuthenticationServiceError::MissingCredentials)?;
+
+    state
+        .redis
+        .blacklist_token(&raw_token.0, REFRESH_TOKEN_DURATION.as_secs())
+        .map_err(|e| AuthenticationServiceError::OperationFailed(e.to_string()))?;
+
+    Ok(ApiResponseBuilder::new()
+        .status_code(StatusCode::OK)
+        .data(())
+        .message("logged out successfully")
         .build())
 }

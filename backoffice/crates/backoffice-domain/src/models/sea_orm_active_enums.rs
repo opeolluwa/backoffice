@@ -6,6 +6,21 @@ use serde::{Deserialize, Serialize};
 #[derive(
     Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ts_rs :: TS,
 )]
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "complaint_status")]
+#[ts(export)]
+pub enum ComplaintStatus {
+    #[sea_orm(string_value = "open")]
+    Open,
+    #[sea_orm(string_value = "in_progress")]
+    InProgress,
+    #[sea_orm(string_value = "resolved")]
+    Resolved,
+    #[sea_orm(string_value = "closed")]
+    Closed,
+}
+#[derive(
+    Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ts_rs :: TS,
+)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "file_type")]
 #[ts(export)]
 pub enum FileType {
@@ -34,6 +49,21 @@ pub enum InvitationStatus {
     Rejected,
     #[sea_orm(string_value = "expired")]
     Expired,
+}
+#[derive(
+    Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ts_rs :: TS,
+)]
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "invoice_status")]
+#[ts(export)]
+pub enum InvoiceStatus {
+    #[sea_orm(string_value = "pending")]
+    Pending,
+    #[sea_orm(string_value = "paid")]
+    Paid,
+    #[sea_orm(string_value = "overdue")]
+    Overdue,
+    #[sea_orm(string_value = "cancelled")]
+    Cancelled,
 }
 #[derive(
     Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ts_rs :: TS,

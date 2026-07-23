@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod complaint;
 pub mod email;
 pub mod invitation;
 pub mod orders;

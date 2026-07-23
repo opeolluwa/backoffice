@@ -30,6 +30,7 @@ mod m20260723_162419_create_customer_table;
 mod m20260723_162500_create_invoices_table;
 mod m20260723_162600_create_complaints_table;
 mod m20260723_162700_change_price_to_bigint;
+mod m20260723_171744_invoice_to_int;
 
 pub use sea_orm_migration::prelude::*;
 
@@ -74,6 +75,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260723_162500_create_invoices_table::Migration),
             Box::new(m20260723_162600_create_complaints_table::Migration),
             Box::new(m20260723_162700_change_price_to_bigint::Migration),
+            Box::new(m20260723_171744_invoice_to_int::Migration),
         ]
     }
 }

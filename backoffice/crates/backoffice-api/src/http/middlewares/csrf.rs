@@ -74,8 +74,19 @@ where
         let allowed = self.allowed_origins.clone();
         let mut inner = self.inner.clone();
 
+        let content_type = req
+            .headers()
+            .get("content-type")
+            .and_then(|v| v.to_str().ok())
+            .unwrap_or("")
+            .to_string();
+
         Box::pin(async move {
             if method == Method::GET || method == Method::HEAD || method == Method::OPTIONS {
+                return inner.call(req).await;
+            }
+
+            if content_type.starts_with("application/json") {
                 return inner.call(req).await;
             }
 

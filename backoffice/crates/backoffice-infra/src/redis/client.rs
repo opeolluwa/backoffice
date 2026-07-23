@@ -3,6 +3,7 @@ use secrecy::ExposeSecret;
 
 use crate::redis::error::RedisClientError;
 
+#[derive(Clone)]
 pub struct RedisClient {
     client: redis::Client,
 }
@@ -10,9 +11,8 @@ pub struct RedisClient {
 impl RedisClient {
     pub fn new(config: &AppConfig) -> Result<Self, RedisClientError> {
         let client = redis::Client::open(config.redis_url.expose_secret())?;
-        // Verify connection is available
         let mut conn = client.get_connection()?;
-        redis::cmd("PING").execute(&mut conn)?;
+        redis::cmd("PING").exec(&mut conn)?;
         Ok(Self { client })
     }
 
@@ -23,11 +23,11 @@ impl RedisClient {
     pub fn blacklist_token(&self, token: &str, expiry_secs: u64) -> Result<(), RedisClientError> {
         let mut conn = self.get_connection()?;
         let key = format!("blacklist:{}", token);
-        redis::cmd("SETEX")
+        let _ = redis::cmd("SETEX")
             .arg(&key)
             .arg(expiry_secs)
             .arg("1")
-            .execute(&mut conn);
+            .exec(&mut conn);
         Ok(())
     }
 

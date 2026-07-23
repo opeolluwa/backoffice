@@ -8,7 +8,7 @@ use axum::{
 };
 
 use crate::http::handlers::auth::{
-    create_account, forgotten_password, login, request_refresh_token, set_new_password,
+    create_account, forgotten_password, login, logout, request_refresh_token, set_new_password,
     verify_account,
 };
 use crate::http::middlewares::auth::authenticate;
@@ -28,6 +28,7 @@ pub(super) fn authentication_routes(state: Arc<AppState>) -> Router {
         .route("/reset-password", post(set_new_password))
         .route("/verify-account", post(verify_account))
         .route("/refresh-token", get(request_refresh_token))
+        .route("/logout", post(logout))
         .layer(middleware::from_fn(authenticate));
 
     Router::new()

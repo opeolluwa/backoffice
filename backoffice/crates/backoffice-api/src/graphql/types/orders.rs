@@ -1,4 +1,3 @@
-use rust_decimal::Decimal;
 use seaography::{CustomInputType, CustomOutputType};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -20,7 +19,7 @@ pub struct PlaceOrderOrderResponse {
     pub status: Option<OrderStatus>,
     pub name: String,
     pub description: String,
-    pub price: Decimal,
+    pub price: i64,
     pub currency_identifier: Option<String>,
     pub picture: Option<String>,
 }
@@ -42,7 +41,7 @@ impl
             status: order.status,
             name: product.name,
             description: product.description,
-            price: product.price,
+            price: product.price.into(),
             currency_identifier: product.currency_identifier,
             picture: product.picture,
         }

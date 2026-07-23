@@ -1,4 +1,3 @@
-use rust_decimal::Decimal;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use ulid::Ulid;
 
@@ -31,7 +30,7 @@ impl ProductRepositoryExt for ProductRepository {
             identifier: Set(Ulid::new().to_string()),
             name: Set(command.name.clone()),
             picture: Set(command.picture.clone()),
-            price: Set(Decimal::from(command.price)),
+            price: Set(command.price),
             description: Set(command.description.clone()),
             currency_identifier: Set(Some(command.currency_identifier.clone())),
             ..Default::default()

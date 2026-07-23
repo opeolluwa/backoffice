@@ -53,6 +53,16 @@ const routes = [
     icon: "heroicons:banknotes",
     to: "/revenue",
   },
+  {
+    label: "Customers",
+    icon: "heroicons:users",
+    to: "/customers",
+  },
+  {
+    label: "Complaints",
+    icon: "heroicons:exclamation-triangle",
+    to: "/complaints",
+  },
 
   {
     label: "Uploads",
@@ -110,7 +120,7 @@ const logout = async () => useLogout();
       }"
     >
       <template #header="{ collapsed }">
-        <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="flex items-center  overflow-hidden">
           <div
             class="size-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0"
           >
@@ -156,7 +166,7 @@ const logout = async () => useLogout();
                 :to="item.to"
                 :icon="item.icon"
                 variant="link"
-                class="text-white/60 -py-1.5"
+                class="text-white/60 -py-3.5"
               >
                 <span>{{ item.label }}</span>
               </UButton>

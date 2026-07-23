@@ -1,5 +1,7 @@
 pub mod auth;
+pub mod complaint;
 pub mod country;
+pub mod customer;
 pub mod emails;
 pub mod invitation;
 pub mod newsletter;
