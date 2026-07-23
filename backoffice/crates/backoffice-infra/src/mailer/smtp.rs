@@ -24,7 +24,7 @@ impl SmtpEmailSender {
         let creds = Credentials::new(username.to_string(), password.to_string());
 
         let mailer = SmtpTransport::starttls_relay(host)
-            .unwrap()
+            .map_err(|e| EmailServiceError::ProviderError(e.to_string()))?
             .credentials(creds)
             .build();
 
@@ -34,15 +34,17 @@ impl SmtpEmailSender {
 
 impl EmailSender for SmtpEmailSender {
     fn send_email(&self, message: EmailMessage) -> Result<(), EmailServiceError> {
+        let from = format!("{} <{}>", message.from_name, message.from_address)
+            .parse()
+            .map_err(|e| EmailServiceError::OperationFailed(format!("invalid from address: {e}")))?;
+
+        let to = format!("{} <{}>", message.to_name, message.to_address)
+            .parse()
+            .map_err(|e| EmailServiceError::OperationFailed(format!("invalid to address: {e}")))?;
+
         let email = Message::builder()
-            .from(
-                format!("{} <{}>", message.from_name, message.from_address)
-                    .parse()
-                    .unwrap(),
-            )
-            .to(format!("{} <{}>", message.to_name, message.to_address)
-                .parse()
-                .unwrap())
+            .from(from)
+            .to(to)
             .subject(message.subject)
             .multipart(
                 MultiPart::alternative().singlepart(
@@ -51,7 +53,7 @@ impl EmailSender for SmtpEmailSender {
                         .body(String::from(message.html_body)),
                 ),
             )
-            .unwrap();
+            .map_err(|e| EmailServiceError::OperationFailed(e.to_string()))?;
 
         self.mailer
             .send(&email)

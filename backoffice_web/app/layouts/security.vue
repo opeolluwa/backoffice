@@ -5,12 +5,12 @@
     class="h-screen w-full flex items-center justify-center overflow-hidden relative bg-linear-to-br from-brand-50 via-white to-brand-50 dark:bg-brand-dark-700"
   >
     <!-- Background image (dark only) -->
-    <img
+    <!-- <img
       src="/bg-dark.jpg"
       alt=""
       class="absolute inset-0 w-full h-full object-cover object-center hidden dark:block"
       aria-hidden="true"
-    />
+    /> -->
 
     <!-- Dark overlay (dark only) -->
     <div class="absolute inset-0 bg-brand-dark-700/75 hidden dark:block" />

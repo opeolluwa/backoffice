@@ -1,4 +1,4 @@
-use jsonwebtoken::{Header, decode, encode};
+use jsonwebtoken::{Algorithm, Header, decode, encode};
 use serde::{Deserialize, Serialize};
 
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
@@ -12,6 +12,12 @@ impl JwtTokenService {
     pub fn new() -> Self {
         Self
     }
+}
+
+fn jwt_validation() -> jsonwebtoken::Validation {
+    let mut validation = jsonwebtoken::Validation::new(Algorithm::HS256);
+    validation.set_required_spec_claims(&["exp", "iat"]);
+    validation
 }
 
 #[derive(Serialize, Deserialize)]
@@ -53,7 +59,7 @@ impl TokenService for JwtTokenService {
         let decoding_key = jsonwebtoken::DecodingKey::from_secret(secret.as_bytes());
 
         let token_data =
-            decode::<JwtClaim>(token, &decoding_key, &jsonwebtoken::Validation::default())
+            decode::<JwtClaim>(token, &decoding_key, &jwt_validation())
                 .map_err(|_| AuthenticationServiceError::InvalidToken)?;
 
         Ok(TokenClaims {

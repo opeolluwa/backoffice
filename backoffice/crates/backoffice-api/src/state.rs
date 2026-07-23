@@ -7,24 +7,42 @@ use backoffice_config::env::AppConfig;
 use backoffice_domain::{
     errors::app_error::AppError,
     services::{
-        auth::AuthenticationService, country::CountryService, emails::EmailsService,
-        invitation::InvitationService, newsletter::NewsletterService, orders::OrderService,
-        product::ProductService, root::RootService, team::TeamService, upload::UploadsService,
+        auth::AuthenticationService,
+        complaint::ComplaintService,
+        country::CountryService,
+        customer::CustomerService,
+        emails::EmailsService,
+        invitation::InvitationService,
+        newsletter::NewsletterService,
+        orders::OrderService,
+        product::ProductService,
+        root::RootService,
+        team::TeamService,
+        upload::UploadsService,
         user::UserService,
     },
 };
 use backoffice_infra::{
     database::repositories::{
-        app_config_repository::AppConfigRepository, base::Repository,
-        country_repository::CountryRepository, email_repository::EmailRepository,
-        invitation_repository::InvitationRepository, newsletter_repository::NewsletterRepository,
-        orders_repository::OrdersRepository, product_repository::ProductRepository,
-        role_repository::RoleRepository, team_repository::TeamRepository,
-        upload_repository::UploadRepository, user_repository::UserRepository,
+        app_config_repository::AppConfigRepository,
+        base::Repository,
+        complaint_repository::ComplaintRepository,
+        country_repository::CountryRepository,
+        customer_repository::CustomerRepository,
+        email_repository::EmailRepository,
+        invitation_repository::InvitationRepository,
+        newsletter_repository::NewsletterRepository,
+        orders_repository::OrdersRepository,
+        product_repository::ProductRepository,
+        role_repository::RoleRepository,
+        team_repository::TeamRepository,
+        upload_repository::UploadRepository,
+        user_repository::UserRepository,
     },
     imagekit::ImagekitClient,
     jwt::JwtTokenService,
     mailer::smtp::SmtpEmailSender,
+    redis::client::RedisClient,
 };
 use backoffice_payment_provider::paystack::PaystackClient;
 
@@ -41,6 +59,8 @@ pub struct Repositories {
     pub role: RoleRepository,
     pub app_config: AppConfigRepository,
     pub orders_repository: OrdersRepository,
+    pub customer_repository: CustomerRepository,
+    pub complaint_repository: ComplaintRepository,
 }
 
 #[derive(Clone)]
@@ -64,6 +84,8 @@ pub struct ServicesState {
     pub paystack_client: PaystackClient,
     pub newsletter_service: NewsletterService<NewsletterRepository>,
     pub orders_service: OrderService<OrdersRepository>,
+    pub customer_service: CustomerService<CustomerRepository>,
+    pub complaint_service: ComplaintService<ComplaintRepository>,
 }
 
 #[derive(Clone)]
@@ -84,6 +106,7 @@ pub struct AppState {
     pub services: ServicesState,
     pub database_connection: DatabaseConnection,
     pub app_config: AppConfig,
+    pub redis: RedisClient,
 }
 
 impl Repositories {
@@ -100,6 +123,8 @@ impl Repositories {
             role: RoleRepository::init(db),
             app_config: AppConfigRepository::init(db),
             orders_repository: OrdersRepository::init(db),
+            customer_repository: CustomerRepository::init(db),
+            complaint_repository: ComplaintRepository::init(db),
         }
     }
 }
@@ -154,6 +179,8 @@ impl ServicesState {
             root_service: RootService::init(),
             paystack_client: contracts.paystack,
             orders_service: OrderService::new(repos.orders_repository),
+            customer_service: CustomerService::new(repos.customer_repository),
+            complaint_service: ComplaintService::new(repos.complaint_repository),
         }
     }
 }
@@ -189,10 +216,14 @@ impl AppState {
 
         let services = ServicesState::new(repositories, contracts);
 
+        let redis = RedisClient::new(&app_config)
+            .map_err(|e| AppError::OperationFailed(format!("Failed to connect to Redis: {}", e)))?;
+
         Ok(Self {
             services,
             database_connection: db.clone(),
             app_config,
+            redis,
         })
     }
 }

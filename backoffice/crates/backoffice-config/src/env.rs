@@ -37,6 +37,7 @@ pub struct AppConfig {
     // Database
     pub database_url: SecretString,
     pub max_db_connections: u32,
+    pub redis_url: SecretString,
 
     // GraphQL
     #[serde(default = "default_graphql_endpoint")]
@@ -94,7 +95,7 @@ impl AppConfig {
 
             // CORS
             allowed_origins: extract_env::<String>("ALLOWED_ORIGINS")
-                .unwrap_or_else(|_| "*".into())
+                .unwrap_or_else(|_| "http://localhost:3000,http://localhost:5173".into())
                 .split(',')
                 .map(str::trim)
                 .filter(|s| !s.is_empty())
@@ -116,13 +117,14 @@ impl AppConfig {
             depth_limit: extract_env::<usize>("DEPTH_LIMIT").ok(),
             complexity_limit: extract_env::<usize>("COMPLEXITY_LIMIT").ok(),
 
-            requests_time_out_secs: Duration::from_secs(requests_time_out * 1000),
+            requests_time_out_secs: Duration::from_secs(requests_time_out),
 
             imagekit_private_key: SecretString::from(extract_env::<String>(
                 "IMAGEKIT_PRIVATE_KEY",
             )?),
 
             imagekit_public_key: SecretString::from(extract_env::<String>("IMAGEKIT_PUBLIC_KEY")?),
+            redis_url: SecretString::from(extract_env::<String>("REDIS_CONNECTION_URL")?),
         })
     }
 
@@ -198,7 +200,7 @@ fn default_export_path() -> String {
 }
 
 fn default_allowed_origins() -> Vec<String> {
-    vec!["*".into()]
+    vec!["http://localhost:3000".into(), "http://localhost:5173".into()]
 }
 
 fn default_graphql_endpoint() -> String {

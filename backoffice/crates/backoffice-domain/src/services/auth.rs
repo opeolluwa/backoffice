@@ -137,36 +137,40 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender + Sen
         &self,
         command: &ForgottenPasswordCommand,
     ) -> Result<ForgottenPasswordResult, AuthenticationServiceError> {
-        let Some(user) = self.repo.find_by_email(&command.email).await else {
-            return Err(AuthenticationServiceError::WrongCredentials);
-        };
+        if let Some(user) = self.repo.find_by_email(&command.email).await {
+            let claims = TokenClaims {
+                email: user.email.clone(),
+                identifier: user.identifier.clone(),
+            };
 
-        let claims = TokenClaims {
-            email: user.email.clone(),
-            identifier: user.identifier.clone(),
-        };
-        let token = self.token_service.generate_token(&claims, 600)?;
+            if let Ok(token) = self.token_service.generate_token(&claims, 600) {
+                let reset_link = format!("https://yourapp.com/reset-password?token={token}");
+                let user_name = user.first_name.as_deref().unwrap_or("there");
 
-        let reset_link = format!("https://yourapp.com/reset-password?token={token}");
-        let user_name = user.first_name.as_deref().unwrap_or("there");
+                let message = EmailMessage {
+                    from_address: "noreply@backoffice.app".to_string(),
+                    from_name: "Paula".to_string(),
+                    to_address: user.email.clone(),
+                    to_name: user.first_name.clone().unwrap_or_else(|| "there".into()),
+                    subject: "Password Reset".to_string(),
+                    html_body: format!(
+                        "Hi {}, click here to reset your password: {}",
+                        user_name, reset_link
+                    ),
+                };
 
-        let message = EmailMessage {
-            from_address: "noreply@backoffice.app".to_string(),
-            from_name: "Paula".to_string(),
-            to_address: user.email.clone(),
-            to_name: user.first_name.clone().unwrap_or_else(|| "there".into()),
-            subject: "Password Reset".to_string(),
-            html_body: format!(
-                "Hi {}, click here to reset your password: {}",
-                user_name, reset_link
-            ),
-        };
-
-        if let Err(err) = self.email_sender.send_email(message) {
-            tracing::error!("Failed to send password reset email: {}", err);
+                if let Err(err) = self.email_sender.send_email(message) {
+                    tracing::error!("Failed to send password reset email: {}", err);
+                }
+            }
+        } else {
+            tracing::warn!(
+                "Password reset requested for non-existent email: {}",
+                command.email
+            );
         }
 
-        Ok(ForgottenPasswordResult { token })
+        Ok(ForgottenPasswordResult {})
     }
 
     async fn set_new_password(
@@ -440,7 +444,7 @@ mod tests {
         };
 
         let result = service.forgotten_password(&cmd).await;
-        assert!(result.is_err());
+        assert!(result.is_ok());
     }
 
     // --- set_new_password tests ---

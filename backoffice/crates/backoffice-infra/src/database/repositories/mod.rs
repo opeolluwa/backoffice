@@ -1,6 +1,8 @@
 pub mod app_config_repository;
 pub mod base;
+pub mod complaint_repository;
 pub mod country_repository;
+pub mod customer_repository;
 pub mod email_repository;
 pub mod invitation_repository;
 pub mod newsletter_repository;

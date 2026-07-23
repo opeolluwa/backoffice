@@ -13,6 +13,8 @@ pub enum AuthenticationServiceError {
     MissingCredentials,
     #[error("Invalid token")]
     InvalidToken,
+    #[error("Operation failed: {0}")]
+    OperationFailed(String),
     #[error(transparent)]
     ServiceError(#[from] ServiceError),
     #[error(transparent)]
@@ -28,6 +30,7 @@ impl AuthenticationServiceError {
             AuthenticationServiceError::WrongCredentials => StatusCode::UNAUTHORIZED,
             AuthenticationServiceError::MissingCredentials => StatusCode::BAD_REQUEST,
             AuthenticationServiceError::InvalidToken => StatusCode::UNAUTHORIZED,
+            AuthenticationServiceError::OperationFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationServiceError::ServiceError(err) => err.status_code(),
             AuthenticationServiceError::AppError(err) => err.status_code(),
             AuthenticationServiceError::JwtError(_) => StatusCode::INTERNAL_SERVER_ERROR,

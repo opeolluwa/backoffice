@@ -84,7 +84,7 @@ impl ImagekitClient {
             .multipart(form)
             .send()
             .await
-            .unwrap();
+            .map_err(|e| ImagekitError::UploadFailed(e.to_string()))?;
 
         if !response.status().is_success() {
             return Err(ImagekitError::UploadFailed(format!(

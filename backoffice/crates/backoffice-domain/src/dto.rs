@@ -66,9 +66,7 @@ pub struct LoginResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ForgottenPasswordResult {
-    pub token: String,
-}
+pub struct ForgottenPasswordResult {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -149,4 +147,21 @@ pub struct PlaceOrderItem {
 #[serde(rename_all = "camelCase")]
 pub struct PlaceOrderCommand {
     pub items: Vec<PlaceOrderItem>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateComplaintCommand {
+    pub customer_identifier: String,
+    pub order_identifier: Option<String>,
+    pub subject: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateComplaintCommand {
+    pub subject: Option<String>,
+    pub description: Option<String>,
+    pub status: Option<String>,
 }

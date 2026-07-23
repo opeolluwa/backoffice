@@ -133,4 +133,37 @@ db-pull:
     just export-bindings
     node scripts/ts-export.js
 
+# Production
+PROD_CMD := "docker compose -f docker-compose.prod.yaml"
+
+[doc('Build production Docker image')]
+prod-build:
+    docker build -t backoffice-prod -f docker/prod/Dockerfile .
+
+[doc('Run infrastructure services')]
+prod-up:
+    {{ PROD_CMD }} up -d
+
+[doc('Run app container')]
+prod-run:
+    just prod-up
+    docker rm -f backoffice-prod 2>/dev/null || true
+    docker run -d --name backoffice-prod \
+        --network backoffice_prod \
+        --env-file backoffice/.env.test \
+        -p 8000:8000 \
+        --restart unless-stopped \
+        --cpus 2 --memory 1g \
+        backoffice-prod
+
+[doc('Stop everything')]
+prod-down:
+    docker stop backoffice-prod && docker rm backoffice-prod || true
+    {{ PROD_CMD }} down
+
+[doc('View production logs')]
+prod-logs:
+    docker logs -f --tail='50' backoffice-prod &
+    {{ PROD_CMD }} logs -f --tail='50'
+
 

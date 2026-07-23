@@ -50,7 +50,6 @@ impl<R: ProductRepositoryExt + Send + Sync> ProductServiceStateExt for ProductSe
 mod tests {
     use super::*;
     use crate::ports::product_repository::MockProductRepositoryExt;
-    use rust_decimal::dec;
     use sea_orm::sqlx::types::chrono::Utc;
 
     fn test_product() -> crate::models::products::Model {
@@ -58,7 +57,7 @@ mod tests {
             identifier: "prod-001".to_string(),
             name: "Widget".to_string(),
             picture: Some("https://example.com/widget.jpg".to_string()),
-            price: dec!(29.99),
+            price: 23,
             description: "A fine widget".to_string(),
             created_at: Utc::now().naive_utc().and_utc().into(),
             updated_at: None,

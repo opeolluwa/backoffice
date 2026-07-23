@@ -25,6 +25,12 @@ mod m20260722_134014_define_rbac_roles;
 mod m20260722_140000_drop_created_by_from_products;
 mod m20260722_150000_drop_marketplace;
 mod m20260722_163951_seed_country_table;
+mod m20260723_162400_create_admin_table;
+mod m20260723_162419_create_customer_table;
+mod m20260723_162500_create_invoices_table;
+mod m20260723_162600_create_complaints_table;
+mod m20260723_162700_change_price_to_bigint;
+mod m20260723_171744_invoice_to_int;
 
 pub use sea_orm_migration::prelude::*;
 
@@ -64,6 +70,12 @@ impl MigratorTrait for Migrator {
             Box::new(m20260722_140000_drop_created_by_from_products::Migration),
             Box::new(m20260722_150000_drop_marketplace::Migration),
             Box::new(m20260722_163951_seed_country_table::Migration),
+            Box::new(m20260723_162400_create_admin_table::Migration),
+            Box::new(m20260723_162419_create_customer_table::Migration),
+            Box::new(m20260723_162500_create_invoices_table::Migration),
+            Box::new(m20260723_162600_create_complaints_table::Migration),
+            Box::new(m20260723_162700_change_price_to_bigint::Migration),
+            Box::new(m20260723_171744_invoice_to_int::Migration),
         ]
     }
 }

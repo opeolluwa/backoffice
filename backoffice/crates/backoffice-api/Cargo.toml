@@ -28,9 +28,11 @@ serde_json.workspace = true
 tempfile = "3.23.0"
 tower.workspace = true
 tower-http.workspace = true
+tokio.workspace = true
 tracing.workspace = true
 ts-rs.workspace = true
 ulid.workspace = true
+url.workspace = true
 validator.workspace = true
 
 [dev-dependencies]

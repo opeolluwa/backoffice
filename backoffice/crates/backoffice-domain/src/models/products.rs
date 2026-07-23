@@ -12,9 +12,7 @@ pub struct Model {
     pub identifier: String,
     pub name: String,
     pub picture: Option<String>,
-    #[sea_orm(column_type = "Decimal(Some((12, 2)))")]
-    #[ts(type = "number")]
-    pub price: Decimal,
+    pub price: i64,
     #[sea_orm(column_type = "Text")]
     pub description: String,
     pub created_at: DateTimeWithTimeZone,

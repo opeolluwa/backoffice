@@ -15,6 +15,8 @@ RUN set -eux; \
         build-essential; \
     rm -rf /var/lib/apt/lists/*
 
+RUN useradd -m -s /bin/bash appuser
+
 RUN cargo install cargo-watch
 
 WORKDIR /app
@@ -24,6 +26,10 @@ COPY backoffice/ ./backoffice/
 WORKDIR /app/backoffice
 
 RUN cargo build
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
 
 VOLUME ["/cargo-target", "/usr/local/cargo/registry"]
 
