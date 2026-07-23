@@ -9,17 +9,32 @@ pub fn init_cors(config: &AppConfig) -> CorsLayer {
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION]);
 
     if config.environment == env::Environment::Production {
-        if config.allowed_origins.len() == 1 && config.allowed_origins[0] == "*" {
-            cors.allow_origin(Any)
+        let has_wildcard = config
+            .allowed_origins
+            .iter()
+            .any(|o| o == "*" || o == "Any");
+
+        if has_wildcard {
+            tracing::warn!(
+                "CORS: wildcard origin is not allowed in production; \
+                 restricting to same-origin only"
+            );
+            cors
         } else {
             let origins = config
                 .allowed_origins
                 .iter()
-                .map(|origin| origin.parse::<HeaderValue>())
-                .collect::<Result<Vec<_>, _>>()
-                .expect("Invalid CORS origin in configuration");
+                .filter_map(|origin| {
+                    origin.parse::<HeaderValue>().ok()
+                })
+                .collect::<Vec<_>>();
 
-            cors.allow_origin(origins)
+            if origins.is_empty() {
+                tracing::warn!("CORS: no valid origins configured; denying all cross-origin requests");
+                cors
+            } else {
+                cors.allow_origin(origins)
+            }
         }
     } else {
         cors.allow_origin(Any)

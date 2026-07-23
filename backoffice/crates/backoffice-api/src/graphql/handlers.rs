@@ -2,6 +2,7 @@ use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     Router,
     extract::State,
+    http::StatusCode,
     response::{self, IntoResponse},
     routing::get,
 };
@@ -19,12 +20,16 @@ pub async fn graphql_playground(
     response::Html(playground_source(GraphQLPlaygroundConfig::new(&endpoint)))
 }
 
-pub async fn graphql_handler(
+async fn graphql_execute(
     State(GraphQlState { schema, .. }): State<GraphQlState>,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
     let req = req.into_inner();
     schema.execute(req).await.into()
+}
+
+async fn graphql_not_found() -> impl IntoResponse {
+    StatusCode::NOT_FOUND
 }
 
 pub fn build_router(app_config: &AppConfig, app_state: AppState) -> Result<Router, AppError> {
@@ -40,10 +45,15 @@ pub fn build_router(app_config: &AppConfig, app_state: AppState) -> Result<Route
         endpoint: app_config.endpoint.clone(),
     };
 
-    Ok(Router::new()
-        .route(
-            &app_config.endpoint,
-            get(graphql_playground).post(graphql_handler),
-        )
-        .with_state(state))
+    let endpoint = app_config.endpoint.clone();
+
+    let router = if app_config.is_development() {
+        Router::new()
+            .route(&endpoint, get(graphql_playground).post(graphql_execute))
+    } else {
+        Router::new()
+            .route(&endpoint, get(graphql_not_found).post(graphql_execute))
+    };
+
+    Ok(router.with_state(state))
 }

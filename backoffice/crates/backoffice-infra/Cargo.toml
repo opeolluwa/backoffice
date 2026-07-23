@@ -16,6 +16,7 @@ jsonwebtoken.workspace = true
 lettre = { version = "0.11.22", features = ["ring", "rustls", "rustls-native-certs"] }
 log = "0.4.27"
 migration.workspace = true
+redis.workspace = true
 reqwest.workspace = true
 rust_decimal.workspace = true
 sea-orm.workspace = true

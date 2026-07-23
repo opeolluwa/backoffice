@@ -6,9 +6,8 @@ use serde::{Deserialize, Serialize};
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
 use backoffice_domain::shared::extract_env::extract_env;
 
-pub const _FIVE_MINUTES: Duration = Duration::from_secs(5 * 60 * 60);
-pub const TWENTY_FIVE_MINUTES: Duration = Duration::from_secs(26 * 60 * 60);
-pub const TEN_MINUTES: Duration = Duration::from_secs(10 * 60 * 60);
+pub const REFRESH_TOKEN_DURATION: Duration = Duration::from_secs(26 * 60 * 60);
+pub const PASSWORD_RESET_TOKEN_DURATION: Duration = Duration::from_secs(10 * 60 * 60);
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JwtCredentials {

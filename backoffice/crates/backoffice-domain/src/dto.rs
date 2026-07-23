@@ -66,9 +66,7 @@ pub struct LoginResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ForgottenPasswordResult {
-    pub token: String,
-}
+pub struct ForgottenPasswordResult {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
