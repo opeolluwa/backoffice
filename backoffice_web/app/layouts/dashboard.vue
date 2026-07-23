@@ -115,12 +115,12 @@ const logout = async () => useLogout();
       :ui="{
         root: 'bg-primary-500 border-r-0',
         header: 'h-16',
-        body: 'gap-1',
+        body: 'gap-0.5',
         footer: 'border-t border-white/10',
       }"
     >
       <template #header="{ collapsed }">
-        <div class="flex items-center  overflow-hidden">
+        <div class="flex items-center overflow-hidden">
           <div
             class="size-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0"
           >
@@ -157,7 +157,9 @@ const logout = async () => useLogout();
         >
           <template #item="{ item }">
             <template v-if="!item.to">
-              <div class="my-2 uppercase text-sm text-white/20">
+              <div
+                class="mt-4 mb-1 px-3 text-xs font-medium tracking-wider text-white/20 uppercase"
+              >
                 {{ item.label }}
               </div>
             </template>

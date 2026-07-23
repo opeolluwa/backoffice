@@ -112,16 +112,13 @@ onMounted(async () => {
       icon="heroicons:exclamation-triangle"
       title="No complaints yet"
       description="Customer complaints will appear here."
-      action-label="File a complaint"
-      @action="openCreate = true"
+  
     />
 
     <template v-else>
       <AppPageHeader
         title="Complaints"
         subtitle="Track and resolve customer issues"
-        cta-text="File complaint"
-        @cta="openCreate = true"
       />
 
       <ComplaintsComplaintList

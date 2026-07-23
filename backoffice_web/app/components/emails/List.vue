@@ -20,7 +20,7 @@ defineEmits<{
 
 <template>
   <div
-    class="w-80 shrink-0 flex flex-col bg-white dark:bg-brand-dark-600 rounded-xl border border-gray-100 dark:border-white/5 overflow-hidden"
+    class="w-80 shrink-0 flex flex-col rounded-xl border border-gray-100 dark:border-white/5 overflow-hidden"
   >
     <div
       class="px-4 pt-4 pb-3 border-b border-gray-100 dark:border-white/5 space-y-3"
