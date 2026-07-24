@@ -3,10 +3,13 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import * as v from "valibot";
 import { useAppStore } from "~/stores/app";
 import { useCountryStore } from "~/stores/country";
+import { useBrandColor } from "~/composables/useBrandColor";
+import { generatePalette } from "~/utils/color";
 
 const toast = useToast();
 const appStore = useAppStore();
 const countryStore = useCountryStore();
+const { applyBrandColor } = useBrandColor();
 
 const config = computed(() => appStore.config);
 
@@ -27,6 +30,7 @@ const state = reactive<Schema>({
 
 const defaultCurrency = ref(config.value?.defaultCurrency ?? "");
 const defaultLanguage = ref(config.value?.defaultLanguage ?? "en");
+const brandColor = ref(config.value?.brandColor ?? "#6D28D9");
 
 const languages = [
   { label: "English", value: "en" },
@@ -46,6 +50,14 @@ const currencyOptions = computed(() =>
 
 const loading = ref(false);
 const localeLoading = ref(false);
+const brandColorLoading = ref(false);
+
+const brandPalette = computed(() => {
+  if (!brandColor.value || !/^#[0-9A-Fa-f]{6}$/.test(brandColor.value)) {
+    return {};
+  }
+  return generatePalette(brandColor.value);
+});
 
 function formatFullDate(date: string | null | undefined): string {
   if (!date) return "-";
@@ -63,11 +75,16 @@ onMounted(async () => {
   state.supportEmail = config.value?.supportEmail ?? "";
   defaultCurrency.value = config.value?.defaultCurrency ?? "";
   defaultLanguage.value = config.value?.defaultLanguage ?? "en";
+  brandColor.value = config.value?.brandColor ?? "#6D28D9";
 });
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
+    await appStore.updateConfig({
+      appName: data.appName,
+      supportEmail: data.supportEmail,
+    });
     state.appName = data.appName;
     state.supportEmail = data.supportEmail;
     toast.add({ title: "App settings updated", color: "success" });
@@ -93,15 +110,33 @@ async function saveLocale() {
   }
 }
 
-function toggleMaintenance() {
+async function saveBrandColor() {
+  brandColorLoading.value = true;
+  try {
+    await appStore.updateConfig({ brandColor: brandColor.value });
+    applyBrandColor(brandColor.value);
+    toast.add({ title: "Brand color saved", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to save brand color", color: "error" });
+  } finally {
+    brandColorLoading.value = false;
+  }
+}
+
+async function toggleMaintenance() {
   if (!config.value) return;
-  appStore.updateConfig({});
-  toast.add({
-    title: config.value.maintenanceMode
-      ? "Maintenance mode disabled"
-      : "Maintenance mode enabled",
-    color: config.value.maintenanceMode ? "success" : "warning",
-  });
+  const newValue = !config.value.maintenanceMode;
+  try {
+    await appStore.updateConfig({ maintenanceMode: newValue });
+    toast.add({
+      title: newValue
+        ? "Maintenance mode enabled"
+        : "Maintenance mode disabled",
+      color: newValue ? "warning" : "success",
+    });
+  } catch {
+    toast.add({ title: "Failed to toggle maintenance mode", color: "error" });
+  }
 }
 </script>
 
@@ -137,11 +172,93 @@ function toggleMaintenance() {
         />
 
         <div class="pt-1">
-          <AppButton type="submit" :loading="loading" :disabled="loading">
+          <AppButton
+            type="submit"
+            size="lg"
+            :loading="loading"
+            :disabled="loading"
+          >
             Save changes
           </AppButton>
         </div>
       </UForm>
+    </div>
+
+    <!-- Brand Color -->
+    <div
+      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+    >
+      <p class="font-semibold text-gray-900 dark:text-white mb-1">
+        Brand color
+      </p>
+      <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
+        Set your brand color to theme the entire application.
+      </p>
+
+      <div class="space-y-4">
+        <div class="flex items-center gap-4">
+          <label class="relative cursor-pointer">
+            <input
+              v-model="brandColor"
+              type="color"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+            <div
+              class="w-14 h-14 rounded-xl border-2 border-gray-200 dark:border-white/10 shadow-sm transition-transform hover:scale-105"
+              :style="{ backgroundColor: brandColor }"
+            />
+          </label>
+          <div class="flex-1">
+            <AppInput
+              v-model="brandColor"
+              label="Hex color"
+              name="brandColor"
+              placeholder="#6D28D9"
+            />
+          </div>
+        </div>
+
+        <div v-if="Object.keys(brandPalette).length" class="space-y-2">
+          <p
+            class="text-xs font-medium text-gray-500 dark:text-white/40 uppercase tracking-wider"
+          >
+            Preview
+          </p>
+          <div class="flex gap-1 rounded-xl overflow-hidden">
+            <div
+              v-for="(color, shade) in brandPalette"
+              :key="shade"
+              class="flex-1 h-10 first:rounded-l-xl last:rounded-r-xl"
+              :style="{ backgroundColor: color }"
+              :title="`shade-${shade}: ${color}`"
+            />
+          </div>
+          <div class="flex gap-1 text-[9px] text-gray-400 dark:text-white/25">
+            <span class="flex-1 text-center">50</span>
+            <span class="flex-1 text-center">100</span>
+            <span class="flex-1 text-center">200</span>
+            <span class="flex-1 text-center">300</span>
+            <span class="flex-1 text-center">400</span>
+            <span class="flex-1 text-center">500</span>
+            <span class="flex-1 text-center">600</span>
+            <span class="flex-1 text-center">700</span>
+            <span class="flex-1 text-center">800</span>
+            <span class="flex-1 text-center">900</span>
+            <span class="flex-1 text-center">950</span>
+          </div>
+        </div>
+
+        <div class="pt-1">
+          <AppButton
+            size="lg"
+            :loading="brandColorLoading"
+            :disabled="brandColorLoading"
+            @click="saveBrandColor"
+          >
+            Save brand color
+          </AppButton>
+        </div>
+      </div>
     </div>
 
     <!-- Locale Defaults -->
@@ -217,7 +334,7 @@ function toggleMaintenance() {
             </p>
           </div>
         </div>
-        <UToggle
+        <USwitch
           :model-value="config?.maintenanceMode ?? false"
           @update:model-value="toggleMaintenance"
         />

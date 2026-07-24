@@ -235,7 +235,7 @@ const logout = async () => useLogout();
         <div class="flex items-center gap-4">
           <UIcon name="heroicons:bell" class="_icon" />
           <UColorModeButton />
-          <NuxtLink to="/account">
+          <NuxtLink to="/settings?tab=profile">
             <AppUserCard />
           </NuxtLink>
         </div>

@@ -15,15 +15,12 @@ use crate::state::AppState;
 #[derive(Debug, Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAppConfigRequest {
-    pub default_currency: Option<String>,
-    pub default_language: Option<String>,
-}
-
-#[derive(Debug, Deserialize, Serialize, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateAppConfigRequest {
     pub app_name: Option<String>,
     pub support_email: Option<String>,
+    pub default_currency: Option<String>,
+    pub default_language: Option<String>,
+    pub maintenance_mode: Option<bool>,
+    pub brand_color: Option<String>,
 }
 
 pub async fn fetch_app_config(
@@ -36,22 +33,6 @@ pub async fn fetch_app_config(
         .build())
 }
 
-pub async fn create_app_config(
-    State(state): State<Arc<AppState>>,
-    AuthenticatedRequest { data, .. }: AuthenticatedRequest<CreateAppConfigRequest>,
-) -> Result<ApiResponse<app_config::Model>, ServiceError> {
-    let config = state
-        .services
-        .app_config_service
-        .create_app_config(data.app_name, data.support_email)
-        .await?;
-
-    Ok(ApiResponse::builder()
-        .message("App config created successfully")
-        .data(config)
-        .build())
-}
-
 pub async fn update_app_config(
     State(state): State<Arc<AppState>>,
     AuthenticatedRequest { data, .. }: AuthenticatedRequest<UpdateAppConfigRequest>,
@@ -59,7 +40,14 @@ pub async fn update_app_config(
     let config = state
         .services
         .app_config_service
-        .update_app_config(data.default_currency, data.default_language)
+        .update_app_config(
+            data.app_name,
+            data.support_email,
+            data.default_currency,
+            data.default_language,
+            data.maintenance_mode,
+            data.brand_color,
+        )
         .await?;
 
     Ok(ApiResponse::builder()

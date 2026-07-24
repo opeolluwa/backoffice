@@ -12,7 +12,8 @@ pub fn init_cors(config: &AppConfig) -> CorsLayer {
             Method::DELETE,
             Method::OPTIONS,
         ])
-        .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION]);
+        .allow_headers(Any)
+        .expose_headers(Any);
 
     if config.environment == env::Environment::Production {
         let has_wildcard = config

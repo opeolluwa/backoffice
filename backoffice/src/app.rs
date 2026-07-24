@@ -3,9 +3,7 @@ use std::net::{Ipv4Addr, SocketAddrV4};
 use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
-use backoffice_api::{
-    http::middlewares::csrf::CsrfLayer, load_graphql_router, load_http_routes, state::AppState,
-};
+use backoffice_api::{load_graphql_router, load_http_routes, state::AppState};
 use backoffice_config::{
     cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal,
 };
@@ -38,7 +36,6 @@ pub async fn run() -> Result<(), AppError> {
         // .layer(CsrfLayer::new(app_config.allowed_origins.clone()))
         .layer(init_cors(&app_config));
 
-    
     let ip_address = SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, app_config.port);
 
     if app_config.is_development() {

@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import type { UserProfile } from "~/bindings/UserProfile";
-import api from "~/plugin/api";
+import api, { UPLOADS_TIMEOUT } from "~/plugin/api";
 
 export const useUserInformationStore = defineStore("user_information", {
-  state: () => ({
+  state: (): UserProfile => ({
     identifier: "",
     firstName: "",
     lastName: "",
@@ -17,7 +17,6 @@ export const useUserInformationStore = defineStore("user_information", {
       state,
     ): UserProfile & {
       fullName: string;
-      profilePicture: string;
       username: string;
     } => ({
       identifier: state.identifier,
@@ -97,7 +96,10 @@ export const useUserInformationStore = defineStore("user_information", {
       const formData = new FormData();
       formData.append("file", file);
       const response = await api.post("/users/profile-picture", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: UPLOADS_TIMEOUT,
       });
       const data = response.data.data as Record<string, unknown>;
       this.$patch({

@@ -20,6 +20,8 @@ pub struct Model {
     pub default_currency: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
     pub default_language: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub brand_color: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

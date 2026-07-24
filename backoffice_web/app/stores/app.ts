@@ -12,12 +12,6 @@ export const useAppStore = defineStore("app", {
       try {
         const res = await api.get("/config");
         this.config = res.data?.data || null;
-
-        if (!this.config) {
-          const created = await api.post("/config", {});
-          this.config = created.data?.data || null;
-        }
-
         return this.config;
       } catch (error) {
         console.error("Failed to fetch app config:", error);
@@ -26,8 +20,12 @@ export const useAppStore = defineStore("app", {
     },
 
     async updateConfig(payload: {
+      appName?: string | null;
+      supportEmail?: string | null;
       defaultCurrency?: string | null;
       defaultLanguage?: string | null;
+      maintenanceMode?: boolean;
+      brandColor?: string | null;
     }) {
       try {
         const res = await api.put("/config", payload);

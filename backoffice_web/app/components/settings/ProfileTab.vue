@@ -26,7 +26,24 @@ const state = reactive<Schema>({
 });
 
 const loading = ref(false);
-const initials = computed(() => useGetInitials(userStore.user));
+const open = ref(false);
+const file = ref<File | null>(null);
+const uploading = ref(false);
+
+async function onUpload() {
+  if (!file.value) return;
+  uploading.value = true;
+  try {
+    await userStore.uploadProfilePicture(file.value);
+    toast.add({ title: "Profile picture updated", color: "success" });
+    open.value = false;
+    file.value = null;
+  } catch {
+    toast.add({ title: "Failed to upload profile picture", color: "error" });
+  } finally {
+    uploading.value = false;
+  }
+}
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   loading.value = true;
@@ -54,7 +71,25 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
     <div
       class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
-      <AppUserCard />
+      <UChip size="sm" position="bottom-right" class="bg-none">
+        <template #content>
+          <UButton
+            color="neutral"
+            icon="heroicons:pencil"
+            class="cursor-pointer"
+            @click="open = true"
+          />
+        </template>
+        <UAvatar
+          class="rounded-none"
+          :src="String(userStore.profilePicture)"
+          :alt="userStore.fullName"
+          loading="lazy"
+          height="420px"
+          width="420px"
+          :ui="{ root: 'h-36 w-36 rounded-md' }"
+        />
+      </UChip>
     </div>
 
     <div
@@ -104,11 +139,42 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
         />
 
         <div class="pt-1">
-          <AppButton type="submit"  size="lg"    :loading="loading" :disabled="loading">
+          <AppButton
+            type="submit"
+            size="lg"
+            :loading="loading"
+            :disabled="loading"
+          >
             Save changes
           </AppButton>
         </div>
       </UForm>
     </div>
+
+    <UModal
+      v-model:open="open"
+      title="Update profile picture"
+      description="Upload a new profile picture."
+    >
+      <template #body>
+        <UFileUpload v-model="file" class="w-full min-h-48" />
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton
+            color="neutral"
+            variant="outline"
+            label="Cancel"
+            @click="open = false"
+          />
+          <UButton
+            label="Upload"
+            :loading="uploading"
+            :disabled="!file"
+            @click="onUpload"
+          />
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

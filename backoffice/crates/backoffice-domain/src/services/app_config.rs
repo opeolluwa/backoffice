@@ -19,55 +19,59 @@ impl<R: AppConfigRepositoryExt> AppConfigService<R> {
 pub trait AppConfigServiceExt {
     async fn get_app_config(&self) -> Result<Option<app_config::Model>, ServiceError>;
 
-    async fn create_app_config(
+    async fn update_app_config(
         &self,
         app_name: Option<String>,
         support_email: Option<String>,
-    ) -> Result<app_config::Model, ServiceError>;
-
-    async fn update_app_config(
-        &self,
         default_currency: Option<String>,
         default_language: Option<String>,
+        maintenance_mode: Option<bool>,
+        brand_color: Option<String>,
     ) -> Result<app_config::Model, ServiceError>;
 }
 
 impl<R: AppConfigRepositoryExt + Send + Sync> AppConfigServiceExt for AppConfigService<R> {
     async fn get_app_config(&self) -> Result<Option<app_config::Model>, ServiceError> {
-        Ok(self.repo.find_app_config_by_identifier("1").await?)
-    }
-
-    async fn create_app_config(
-        &self,
-        app_name: Option<String>,
-        support_email: Option<String>,
-    ) -> Result<app_config::Model, ServiceError> {
-        Ok(self
-            .repo
-            .create_app_config(
-                &Ulid::new().to_string(),
-                app_name,
-                support_email,
-                None,
-                None,
-            )
-            .await?)
+        Ok(self.repo.find_app_config().await?)
     }
 
     async fn update_app_config(
         &self,
+        app_name: Option<String>,
+        support_email: Option<String>,
         default_currency: Option<String>,
         default_language: Option<String>,
+        maintenance_mode: Option<bool>,
+        brand_color: Option<String>,
     ) -> Result<app_config::Model, ServiceError> {
-        let config = self.repo.find_app_config_by_identifier("1").await?;
-        let id = config
-            .as_ref()
-            .map(|c| c.identifier.as_str())
-            .unwrap_or("1");
+        let existing = self.repo.find_app_config().await.unwrap();
 
-        Ok(self
-            .repo
-            .update_app_config(id, default_currency, default_language)
-            .await?)
+        match existing {
+            Some(_) => Ok(self
+                .repo
+                .update_app_config(
+                    app_name,
+                    support_email,
+                    default_currency,
+                    default_language,
+                    maintenance_mode,
+                    brand_color,
+                )
+                .await?),
+            None => {
+                let id = Ulid::new().to_string();
+                Ok(self
+                    .repo
+                    .create_app_config(
+                        &id,
+                        app_name,
+                        support_email,
+                        default_currency,
+                        default_language,
+                        brand_color,
+                    )
+                    .await?)
+            }
+        }
     }
 }
