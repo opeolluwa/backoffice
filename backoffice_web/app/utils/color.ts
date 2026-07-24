@@ -161,6 +161,9 @@ export function paletteToCssVars(
   prefix: string,
 ): string {
   return Object.entries(palette)
-    .map(([shade, color]) => `  --color-${prefix}-${shade}: ${color};`)
+    .map(
+      ([shade, color]) =>
+        `  --color-${prefix}-${shade}: ${color};\n  --ui-${prefix}-${shade}: ${color};`,
+    )
     .join("\n");
 }

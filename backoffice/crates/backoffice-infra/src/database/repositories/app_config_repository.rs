@@ -35,6 +35,7 @@ impl AppConfigRepositoryExt for AppConfigRepository {
         default_currency: Option<String>,
         default_language: Option<String>,
         brand_color: Option<String>,
+        logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError> {
         let model = app_config::ActiveModel {
             identifier: Set(identifier.to_string()),
@@ -44,6 +45,7 @@ impl AppConfigRepositoryExt for AppConfigRepository {
             default_currency: Set(default_currency),
             default_language: Set(default_language),
             brand_color: Set(brand_color),
+            logo_url: Set(logo_url),
             ..Default::default()
         };
         model
@@ -60,6 +62,7 @@ impl AppConfigRepositoryExt for AppConfigRepository {
         default_language: Option<String>,
         maintenance_mode: Option<bool>,
         brand_color: Option<String>,
+        logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError> {
         let config = AppConfigEntity::find()
             .one(&self.db)
@@ -78,6 +81,7 @@ impl AppConfigRepositoryExt for AppConfigRepository {
             active.maintenance_mode = Set(mode);
         }
         active.brand_color = Set(brand_color);
+        active.logo_url = Set(logo_url);
 
         active
             .update(&self.db)

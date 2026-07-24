@@ -21,6 +21,7 @@ pub struct UpdateAppConfigRequest {
     pub default_language: Option<String>,
     pub maintenance_mode: Option<bool>,
     pub brand_color: Option<String>,
+    pub logo_url: Option<String>,
 }
 
 pub async fn fetch_app_config(
@@ -47,6 +48,7 @@ pub async fn update_app_config(
             data.default_language,
             data.maintenance_mode,
             data.brand_color,
+            data.logo_url,
         )
         .await?;
 

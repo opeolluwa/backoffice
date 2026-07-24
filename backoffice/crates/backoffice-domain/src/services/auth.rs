@@ -41,6 +41,8 @@ pub trait AuthenticationServiceTrait {
     fn login(
         &self,
         command: &LoginCommand,
+        access_token_ttl_secs: u64,
+        refresh_token_ttl_secs: u64,
     ) -> impl std::future::Future<Output = Result<LoginResult, AuthenticationServiceError>> + Send;
 
     fn forgotten_password(
@@ -65,6 +67,8 @@ pub trait AuthenticationServiceTrait {
     fn request_refresh_token(
         &self,
         command: &RefreshTokenCommand,
+        access_token_ttl_secs: u64,
+        refresh_token_ttl_secs: u64,
     ) -> impl std::future::Future<Output = Result<RefreshTokenResult, AuthenticationServiceError>> + Send;
 }
 
@@ -112,6 +116,8 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender + Sen
     async fn login(
         &self,
         command: &LoginCommand,
+        access_token_ttl_secs: u64,
+        refresh_token_ttl_secs: u64,
     ) -> Result<LoginResult, AuthenticationServiceError> {
         let Some(user) = self.repo.find_by_email(&command.email).await else {
             return Err(AuthenticationServiceError::WrongCredentials);
@@ -124,13 +130,30 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender + Sen
             return Err(AuthenticationServiceError::WrongCredentials);
         }
 
-        let claims = TokenClaims {
+        let now = chrono::Utc::now().timestamp();
+
+        let access_claims = TokenClaims {
             email: user.email.clone(),
             identifier: user.identifier.clone(),
+            token_type: "access".to_string(),
         };
-        let token = self.token_service.generate_token(&claims, 600)?;
+        let access_token = self.token_service.generate_token(&access_claims, access_token_ttl_secs)?;
+        let access_token_expiry = now + access_token_ttl_secs as i64;
 
-        Ok(LoginResult { token })
+        let refresh_claims = TokenClaims {
+            email: user.email.clone(),
+            identifier: user.identifier.clone(),
+            token_type: "refresh".to_string(),
+        };
+        let refresh_token = self.token_service.generate_token(&refresh_claims, refresh_token_ttl_secs)?;
+        let refresh_token_expiry = now + refresh_token_ttl_secs as i64;
+
+        Ok(LoginResult {
+            access_token,
+            refresh_token,
+            access_token_expiry,
+            refresh_token_expiry,
+        })
     }
 
     async fn forgotten_password(
@@ -141,6 +164,7 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender + Sen
             let claims = TokenClaims {
                 email: user.email.clone(),
                 identifier: user.identifier.clone(),
+                token_type: "access".to_string(),
             };
 
             if let Ok(token) = self.token_service.generate_token(&claims, 600) {
@@ -217,15 +241,38 @@ impl<R: UserRepositoryTrait + Send + Sync, T: TokenService, E: EmailSender + Sen
     async fn request_refresh_token(
         &self,
         command: &RefreshTokenCommand,
+        access_token_ttl_secs: u64,
+        refresh_token_ttl_secs: u64,
     ) -> Result<RefreshTokenResult, AuthenticationServiceError> {
-        let claims = TokenClaims {
-            email: command.email.clone(),
-            identifier: command.identifier.clone(),
+        let refresh_claims = self.token_service.validate_token(&command.refresh_token)?;
+
+        if refresh_claims.token_type != "refresh" {
+            return Err(AuthenticationServiceError::InvalidToken);
+        }
+
+        let now = chrono::Utc::now().timestamp();
+
+        let access_claims = TokenClaims {
+            email: refresh_claims.email.clone(),
+            identifier: refresh_claims.identifier.clone(),
+            token_type: "access".to_string(),
         };
-        let refresh_token = self.token_service.generate_token(&claims, 1500)?;
+        let access_token = self.token_service.generate_token(&access_claims, access_token_ttl_secs)?;
+        let access_token_expiry = now + access_token_ttl_secs as i64;
+
+        let new_refresh_claims = TokenClaims {
+            email: refresh_claims.email.clone(),
+            identifier: refresh_claims.identifier.clone(),
+            token_type: "refresh".to_string(),
+        };
+        let new_refresh_token = self.token_service.generate_token(&new_refresh_claims, refresh_token_ttl_secs)?;
+        let refresh_token_expiry = now + refresh_token_ttl_secs as i64;
 
         Ok(RefreshTokenResult {
-            token: refresh_token,
+            access_token,
+            refresh_token: new_refresh_token,
+            access_token_expiry,
+            refresh_token_expiry,
         })
     }
 }
@@ -243,6 +290,7 @@ mod tests {
         TokenClaims {
             email: "user@test.com".to_string(),
             identifier: "user-001".to_string(),
+            token_type: "access".to_string(),
         }
     }
 
@@ -346,9 +394,11 @@ mod tests {
             password: "Password123!".to_string(),
         };
 
-        let result = service.login(&cmd).await;
+        let result = service.login(&cmd, 600, 25200).await;
         assert!(result.is_ok());
-        assert_eq!(result.unwrap().token, "jwt-token-abc");
+        let login_result = result.unwrap();
+        assert_eq!(login_result.access_token, "jwt-token-abc");
+        assert_eq!(login_result.refresh_token, "jwt-token-abc");
     }
 
     #[tokio::test]
@@ -366,7 +416,7 @@ mod tests {
             password: "whatever".to_string(),
         };
 
-        let result = service.login(&cmd).await;
+        let result = service.login(&cmd, 600, 25200).await;
         assert!(result.is_err());
         assert!(matches!(
             result.unwrap_err(),
@@ -393,7 +443,7 @@ mod tests {
             password: "WrongPassword".to_string(),
         };
 
-        let result = service.login(&cmd).await;
+        let result = service.login(&cmd, 600, 25200).await;
         assert!(result.is_err());
         assert!(matches!(
             result.unwrap_err(),
@@ -554,17 +604,27 @@ mod tests {
         let email_sender = MockEmailSender::new();
 
         token_service
+            .expect_validate_token()
+            .returning(|_| {
+                Ok(TokenClaims {
+                    email: "user@test.com".to_string(),
+                    identifier: "user-001".to_string(),
+                    token_type: "refresh".to_string(),
+                })
+            });
+        token_service
             .expect_generate_token()
-            .returning(|_, _| Ok("refresh-token-abc".to_string()));
+            .returning(|_, _| Ok("new-token-abc".to_string()));
 
         let service = setup_auth_service(repo, token_service, email_sender);
         let cmd = RefreshTokenCommand {
-            email: "user@test.com".to_string(),
-            identifier: "user-001".to_string(),
+            refresh_token: "old-refresh-token".to_string(),
         };
 
-        let result = service.request_refresh_token(&cmd).await;
+        let result = service.request_refresh_token(&cmd, 600, 25200).await;
         assert!(result.is_ok());
-        assert_eq!(result.unwrap().token, "refresh-token-abc");
+        let refresh_result = result.unwrap();
+        assert_eq!(refresh_result.access_token, "new-token-abc");
+        assert_eq!(refresh_result.refresh_token, "new-token-abc");
     }
 }

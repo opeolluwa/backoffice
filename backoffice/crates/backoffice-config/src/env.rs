@@ -60,6 +60,10 @@ pub struct AppConfig {
     pub paystack_api_key: SecretString,
     pub paystack_api_secret: SecretString,
     pub paystack_base_url: String,
+
+    // Token TTLs
+    pub access_token_ttl_secs: Duration,
+    pub refresh_token_ttl_secs: Duration,
 }
 
 impl AppConfig {
@@ -125,6 +129,18 @@ impl AppConfig {
 
             imagekit_public_key: SecretString::from(extract_env::<String>("IMAGEKIT_PUBLIC_KEY")?),
             redis_url: SecretString::from(extract_env::<String>("REDIS_CONNECTION_URL")?),
+
+            // Token TTLs
+            access_token_ttl_secs: Duration::from_secs(
+                extract_env::<u64>("ACCESS_TOKEN_TTL_IN_MINUTES")
+                    .unwrap_or(10)
+                    * 60,
+            ),
+            refresh_token_ttl_secs: Duration::from_secs(
+                extract_env::<u64>("REFRESH_TOKEN_TTL_IN_MINUTES")
+                    .unwrap_or(420)
+                    * 60,
+            ),
         })
     }
 

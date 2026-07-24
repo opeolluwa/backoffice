@@ -6,13 +6,14 @@ use serde::{Deserialize, Serialize};
 use backoffice_domain::errors::auth_service_error::AuthenticationServiceError;
 use backoffice_domain::shared::extract_env::extract_env;
 
-pub const REFRESH_TOKEN_DURATION: Duration = Duration::from_secs(26 * 60 * 60);
+pub const REFRESH_TOKEN_DURATION: Duration = Duration::from_secs(420 * 60);
 pub const PASSWORD_RESET_TOKEN_DURATION: Duration = Duration::from_secs(10 * 60 * 60);
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JwtCredentials {
     pub email: String,
     pub identifier: String,
+    pub token_type: String,
 }
 
 pub type Claims = JwtCredentials;
@@ -35,6 +36,7 @@ impl Keys {
 struct Claim {
     pub email: String,
     pub identifier: String,
+    pub token_type: String,
     pub iat: i64,
     pub exp: i64,
 }
@@ -52,6 +54,7 @@ impl JwtCredentials {
         let claim = Claim {
             email: self.email.to_string(),
             identifier: self.identifier.to_string(),
+            token_type: "access".to_string(),
             iat: now,
             exp: now + validity.as_secs() as i64,
         };

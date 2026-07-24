@@ -67,7 +67,9 @@ export function useBrandColor() {
     const lightVars = paletteToCssVars(lightPalette, "primary");
     const darkVars = paletteToCssVars(darkPalette, "primary");
 
-    injectPalette(lightVars, darkVars);
+    const baseVar = `  --color-primary: ${hex};\n  --ui-primary: ${hex};`;
+
+    injectPalette(`${baseVar}\n${lightVars}`, `${baseVar}\n${darkVars}`);
     setCachedBrandColor(hex);
     setCachedPalette(lightVars, darkVars);
   }
@@ -78,7 +80,8 @@ export function useBrandColor() {
 
     const paletteCache = getCachedPalette();
     if (paletteCache) {
-      injectPalette(paletteCache.light, paletteCache.dark);
+      const baseVar = `  --color-primary: ${cached};\n  --ui-primary: ${cached};`;
+      injectPalette(`${baseVar}\n${paletteCache.light}`, `${baseVar}\n${paletteCache.dark}`);
       return true;
     }
 

@@ -51,8 +51,7 @@ pub struct VerifyAccountCommand {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshTokenCommand {
-    pub email: String,
-    pub identifier: String,
+    pub refresh_token: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,12 +59,16 @@ pub struct RefreshTokenCommand {
 pub struct TokenClaims {
     pub email: String,
     pub identifier: String,
+    pub token_type: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginResult {
-    pub token: String,
+    pub access_token: String,
+    pub refresh_token: String,
+    pub access_token_expiry: i64,
+    pub refresh_token_expiry: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -83,7 +86,10 @@ pub struct VerifyAccountResult {}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshTokenResult {
-    pub token: String,
+    pub access_token: String,
+    pub refresh_token: String,
+    pub access_token_expiry: i64,
+    pub refresh_token_expiry: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -37,4 +37,46 @@ impl RedisClient {
         let exists: bool = redis::cmd("EXISTS").arg(&key).query(&mut conn)?;
         Ok(exists)
     }
+
+    pub fn store_refresh_token(
+        &self,
+        token: &str,
+        user_identifier: &str,
+        expiry_secs: u64,
+    ) -> Result<(), RedisClientError> {
+        let mut conn = self.get_connection()?;
+        let key = format!("refresh:{}:{}", user_identifier, token);
+        let _ = redis::cmd("SETEX")
+            .arg(&key)
+            .arg(expiry_secs)
+            .arg("1")
+            .exec(&mut conn);
+        Ok(())
+    }
+
+    pub fn is_refresh_token_valid(
+        &self,
+        token: &str,
+        user_identifier: &str,
+    ) -> Result<bool, RedisClientError> {
+        let mut conn = self.get_connection()?;
+        let key = format!("refresh:{}:{}", user_identifier, token);
+        let exists: bool = redis::cmd("EXISTS").arg(&key).query(&mut conn)?;
+        Ok(exists)
+    }
+
+    pub fn revoke_refresh_tokens_for_user(
+        &self,
+        user_identifier: &str,
+    ) -> Result<(), RedisClientError> {
+        let mut conn = self.get_connection()?;
+        let pattern = format!("refresh:{}:*", user_identifier);
+        let keys: Vec<String> = redis::cmd("KEYS")
+            .arg(&pattern)
+            .query(&mut conn)?;
+        for key in &keys {
+            let _ = redis::cmd("DEL").arg(key).exec(&mut conn);
+        }
+        Ok(())
+    }
 }

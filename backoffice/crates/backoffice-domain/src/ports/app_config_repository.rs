@@ -13,6 +13,7 @@ pub trait AppConfigRepositoryExt {
         default_language: Option<String>,
         maintenance_mode: Option<bool>,
         brand_color: Option<String>,
+        logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError>;
 
     async fn create_app_config(
@@ -23,5 +24,6 @@ pub trait AppConfigRepositoryExt {
         default_currency: Option<String>,
         default_language: Option<String>,
         brand_color: Option<String>,
+        logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError>;
 }

@@ -24,6 +24,7 @@ fn jwt_validation() -> jsonwebtoken::Validation {
 struct JwtClaim {
     pub email: String,
     pub identifier: String,
+    pub token_type: String,
     pub iat: i64,
     pub exp: i64,
 }
@@ -38,6 +39,7 @@ impl TokenService for JwtTokenService {
         let claim = JwtClaim {
             email: claims.email.clone(),
             identifier: claims.identifier.clone(),
+            token_type: claims.token_type.clone(),
             iat: now,
             exp: now + validity_secs as i64,
         };
@@ -65,6 +67,7 @@ impl TokenService for JwtTokenService {
         Ok(TokenClaims {
             email: token_data.claims.email,
             identifier: token_data.claims.identifier,
+            token_type: token_data.claims.token_type,
         })
     }
 }
