@@ -10,4 +10,5 @@ export type AppConfigInterface = {
   defaultCurrency: string | null;
   defaultLanguage: string | null;
   brandColor: string | null;
+  logoUrl: string | null;
 };

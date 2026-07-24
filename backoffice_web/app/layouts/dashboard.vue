@@ -110,10 +110,10 @@ const logout = async () => useLogout();
   <UDashboardGroup>
     <UDashboardSidebar
       collapsible
-      :toggle="{ variant: 'ghost' }"
-      class="bg-primary-500 border-r-0"
+
+      class="border-r-0"
       :ui="{
-        root: 'bg-primary-500 border-r-0',
+        root: 'bg-primary border-r-0',
         header: 'h-16',
         body: 'gap-0.5',
         footer: 'border-t border-white/10',

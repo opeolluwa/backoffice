@@ -24,9 +24,14 @@ fn jwt_validation() -> jsonwebtoken::Validation {
 struct JwtClaim {
     pub email: String,
     pub identifier: String,
+    #[serde(default = "default_token_type")]
     pub token_type: String,
     pub iat: i64,
     pub exp: i64,
+}
+
+fn default_token_type() -> String {
+    "access".to_string()
 }
 
 impl TokenService for JwtTokenService {

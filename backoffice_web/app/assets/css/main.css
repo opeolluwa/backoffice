@@ -36,6 +36,19 @@ body {
   --color-primary-800: oklch(0% 0 none);
   --color-primary-900: oklch(0% 0 none);
   --color-primary-950: oklch(0% 0 none);
+
+  --ui-primary: oklch(28.299% 0.07694 303.88);
+  --ui-primary-50: oklch(57.836% 0.14241 304.4);
+  --ui-primary-100: oklch(53.864% 0.15627 303.52);
+  --ui-primary-200: oklch(47.521% 0.14582 303.37);
+  --ui-primary-300: oklch(41.415% 0.12488 303.23);
+  --ui-primary-400: oklch(35.007% 0.10164 303.48);
+  --ui-primary-500: oklch(28.299% 0.07694 303.88);
+  --ui-primary-600: oklch(18.429% 0.03734 303.43);
+  --ui-primary-700: oklch(0% 0 none);
+  --ui-primary-800: oklch(0% 0 none);
+  --ui-primary-900: oklch(0% 0 none);
+  --ui-primary-950: oklch(0% 0 none);
 }
 
 .dark {

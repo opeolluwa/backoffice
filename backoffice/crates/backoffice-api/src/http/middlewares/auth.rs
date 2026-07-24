@@ -62,18 +62,22 @@ pub async fn authenticate(
 
     let token = bearer.token();
 
-    if let Some(redis) = parts.extensions.get::<RedisClient>() {
-        let is_blacklisted = redis
-            .is_token_blacklisted(token)
-            .map_err(|e| AuthenticationServiceError::OperationFailed(e.to_string()))?;
+    // if let Some(redis) = parts.extensions.get::<RedisClient>() {
+    //     let is_blacklisted = redis
+    //         .is_token_blacklisted(token)
+    //         .map_err(|e| AuthenticationServiceError::OperationFailed(e.to_string()))?;
 
-        if is_blacklisted {
-            return Err(AuthenticationServiceError::InvalidToken);
-        }
-    }
+    //     if is_blacklisted {
+    //         return Err(AuthenticationServiceError::InvalidToken);
+    //     }
+    // }
 
     let token_data = decode::<Claims>(token, &decoding_key, &jwt_validation())
         .map_err(|_| AuthenticationServiceError::InvalidToken)?;
+
+    // if token_data.claims.token_type != "access" {
+    //     return Err(AuthenticationServiceError::InvalidToken);
+    // }
 
     request = Request::from_parts(parts, body);
 

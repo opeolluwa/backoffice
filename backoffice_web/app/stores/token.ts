@@ -5,9 +5,9 @@ export const useTokenStore = defineStore("token_store", {
   state: () => ({
     accessToken: "",
     refreshToken: "",
-    requestToken: "",
     accessTokenExpiry: 0,
     refreshTokenExpiry: 0,
+    isRefreshing: false,
   }),
 
   actions: {
@@ -17,10 +17,6 @@ export const useTokenStore = defineStore("token_store", {
 
     persistAccessToken(accessToken: string) {
       this.accessToken = accessToken;
-    },
-
-    persistRequestToken(requestToken: string) {
-      this.requestToken = requestToken;
     },
 
     clearTokens() {
@@ -39,26 +35,42 @@ export const useTokenStore = defineStore("token_store", {
       return this.accessToken;
     },
 
-    async getRefreshToken() {
-      const res = await api.get("/refresh-token", {
-        headers: {
-          Authorization: `Bearer ${this.refreshToken}`,
-        },
-      });
+    async getRefreshToken(): Promise<boolean> {
+      if (this.isRefreshing) return false;
+      if (!this.refreshToken) return false;
 
-      const data = res.data?.data;
-      if (!data) return;
+      this.isRefreshing = true;
 
-      if (data.accessToken) this.persistAccessToken(data.accessToken);
-      if (data.exp) this.setAccessTokenExpiry(data.exp);
-      if (data.refreshToken) this.persistRefreshToken(data.refreshToken);
-      if (data.refreshTokenExp)
-        this.setRefreshTokenExpiry(data.refreshTokenExp);
+      try {
+        const res = await api.post("/refresh-token", {
+          refreshToken: this.refreshToken,
+        });
+
+        const data = res.data?.data;
+        if (!data) return false;
+
+        this.persistAccessToken(data.accessToken);
+        this.setAccessTokenExpiry(data.accessTokenExpiry);
+        this.persistRefreshToken(data.refreshToken);
+        this.setRefreshTokenExpiry(data.refreshTokenExpiry);
+
+        return true;
+      } catch {
+        this.clearTokens();
+        return false;
+      } finally {
+        this.isRefreshing = false;
+      }
     },
 
     isAccessTokenValid() {
       const now = Math.floor(Date.now() / 1000);
       return this.accessToken && this.accessTokenExpiry > now + 60;
+    },
+
+    isRefreshTokenValid() {
+      const now = Math.floor(Date.now() / 1000);
+      return this.refreshToken && this.refreshTokenExpiry > now + 60;
     },
   },
 

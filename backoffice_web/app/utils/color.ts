@@ -32,6 +32,14 @@ function rgbToHex(rgb: RGB): string {
   return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
 }
 
+export function hexToRgbString(hex: string): string {
+  const rgb = hexToRgb(hex);
+  const r = Math.round(rgb.r * 255);
+  const g = Math.round(rgb.g * 255);
+  const b = Math.round(rgb.b * 255);
+  return `${r} ${g} ${b}`;
+}
+
 function linearize(c: number): number {
   return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
 }
@@ -163,7 +171,7 @@ export function paletteToCssVars(
   return Object.entries(palette)
     .map(
       ([shade, color]) =>
-        `  --color-${prefix}-${shade}: ${color};\n  --ui-${prefix}-${shade}: ${color};`,
+        `  --color-${prefix}-${shade}: rgb(${hexToRgbString(color)});\n  --ui-${prefix}-${shade}: rgb(${hexToRgbString(color)});`,
     )
     .join("\n");
 }

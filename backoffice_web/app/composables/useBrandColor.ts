@@ -2,6 +2,7 @@ import {
   generatePalette,
   generateDarkPalette,
   paletteToCssVars,
+  hexToRgbString,
 } from "~/utils/color";
 
 const BRAND_COLOR_KEY = "brand_color";
@@ -67,7 +68,7 @@ export function useBrandColor() {
     const lightVars = paletteToCssVars(lightPalette, "primary");
     const darkVars = paletteToCssVars(darkPalette, "primary");
 
-    const baseVar = `  --color-primary: ${hex};\n  --ui-primary: ${hex};`;
+    const baseVar = `  --color-primary: rgb(${hexToRgbString(hex)});\n  --ui-primary: rgb(${hexToRgbString(hex)});`;
 
     injectPalette(`${baseVar}\n${lightVars}`, `${baseVar}\n${darkVars}`);
     setCachedBrandColor(hex);
@@ -80,7 +81,7 @@ export function useBrandColor() {
 
     const paletteCache = getCachedPalette();
     if (paletteCache) {
-      const baseVar = `  --color-primary: ${cached};\n  --ui-primary: ${cached};`;
+      const baseVar = `  --color-primary: rgb(${hexToRgbString(cached)});\n  --ui-primary: rgb(${hexToRgbString(cached)});`;
       injectPalette(`${baseVar}\n${paletteCache.light}`, `${baseVar}\n${paletteCache.dark}`);
       return true;
     }

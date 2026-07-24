@@ -13,7 +13,12 @@ pub const PASSWORD_RESET_TOKEN_DURATION: Duration = Duration::from_secs(10 * 60 
 pub struct JwtCredentials {
     pub email: String,
     pub identifier: String,
+    #[serde(default = "default_token_type")]
     pub token_type: String,
+}
+
+fn default_token_type() -> String {
+    "access".to_string()
 }
 
 pub type Claims = JwtCredentials;
@@ -46,6 +51,7 @@ impl JwtCredentials {
         Self {
             email: email.to_string(),
             identifier: identifier.to_owned(),
+            token_type: "access".to_string(),
         }
     }
 

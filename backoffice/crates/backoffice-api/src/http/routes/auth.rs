@@ -4,7 +4,7 @@ use std::time::Duration;
 use axum::{
     Router,
     middleware,
-    routing::{get, post},
+    routing::post,
 };
 
 use crate::http::handlers::auth::{
