@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
     Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ts_rs :: TS,
 )]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "complaint_status")]
-#[ts(export)]
+#[ts(export, export_to = "sea_orm_active_enums.ts")]
 pub enum ComplaintStatus {
     #[sea_orm(string_value = "open")]
     Open,

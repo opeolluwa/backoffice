@@ -1,5 +1,5 @@
 import { useTokenStore } from "~/stores/token";
-import { useUserInformationStore } from "~/stores/susers";
+import { useUserInformationStore } from "~/stores/users";
 
 export function useAuth() {
   const tokenStore = useTokenStore();

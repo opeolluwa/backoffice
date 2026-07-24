@@ -3,7 +3,7 @@ use ulid::Ulid;
 
 use backoffice_domain::errors::service_error::ServiceError;
 use backoffice_domain::{
-    dto::{CreateUserCommand, UserProfile},
+    dto::{CreateUserCommand, UpdateProfileCommand, UserProfile},
     models::users::{self, Entity as UserEntity},
     ports::user_repository::UserRepositoryTrait,
 };
@@ -97,6 +97,44 @@ impl UserRepositoryTrait for UserRepository {
             email: user.email,
             first_name: user.first_name.unwrap_or_default(),
             last_name: user.last_name.unwrap_or_default(),
+            profile_picture: user.profile_picture,
+            username: user.username,
         })
+    }
+
+    async fn update_profile(
+        &self,
+        identifier: &str,
+        command: &UpdateProfileCommand,
+    ) -> Result<(), ServiceError> {
+        let model = users::ActiveModel {
+            identifier: Set(identifier.to_string()),
+            first_name: Set(Some(command.first_name.clone())),
+            last_name: Set(Some(command.last_name.clone())),
+            username: Set(command.username.clone()),
+            ..Default::default()
+        };
+        UserEntity::update(model)
+            .exec(&self.db)
+            .await
+            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?;
+        Ok(())
+    }
+
+    async fn update_profile_picture(
+        &self,
+        identifier: &str,
+        url: &str,
+    ) -> Result<(), ServiceError> {
+        let model = users::ActiveModel {
+            identifier: Set(identifier.to_string()),
+            profile_picture: Set(Some(url.to_string())),
+            ..Default::default()
+        };
+        UserEntity::update(model)
+            .exec(&self.db)
+            .await
+            .map_err(|e| ServiceError::OperationFailed(e.to_string()))?;
+        Ok(())
     }
 }

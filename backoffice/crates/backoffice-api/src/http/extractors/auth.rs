@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::http::dto::jwt::Claims;
-
 #[derive(Debug, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateUserRequest {
@@ -47,7 +45,12 @@ pub struct VerifyAccountRequest {
     pub otp: String,
 }
 
-pub type RefreshTokenRequest = Claims;
+#[derive(Debug, Serialize, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct RefreshTokenRequest {
+    #[validate(length(min = 1, message = "refresh token cannot be empty"))]
+    pub refresh_token: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

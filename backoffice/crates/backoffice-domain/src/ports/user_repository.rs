@@ -1,5 +1,5 @@
 use crate::{
-    dto::{CreateUserCommand, UserProfile},
+    dto::{CreateUserCommand, UpdateProfileCommand, UserProfile},
     errors::service_error::ServiceError,
     models::users,
 };
@@ -36,4 +36,16 @@ pub trait UserRepositoryTrait {
         &self,
         identifier: &str,
     ) -> impl std::future::Future<Output = Result<UserProfile, ServiceError>> + Send;
+
+    fn update_profile(
+        &self,
+        identifier: &str,
+        command: &UpdateProfileCommand,
+    ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
+
+    fn update_profile_picture(
+        &self,
+        identifier: &str,
+        url: &str,
+    ) -> impl std::future::Future<Output = Result<(), ServiceError>> + Send;
 }

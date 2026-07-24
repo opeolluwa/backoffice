@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { useNuxtApp } from "#app";
-import { ToasterProps } from "@nuxt/ui";
+import { useBrandColor } from "~/composables/useBrandColor";
 
 const { $viewport } = useNuxtApp();
+const { initBrandColor } = useBrandColor();
+
+onMounted(() => {
+  initBrandColor();
+});
 
 watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
   console.log("Breakpoint updated:", oldBreakpoint, "->", newBreakpoint);
@@ -27,7 +32,7 @@ watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
       </p>
     </div>
     <div v-else>
-      <UApp :toaster="{ position: 'top-right', progress: true, vax:'' }">
+      <UApp :toaster="{ position: 'top-right', progress: true }">
         <NuxtLoadingIndicator />
         <NuxtLayout>
           <NuxtPage />

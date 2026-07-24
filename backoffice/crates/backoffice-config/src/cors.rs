@@ -5,8 +5,15 @@ use crate::env::{self, AppConfig};
 
 pub fn init_cors(config: &AppConfig) -> CorsLayer {
     let cors = CorsLayer::new()
-        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
-        .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION]);
+        .allow_methods([
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::DELETE,
+            Method::OPTIONS,
+        ])
+        .allow_headers(Any)
+        .expose_headers(Any);
 
     if config.environment == env::Environment::Production {
         let has_wildcard = config
@@ -24,13 +31,13 @@ pub fn init_cors(config: &AppConfig) -> CorsLayer {
             let origins = config
                 .allowed_origins
                 .iter()
-                .filter_map(|origin| {
-                    origin.parse::<HeaderValue>().ok()
-                })
+                .filter_map(|origin| origin.parse::<HeaderValue>().ok())
                 .collect::<Vec<_>>();
 
             if origins.is_empty() {
-                tracing::warn!("CORS: no valid origins configured; denying all cross-origin requests");
+                tracing::warn!(
+                    "CORS: no valid origins configured; denying all cross-origin requests"
+                );
                 cors
             } else {
                 cors.allow_origin(origins)

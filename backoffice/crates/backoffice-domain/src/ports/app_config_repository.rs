@@ -3,15 +3,27 @@ use crate::{errors::database_error::DatabaseError, models::app_config};
 #[cfg_attr(test, mockall::automock)]
 #[allow(async_fn_in_trait)]
 pub trait AppConfigRepositoryExt {
-    async fn find_app_config_by_identifier(
+    async fn find_app_config(&self) -> Result<Option<app_config::Model>, DatabaseError>;
+
+    async fn update_app_config(
         &self,
-        identifier: i16,
-    ) -> Result<Option<app_config::Model>, DatabaseError>;
+        app_name: Option<String>,
+        support_email: Option<String>,
+        default_currency: Option<String>,
+        default_language: Option<String>,
+        maintenance_mode: Option<bool>,
+        brand_color: Option<String>,
+        logo_url: Option<String>,
+    ) -> Result<app_config::Model, DatabaseError>;
 
     async fn create_app_config(
         &self,
-        identifier: i16,
+        identifier: &str,
         app_name: Option<String>,
         support_email: Option<String>,
+        default_currency: Option<String>,
+        default_language: Option<String>,
+        brand_color: Option<String>,
+        logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError>;
 }

@@ -7,6 +7,7 @@ use backoffice_config::env::AppConfig;
 use backoffice_domain::{
     errors::app_error::AppError,
     services::{
+        app_config::AppConfigService,
         auth::AuthenticationService,
         complaint::ComplaintService,
         country::CountryService,
@@ -86,6 +87,8 @@ pub struct ServicesState {
     pub orders_service: OrderService<OrdersRepository>,
     pub customer_service: CustomerService<CustomerRepository>,
     pub complaint_service: ComplaintService<ComplaintRepository>,
+    pub app_config_service: AppConfigService<AppConfigRepository>,
+    pub imagekit: ImagekitClient,
 }
 
 #[derive(Clone)]
@@ -181,6 +184,8 @@ impl ServicesState {
             orders_service: OrderService::new(repos.orders_repository),
             customer_service: CustomerService::new(repos.customer_repository),
             complaint_service: ComplaintService::new(repos.complaint_repository),
+            app_config_service: AppConfigService::new(repos.app_config),
+            imagekit: contracts.imagekit,
         }
     }
 }

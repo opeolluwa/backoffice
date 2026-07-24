@@ -70,7 +70,7 @@ async fn init(app: &Application) -> Result<(), CliError> {
     let existing = app
         .repositories
         .app_config
-        .find_app_config_by_identifier(1)
+        .find_app_config()
         .await
         .map_err(|e| CliError::DatabaseError(e.to_string()))?;
 
@@ -79,12 +79,9 @@ async fn init(app: &Application) -> Result<(), CliError> {
         return Ok(());
     }
 
-    let ulid = Ulid::new().to_string();
-    let default_app_name = format!("backoffice-{ulid}");
-
     let app_name: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Application name")
-        .default(default_app_name)
+        .default("backoffice".into())
         .interact_text()
         .map_err(|e| CliError::ConfigError(e.to_string()))?;
 
@@ -100,9 +97,11 @@ async fn init(app: &Application) -> Result<(), CliError> {
         .interact_text()
         .map_err(|e| CliError::ConfigError(e.to_string()))?;
 
+    let config_ulid = Ulid::new().to_string();
+
     app.repositories
         .app_config
-        .create_app_config(1, Some(app_name), Some(email))
+        .create_app_config(&config_ulid, Some(app_name), Some(email), None, None, None, None)
         .await
         .map_err(|e| CliError::DatabaseError(e.to_string()))?;
 

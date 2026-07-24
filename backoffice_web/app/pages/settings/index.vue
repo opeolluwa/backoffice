@@ -10,15 +10,16 @@ definePageMeta({
   },
 });
 
+const route = useRoute();
 type TabKey = "profile" | "security" | "locale" | "app";
-const activeTab = ref<TabKey>("profile");
+const activeTab = ref<TabKey>((route.query.tab as TabKey) || "profile");
 
 const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
   {
-    key: "profile",
-    label: "Profile",
-    icon: "heroicons:user-circle",
-    desc: "Your personal info",
+    key: "app",
+    label: "App",
+    icon: "heroicons:cog-6-tooth",
+    desc: "Application settings",
   },
   {
     key: "security",
@@ -27,16 +28,17 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
     desc: "Password & access",
   },
   {
+    key: "profile",
+    label: "Profile",
+    icon: "heroicons:user-circle",
+    desc: "Your personal info",
+  },
+
+  {
     key: "locale",
     label: "Locale",
     icon: "heroicons:computer-desktop",
     desc: "Device preferences",
-  },
-  {
-    key: "app",
-    label: "App",
-    icon: "heroicons:cog-6-tooth",
-    desc: "Application settings",
   },
 ];
 </script>
@@ -84,10 +86,10 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
     </aside>
 
     <div class="flex-1 min-w-0 max-w-xl">
-      <SettingsProfileTab v-show="activeTab === 'profile'" />
-      <SettingsSecurityTab v-show="activeTab === 'security'" />
-      <SettingsLocaleTab v-show="activeTab === 'locale'" />
       <SettingsAppTab v-show="activeTab === 'app'" />
+      <SettingsSecurityTab v-show="activeTab === 'security'" />
+      <SettingsProfileTab v-show="activeTab === 'profile'" />
+      <SettingsLocaleTab v-show="activeTab === 'locale'" />
     </div>
   </div>
 </template>

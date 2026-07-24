@@ -1,12 +1,16 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 #[serde(rename_all = "camelCase")]
 pub struct UserProfile {
     pub identifier: String,
     pub email: String,
     pub first_name: String,
     pub last_name: String,
+    pub profile_picture: Option<String>,
+    pub username: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -47,8 +51,7 @@ pub struct VerifyAccountCommand {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshTokenCommand {
-    pub email: String,
-    pub identifier: String,
+    pub refresh_token: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -56,12 +59,16 @@ pub struct RefreshTokenCommand {
 pub struct TokenClaims {
     pub email: String,
     pub identifier: String,
+    pub token_type: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginResult {
-    pub token: String,
+    pub access_token: String,
+    pub refresh_token: String,
+    pub access_token_expiry: i64,
+    pub refresh_token_expiry: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,7 +86,10 @@ pub struct VerifyAccountResult {}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshTokenResult {
-    pub token: String,
+    pub access_token: String,
+    pub refresh_token: String,
+    pub access_token_expiry: i64,
+    pub refresh_token_expiry: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -164,4 +174,20 @@ pub struct UpdateComplaintCommand {
     pub subject: Option<String>,
     pub description: Option<String>,
     pub status: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChangePasswordCommand {
+    pub current_password: String,
+    pub new_password: String,
+    pub confirm_password: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateProfileCommand {
+    pub first_name: String,
+    pub last_name: String,
+    pub username: Option<String>,
 }
