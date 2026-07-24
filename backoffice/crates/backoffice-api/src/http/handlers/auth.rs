@@ -14,8 +14,8 @@ use backoffice_domain::services::auth::AuthenticationServiceTrait;
 
 use crate::http::dto::jwt::{Claims, REFRESH_TOKEN_DURATION};
 use crate::http::extractors::auth::{
-    CreateUserRequest, ForgottenPasswordRequest, LoginRequest, SetNewPasswordRequest,
-    VerifyAccountRequest,
+    CreateUserRequest, ForgottenPasswordRequest, LoginRequest, RefreshTokenRequest,
+    SetNewPasswordRequest, VerifyAccountRequest,
 };
 use crate::http::middlewares::auth::RawToken;
 use crate::http::middlewares::validator::ValidatedRequest;
@@ -47,7 +47,15 @@ pub async fn login(
         email: request.email,
         password: request.password,
     };
-    let login_response = state.services.auth_service.login(&command).await?;
+    let access_token_ttl = state.app_config.access_token_ttl_secs.as_secs();
+    let refresh_token_ttl = state.app_config.refresh_token_ttl_secs.as_secs();
+
+    let login_response = state
+        .services
+        .auth_service
+        .login(&command, access_token_ttl, refresh_token_ttl)
+        .await?;
+
     Ok(ApiResponseBuilder::new()
         .status_code(StatusCode::OK)
         .data(login_response)
@@ -63,6 +71,7 @@ pub async fn verify_account(
     let token_claims = TokenClaims {
         email: claims.email,
         identifier: claims.identifier,
+        token_type: claims.token_type,
     };
     let command = VerifyAccountCommand { otp: request.otp };
     let verify_account_response = state
@@ -104,6 +113,7 @@ pub async fn set_new_password(
     let token_claims = TokenClaims {
         email: claims.email,
         identifier: claims.identifier,
+        token_type: claims.token_type,
     };
     let command = SetNewPasswordCommand {
         password: request.password,
@@ -123,21 +133,30 @@ pub async fn set_new_password(
 
 pub async fn request_refresh_token(
     State(state): State<Arc<AppState>>,
-    claims: Claims,
+    ValidatedRequest(request): ValidatedRequest<RefreshTokenRequest>,
 ) -> Result<ApiResponse<backoffice_domain::dto::RefreshTokenResult>, AuthenticationServiceError> {
+    let access_token_ttl = state.app_config.access_token_ttl_secs.as_secs();
+    let refresh_token_ttl = state.app_config.refresh_token_ttl_secs.as_secs();
+
     let command = RefreshTokenCommand {
-        email: claims.email,
-        identifier: claims.identifier,
+        refresh_token: request.refresh_token.clone(),
     };
+
     let refresh_token_response = state
         .services
         .auth_service
-        .request_refresh_token(&command)
+        .request_refresh_token(&command, access_token_ttl, refresh_token_ttl)
         .await?;
+
+    // Blacklist the old refresh token (rotation)
+    state
+        .redis
+        .blacklist_token(&request.refresh_token, REFRESH_TOKEN_DURATION.as_secs())
+        .map_err(|e| AuthenticationServiceError::OperationFailed(e.to_string()))?;
 
     Ok(ApiResponseBuilder::new()
         .data(refresh_token_response)
-        .message("token updated successfully")
+        .message("token refreshed successfully")
         .build())
 }
 
