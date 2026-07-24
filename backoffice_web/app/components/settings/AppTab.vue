@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as v from "valibot";
-import type { AppConfigInterface } from "@bindings/AppConfigInterface";
+import { useAppStore } from "~/stores/app";
+import { useCountryStore } from "~/stores/country";
 
 const toast = useToast();
+const appStore = useAppStore();
+const countryStore = useCountryStore();
 
-const config = reactive<AppConfigInterface>({
-  identifier: 1,
-  appName: "Backoffice",
-  maintenanceMode: false,
-  supportEmail: "support@example.com",
-  createdAt: new Date().toISOString(),
-  lastUpdated: new Date().toISOString(),
-});
+const config = computed(() => appStore.config);
 
 const schema = v.object({
   appName: v.pipe(v.string(), v.minLength(1, "App name is required.")),
@@ -25,18 +21,55 @@ const schema = v.object({
 type Schema = v.InferOutput<typeof schema>;
 
 const state = reactive<Schema>({
-  appName: config.appName ?? "",
-  supportEmail: config.supportEmail ?? "",
+  appName: config.value?.appName ?? "",
+  supportEmail: config.value?.supportEmail ?? "",
 });
 
+const defaultCurrency = ref(config.value?.defaultCurrency ?? "");
+const defaultLanguage = ref(config.value?.defaultLanguage ?? "en");
+
+const languages = [
+  { label: "English", value: "en" },
+  { label: "Spanish", value: "es" },
+  { label: "French", value: "fr" },
+  { label: "German", value: "de" },
+  { label: "Portuguese", value: "pt" },
+];
+
+const currencyOptions = computed(() =>
+  countryStore.countries.map((c) => ({
+    label: `${c.currencyCode} - ${c.country}`,
+    avatar: c.flag ? c.flag : undefined,
+    value: c.identifier,
+  })),
+);
+
 const loading = ref(false);
+const localeLoading = ref(false);
+
+function formatFullDate(date: string | null | undefined): string {
+  if (!date) return "-";
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+onMounted(async () => {
+  await Promise.all([appStore.fetchConfig(), countryStore.fetchCountries()]);
+  state.appName = config.value?.appName ?? "";
+  state.supportEmail = config.value?.supportEmail ?? "";
+  defaultCurrency.value = config.value?.defaultCurrency ?? "";
+  defaultLanguage.value = config.value?.defaultLanguage ?? "en";
+});
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
-    config.appName = data.appName;
-    config.supportEmail = data.supportEmail;
-    config.lastUpdated = new Date().toISOString();
+    state.appName = data.appName;
+    state.supportEmail = data.supportEmail;
     toast.add({ title: "App settings updated", color: "success" });
   } catch {
     toast.add({ title: "Failed to update app settings", color: "error" });
@@ -45,13 +78,29 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   }
 }
 
+async function saveLocale() {
+  localeLoading.value = true;
+  try {
+    await appStore.updateConfig({
+      defaultCurrency: defaultCurrency.value || null,
+      defaultLanguage: defaultLanguage.value || null,
+    });
+    toast.add({ title: "Locale settings saved", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to save locale settings", color: "error" });
+  } finally {
+    localeLoading.value = false;
+  }
+}
+
 function toggleMaintenance() {
-  config.maintenanceMode = !config.maintenanceMode;
+  if (!config.value) return;
+  appStore.updateConfig({});
   toast.add({
-    title: config.maintenanceMode
-      ? "Maintenance mode enabled"
-      : "Maintenance mode disabled",
-    color: config.maintenanceMode ? "warning" : "success",
+    title: config.value.maintenanceMode
+      ? "Maintenance mode disabled"
+      : "Maintenance mode enabled",
+    color: config.value.maintenanceMode ? "success" : "warning",
   });
 }
 </script>
@@ -95,6 +144,47 @@ function toggleMaintenance() {
       </UForm>
     </div>
 
+    <!-- Locale Defaults -->
+    <div
+      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+    >
+      <p class="font-semibold text-gray-900 dark:text-white mb-1">
+        Locale defaults
+      </p>
+      <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
+        Set the default currency and language for the application.
+      </p>
+
+      <div class="space-y-4">
+        <AppSelect
+          v-model="defaultCurrency"
+          :items="currencyOptions"
+          label="Default currency"
+          placeholder="Select currency"
+          class="w-full"
+        />
+
+        <AppSelect
+          v-model="defaultLanguage"
+          :items="languages"
+          label="Default language"
+          placeholder="Select language"
+          class="w-full"
+        />
+
+        <div class="pt-1">
+          <AppButton
+            size="lg"
+            :loading="localeLoading"
+            :disabled="localeLoading"
+            @click="saveLocale"
+          >
+            Save locale
+          </AppButton>
+        </div>
+      </div>
+    </div>
+
     <!-- Maintenance -->
     <div
       class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
@@ -123,18 +213,18 @@ function toggleMaintenance() {
               Maintenance mode
             </p>
             <p class="text-xs text-gray-400 dark:text-white/30 mt-0.5">
-              {{ config.maintenanceMode ? "Currently active" : "Inactive" }}
+              {{ config?.maintenanceMode ? "Currently active" : "Inactive" }}
             </p>
           </div>
         </div>
         <UToggle
-          :model-value="config.maintenanceMode"
+          :model-value="config?.maintenanceMode ?? false"
           @update:model-value="toggleMaintenance"
         />
       </div>
 
       <div
-        v-if="config.maintenanceMode"
+        v-if="config?.maintenanceMode"
         class="mt-3 flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10"
       >
         <UIcon
@@ -163,14 +253,14 @@ function toggleMaintenance() {
             >Identifier</span
           >
           <span class="text-sm font-medium text-gray-700 dark:text-white/60">{{
-            config.identifier
+            config?.identifier
           }}</span>
         </div>
         <div class="border-t border-gray-100 dark:border-white/5" />
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-500 dark:text-white/40">Created</span>
           <span class="text-sm font-medium text-gray-700 dark:text-white/60">
-            {{ new Date(config.createdAt).toLocaleDateString() }}
+            {{ formatFullDate(config?.createdAt) }}
           </span>
         </div>
         <div class="border-t border-gray-100 dark:border-white/5" />
@@ -179,7 +269,7 @@ function toggleMaintenance() {
             >Last updated</span
           >
           <span class="text-sm font-medium text-gray-700 dark:text-white/60">
-            {{ new Date(config.lastUpdated).toLocaleDateString() }}
+            {{ formatFullDate(config?.lastUpdated) }}
           </span>
         </div>
       </div>

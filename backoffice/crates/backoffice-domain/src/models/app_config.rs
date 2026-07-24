@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[backoffice_macros::ts_rs_export_sea_orm_entity_name]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub identifier: i16,
+    pub identifier: String,
     #[sea_orm(column_type = "Text", nullable)]
     pub app_name: Option<String>,
     pub maintenance_mode: bool,
@@ -17,12 +17,33 @@ pub struct Model {
     pub support_email: Option<String>,
     pub created_at: DateTimeWithTimeZone,
     pub last_updated: DateTimeWithTimeZone,
+    pub default_currency: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub default_language: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::countries::Entity",
+        from = "Column::DefaultCurrency",
+        to = "super::countries::Column::Identifier",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    Countries,
+}
+
+impl Related<super::countries::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Countries.def()
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
-pub enum RelatedEntity {}
+pub enum RelatedEntity {
+    #[sea_orm(entity = "super::countries::Entity")]
+    Countries,
+}

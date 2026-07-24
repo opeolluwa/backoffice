@@ -31,7 +31,11 @@ const initials = computed(() => useGetInitials(userStore.user));
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
-    userStore.updateProfile({ ...userStore.user, ...data });
+    await userStore.updateProfile({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      username: data.username,
+    });
     state.firstName = userStore.user.firstName;
     state.lastName = userStore.user.lastName;
     state.username = userStore.user.username;
@@ -96,10 +100,11 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
           label="Email address"
           name="email"
           placeholder="jane@example.com"
+          :disabled="true"
         />
 
         <div class="pt-1">
-          <AppButton type="submit" :loading="loading" :disabled="loading">
+          <AppButton type="submit"  size="lg"    :loading="loading" :disabled="loading">
             Save changes
           </AppButton>
         </div>

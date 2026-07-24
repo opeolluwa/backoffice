@@ -31,6 +31,9 @@ mod m20260723_162500_create_invoices_table;
 mod m20260723_162600_create_complaints_table;
 mod m20260723_162700_change_price_to_bigint;
 mod m20260723_171744_invoice_to_int;
+mod m20260724_000000_add_locale_to_app_config;
+mod m20260724_010000_add_profile_fields_to_users;
+mod m20260724_020000_change_app_config_id_to_ulid;
 
 pub use sea_orm_migration::prelude::*;
 
@@ -76,6 +79,9 @@ impl MigratorTrait for Migrator {
             Box::new(m20260723_162600_create_complaints_table::Migration),
             Box::new(m20260723_162700_change_price_to_bigint::Migration),
             Box::new(m20260723_171744_invoice_to_int::Migration),
+            Box::new(m20260724_000000_add_locale_to_app_config::Migration),
+            Box::new(m20260724_010000_add_profile_fields_to_users::Migration),
+            Box::new(m20260724_020000_change_app_config_id_to_ulid::Migration),
         ]
     }
 }

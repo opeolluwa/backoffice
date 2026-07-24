@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import type { UserProfile } from "~/bindings/UserProfile";
-import axios from "axios";
 import api from "~/plugin/api";
 
 export const useUserInformationStore = defineStore("user_information", {
@@ -40,6 +39,9 @@ export const useUserInformationStore = defineStore("user_information", {
         state.firstName = userInformation.firstName ?? "";
         state.lastName = userInformation.lastName ?? "";
         state.email = userInformation.email;
+        const info = userInformation as Record<string, unknown>;
+        state.profilePicture = (info.profilePicture as string) ?? "";
+        state.username = (info.username as string) ?? "";
       });
       return userInformation;
     },
@@ -58,14 +60,48 @@ export const useUserInformationStore = defineStore("user_information", {
       this.$patch({ profilePicture: url });
     },
 
-    updateProfile(profile: UserProfile) {
+    async updateProfile(profile: {
+      firstName: string;
+      lastName: string;
+      username?: string;
+    }) {
+      const response = await api.put("/users/profile", {
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        username: profile.username ?? null,
+      });
+      const data = response.data.data as Record<string, unknown>;
       this.$patch({
-        identifier: profile.identifier,
-        firstName: profile.firstName ?? "",
-        lastName: profile.lastName ?? "",
-        email: profile.email,
-        // profilePicture: profile.profilePicture ?? "",
-        // username: profile.username ?? "",
+        identifier: data.identifier as string,
+        firstName: (data.firstName as string) ?? "",
+        lastName: (data.lastName as string) ?? "",
+        email: data.email as string,
+        profilePicture: (data.profilePicture as string) ?? "",
+        username: (data.username as string) ?? "",
+      });
+    },
+
+    async changePassword(payload: {
+      currentPassword: string;
+      newPassword: string;
+      confirmPassword: string;
+    }) {
+      await api.post("/users/change-password", {
+        currentPassword: payload.currentPassword,
+        newPassword: payload.newPassword,
+        confirmPassword: payload.confirmPassword,
+      });
+    },
+
+    async uploadProfilePicture(file: File) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await api.post("/users/profile-picture", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const data = response.data.data as Record<string, unknown>;
+      this.$patch({
+        profilePicture: (data.profilePicture as string) ?? "",
       });
     },
   },

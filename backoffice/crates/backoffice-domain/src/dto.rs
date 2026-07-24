@@ -7,6 +7,8 @@ pub struct UserProfile {
     pub email: String,
     pub first_name: String,
     pub last_name: String,
+    pub profile_picture: Option<String>,
+    pub username: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -164,4 +166,20 @@ pub struct UpdateComplaintCommand {
     pub subject: Option<String>,
     pub description: Option<String>,
     pub status: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChangePasswordCommand {
+    pub current_password: String,
+    pub new_password: String,
+    pub confirm_password: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateProfileCommand {
+    pub first_name: String,
+    pub last_name: String,
+    pub username: Option<String>,
 }

@@ -257,6 +257,8 @@ mod tests {
             updated_at: None,
             is_active: true,
             role_identifier: None,
+            profile_picture: None,
+            username: None,
         }
     }
 

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as v from "valibot";
+import { useUserInformationStore } from "~/stores/users";
 
+const userStore = useUserInformationStore();
 const toast = useToast();
 
 const schema = v.pipe(
@@ -42,6 +44,11 @@ const loading = ref(false);
 async function onSubmit({ data: _ }: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
+    await userStore.changePassword({
+      currentPassword: state.currentPassword,
+      newPassword: state.newPassword,
+      confirmPassword: state.confirmPassword,
+    });
     toast.add({ title: "Password changed", color: "success" });
     state.currentPassword = "";
     state.newPassword = "";
@@ -100,7 +107,7 @@ async function onSubmit({ data: _ }: FormSubmitEvent<Schema>) {
         </div>
 
         <div class="pt-1">
-          <AppButton type="submit" :loading="loading" :disabled="loading">
+          <AppButton type="submit" size="lg" :loading="loading" :disabled="loading">
             Change password
           </AppButton>
         </div>

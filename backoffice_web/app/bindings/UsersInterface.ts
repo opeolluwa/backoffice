@@ -10,4 +10,6 @@ export type UsersInterface = {
   updatedAt: string | null;
   isActive: boolean;
   roleIdentifier: string | null;
+  profilePicture: string | null;
+  username: string | null;
 };

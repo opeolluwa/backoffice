@@ -19,6 +19,9 @@ pub struct Model {
     pub updated_at: Option<DateTimeWithTimeZone>,
     pub is_active: bool,
     pub role_identifier: Option<String>,
+    pub profile_picture: Option<String>,
+    #[sea_orm(unique)]
+    pub username: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

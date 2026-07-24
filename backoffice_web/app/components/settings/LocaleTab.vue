@@ -112,7 +112,7 @@ function save() {
     </div>
 
     <div>
-      <AppButton @click="save">Save preferences</AppButton>
+      <AppButton size="lg" @click="save">Save preferences</AppButton>
     </div>
   </div>
 </template>
