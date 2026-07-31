@@ -114,7 +114,7 @@ const logout = async () => useLogout();
       :ui="{
         root: 'bg-primary border-r-0',
         header: 'h-16',
-        body: 'gap-0.5',
+        body: 'gap-1 px-2 py-2',
         footer: 'border-t border-white/10',
       }"
     >
@@ -131,32 +131,13 @@ const logout = async () => useLogout();
           :collapsed="collapsed"
           class="w-full text-white"
           :ui="{
-            item: 'text-white/50 hover:text-white data-active:text-white',
-            link: 'text-white/50 hover:text-white data-active:text-white data-active:bg-white/15 rounded-lg',
-            label: 'text-sm text-white/50 group-hover:text-white',
-            linkLeadingIcon: 'text-white/50',
+            link: 'px-2 py-2 text-sm rounded-lg text-white/50 transition-colors hover:bg-white/5 hover:text-white data-active:bg-white/10 data-active:text-white data-active:font-medium',
+            linkLeadingIcon:
+              'size-5 text-white/40 group-hover:text-white group-data-active:text-white',
+            label:
+              'mt-4 pt-3 border-t border-white/10 px-2 pb-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white/30',
           }"
-        >
-          <template #item="{ item }">
-            <template v-if="!item.to">
-              <div
-                class="mt-4 mb-1 px-3 text-xs font-medium tracking-wider text-white/20 uppercase"
-              >
-                {{ item.label }}
-              </div>
-            </template>
-            <template v-else>
-              <UButton
-                :to="item.to"
-                :icon="item.icon"
-                variant="link"
-                class="text-white/60 -py-3.5"
-              >
-                <span>{{ item.label }}</span>
-              </UButton>
-            </template>
-          </template>
-        </UNavigationMenu>
+        />
       </template>
 
       <template #footer="{ collapsed }">
@@ -164,8 +145,8 @@ const logout = async () => useLogout();
           class="flex w-full items-center gap-3 rounded-lg text-sm transition-all cursor-pointer"
           :class="
             collapsed
-              ? 'justify-center text-white/60 hover:text-red-300 py-2'
-              : 'px-3 py-2.5 text-white/60 hover:text-red-300'
+              ? 'justify-center text-white/50 hover:text-red-300 py-2'
+              : 'px-0 py-2 text-white/50 hover:text-red-300'
           "
           @click="logout"
         >

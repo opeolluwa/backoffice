@@ -21,12 +21,12 @@ pub trait AppConfigServiceExt {
 
     async fn update_app_config(
         &self,
-        app_name: Option<String>,
-        support_email: Option<String>,
-        default_currency: Option<String>,
-        default_language: Option<String>,
+        app_name: Option<Option<String>>,
+        support_email: Option<Option<String>>,
+        default_currency: Option<Option<String>>,
+        default_language: Option<Option<String>>,
         maintenance_mode: Option<bool>,
-        logo_url: Option<String>,
+        logo_url: Option<Option<String>>,
     ) -> Result<app_config::Model, ServiceError>;
 }
 
@@ -37,12 +37,12 @@ impl<R: AppConfigRepositoryExt + Send + Sync> AppConfigServiceExt for AppConfigS
 
     async fn update_app_config(
         &self,
-        app_name: Option<String>,
-        support_email: Option<String>,
-        default_currency: Option<String>,
-        default_language: Option<String>,
+        app_name: Option<Option<String>>,
+        support_email: Option<Option<String>>,
+        default_currency: Option<Option<String>>,
+        default_language: Option<Option<String>>,
         maintenance_mode: Option<bool>,
-        logo_url: Option<String>,
+        logo_url: Option<Option<String>>,
     ) -> Result<app_config::Model, ServiceError> {
         let existing = self.repo.find_app_config().await?;
 
@@ -64,11 +64,11 @@ impl<R: AppConfigRepositoryExt + Send + Sync> AppConfigServiceExt for AppConfigS
                     .repo
                     .create_app_config(
                         &id,
-                        app_name,
-                        support_email,
-                        default_currency,
-                        default_language,
-                        logo_url,
+                        app_name.flatten(),
+                        support_email.flatten(),
+                        default_currency.flatten(),
+                        default_language.flatten(),
+                        logo_url.flatten(),
                     )
                     .await?)
             }

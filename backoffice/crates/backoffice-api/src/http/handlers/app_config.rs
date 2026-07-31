@@ -15,12 +15,12 @@ use crate::state::AppState;
 #[derive(Debug, Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAppConfigRequest {
-    pub app_name: Option<String>,
-    pub support_email: Option<String>,
-    pub default_currency: Option<String>,
-    pub default_language: Option<String>,
+    pub app_name: Option<Option<String>>,
+    pub support_email: Option<Option<String>>,
+    pub default_currency: Option<Option<String>>,
+    pub default_language: Option<Option<String>>,
     pub maintenance_mode: Option<bool>,
-    pub logo_url: Option<String>,
+    pub logo_url: Option<Option<String>>,
 }
 
 pub async fn fetch_app_config(

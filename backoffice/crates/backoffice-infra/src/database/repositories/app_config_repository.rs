@@ -54,12 +54,12 @@ impl AppConfigRepositoryExt for AppConfigRepository {
 
     async fn update_app_config(
         &self,
-        app_name: Option<String>,
-        support_email: Option<String>,
-        default_currency: Option<String>,
-        default_language: Option<String>,
+        app_name: Option<Option<String>>,
+        support_email: Option<Option<String>>,
+        default_currency: Option<Option<String>>,
+        default_language: Option<Option<String>>,
         maintenance_mode: Option<bool>,
-        logo_url: Option<String>,
+        logo_url: Option<Option<String>>,
     ) -> Result<app_config::Model, DatabaseError> {
         let config = AppConfigEntity::find()
             .one(&self.db)
@@ -70,14 +70,24 @@ impl AppConfigRepositoryExt for AppConfigRepository {
             })?;
 
         let mut active: app_config::ActiveModel = config.into();
-        active.app_name = Set(app_name);
-        active.support_email = Set(support_email);
-        active.default_currency = Set(default_currency);
-        active.default_language = Set(default_language);
+        if let Some(name) = app_name {
+            active.app_name = Set(name);
+        }
+        if let Some(email) = support_email {
+            active.support_email = Set(email);
+        }
+        if let Some(currency) = default_currency {
+            active.default_currency = Set(currency);
+        }
+        if let Some(language) = default_language {
+            active.default_language = Set(language);
+        }
         if let Some(mode) = maintenance_mode {
             active.maintenance_mode = Set(mode);
         }
-        active.logo_url = Set(logo_url);
+        if let Some(logo) = logo_url {
+            active.logo_url = Set(logo);
+        }
 
         active
             .update(&self.db)
