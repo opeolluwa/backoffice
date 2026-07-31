@@ -29,14 +29,14 @@ function formatDate(dateStr: string) {
 <template>
   <button
     class="w-full text-left px-4 py-3 border-b border-gray-50 dark:border-white/[0.03] hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer"
-    :class="selected ? 'bg-brand-50/60 dark:bg-brand/5' : ''"
+    :class="selected ? 'bg-gray-50/60 dark:bg-white/5' : ''"
     @click="$emit('select', email)"
   >
     <div class="flex items-start justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
         <span
           class="shrink-0 size-1.5 rounded-full mt-1.5"
-          :class="!email.isRead ? 'bg-brand' : 'bg-transparent'"
+          :class="!email.isRead ? 'bg-gray-900 dark:bg-gray-100' : 'bg-transparent'"
         />
         <div class="min-w-0">
           <p

@@ -24,7 +24,7 @@ function formatFullDate(dateStr: string) {
 
 <template>
   <div
-    class="flex-1 bg-white dark:bg-brand-dark-600 rounded-xl border border-gray-100 dark:border-white/5 overflow-hidden flex flex-col"
+    class="flex-1 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-white/5 overflow-hidden flex flex-col"
   >
     <div
       v-if="!email"
@@ -72,7 +72,7 @@ function formatFullDate(dateStr: string) {
             </span>
             <span
               v-if="email.tag"
-              class="text-xs bg-brand-50 dark:bg-brand/10 text-brand dark:text-brand-300 rounded-full px-2.5 py-0.5 font-medium"
+              class="text-xs bg-gray-50 dark:bg-white/10 text-brand dark:text-brand-300 rounded-full px-2.5 py-0.5 font-medium"
             >
               {{ email.tag }}
             </span>

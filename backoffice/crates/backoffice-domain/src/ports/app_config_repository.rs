@@ -7,13 +7,12 @@ pub trait AppConfigRepositoryExt {
 
     async fn update_app_config(
         &self,
-        app_name: Option<String>,
-        support_email: Option<String>,
-        default_currency: Option<String>,
-        default_language: Option<String>,
+        app_name: Option<Option<String>>,
+        support_email: Option<Option<String>>,
+        default_currency: Option<Option<String>>,
+        default_language: Option<Option<String>>,
         maintenance_mode: Option<bool>,
-        brand_color: Option<String>,
-        logo_url: Option<String>,
+        logo_url: Option<Option<String>>,
     ) -> Result<app_config::Model, DatabaseError>;
 
     async fn create_app_config(
@@ -23,7 +22,6 @@ pub trait AppConfigRepositoryExt {
         support_email: Option<String>,
         default_currency: Option<String>,
         default_language: Option<String>,
-        brand_color: Option<String>,
         logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError>;
 }

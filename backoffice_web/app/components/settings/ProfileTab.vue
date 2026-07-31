@@ -69,7 +69,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 <template>
   <div class="space-y-4">
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <UChip size="sm" position="bottom-right" class="bg-none">
         <template #content>
@@ -81,19 +81,19 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
           />
         </template>
         <UAvatar
-          class="rounded-none"
+          class="rounded-4xl"
           :src="String(userStore.profilePicture)"
           :alt="userStore.fullName"
           loading="lazy"
           height="420px"
           width="420px"
-          :ui="{ root: 'h-36 w-36 rounded-md' }"
+          :ui="{ root: 'h-36 w-36 rounded-full' }"
         />
       </UChip>
     </div>
 
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">
         Personal information

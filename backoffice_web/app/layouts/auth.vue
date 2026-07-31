@@ -8,6 +8,9 @@
       <div
         class="border-none bg-white border-gray-100 rounded-2xl px-8 py-10 shadow-sm dark:border-white/8"
       >
+        <div class="flex justify-center mb-6">
+          <AppLogo size="md" />
+        </div>
         <slot />
       </div>
 

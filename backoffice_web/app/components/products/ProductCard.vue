@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { ProductsInterface } from "~/bindings/ProductsInterface";
+import { useCurrency } from "~/composables/useCurrency";
 
 defineProps<{
   product: ProductsInterface;
   pictureUrl: string | null;
 }>();
+
+const { formatMoney } = useCurrency();
 </script>
 
 <template>
@@ -28,9 +31,7 @@ defineProps<{
     </div>
 
     <div class="p-4 space-y-2">
-      <h3
-        class="text-sm font-semibold text-gray-900 dark:text-white truncate"
-      >
+      <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
         {{ product.name }}
       </h3>
       <p class="text-xs text-gray-500 dark:text-white/40 line-clamp-2">
@@ -38,7 +39,7 @@ defineProps<{
       </p>
       <div class="flex items-center justify-between pt-1">
         <span class="text-lg font-bold text-gray-900 dark:text-white">
-          {{ product.price }}
+          {{ formatMoney(product.price) }}
         </span>
       </div>
     </div>

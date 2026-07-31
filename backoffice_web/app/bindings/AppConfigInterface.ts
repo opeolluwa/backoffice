@@ -9,6 +9,5 @@ export type AppConfigInterface = {
   lastUpdated: string;
   defaultCurrency: string | null;
   defaultLanguage: string | null;
-  brandColor: string | null;
   logoUrl: string | null;
 };

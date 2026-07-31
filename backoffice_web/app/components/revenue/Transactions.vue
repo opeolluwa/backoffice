@@ -14,7 +14,7 @@ defineProps<{
 
 <template>
   <div
-    class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+    class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
   >
     <div class="flex items-center justify-between mb-5">
       <div>
@@ -56,7 +56,7 @@ defineProps<{
         class="flex items-center gap-4 py-3"
       >
         <div
-          class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand/10 flex items-center justify-center shrink-0"
+          class="w-9 h-9 rounded-xl bg-gray-50 dark:bg-white/10 flex items-center justify-center shrink-0"
         >
           <UIcon name="heroicons:banknotes" class="size-4 text-brand" />
         </div>
@@ -78,7 +78,7 @@ defineProps<{
           <span
             class="text-xs rounded-full px-2.5 py-0.5 font-medium"
             :class="{
-              'bg-brand-50 dark:bg-brand/10 text-brand dark:text-brand-300':
+              'bg-gray-50 dark:bg-white/10 text-brand dark:text-brand-300':
                 tx.status === 'completed',
               'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400':
                 tx.status === 'pending',

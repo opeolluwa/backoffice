@@ -3,13 +3,13 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import * as v from "valibot";
 import { useAppStore } from "~/stores/app";
 import { useCountryStore } from "~/stores/country";
-import { useBrandColor } from "~/composables/useBrandColor";
-import { generatePalette } from "~/utils/color";
+import { useUploadStore } from "~/stores/uploads";
+import { UPLOAD_LIMIT_SIZE } from "~/plugin/api";
 
 const toast = useToast();
 const appStore = useAppStore();
 const countryStore = useCountryStore();
-const { applyBrandColor } = useBrandColor();
+const uploadStore = useUploadStore();
 
 const config = computed(() => appStore.config);
 
@@ -30,7 +30,6 @@ const state = reactive<Schema>({
 
 const defaultCurrency = ref(config.value?.defaultCurrency ?? "");
 const defaultLanguage = ref(config.value?.defaultLanguage ?? "en");
-const brandColor = ref(config.value?.brandColor ?? "#6D28D9");
 
 const languages = [
   { label: "English", value: "en" },
@@ -48,16 +47,21 @@ const currencyOptions = computed(() =>
   })),
 );
 
+function resolveCurrencyIdentifier(value: string): string {
+  const needle = value.toLowerCase();
+  return (
+    countryStore.countries.find(
+      (c) =>
+        c.identifier.toLowerCase() === needle ||
+        c.currencyCode.toLowerCase() === needle,
+    )?.identifier ?? ""
+  );
+}
+
 const loading = ref(false);
 const localeLoading = ref(false);
-const brandColorLoading = ref(false);
-
-const brandPalette = computed(() => {
-  if (!brandColor.value || !/^#[0-9A-Fa-f]{6}$/.test(brandColor.value)) {
-    return {};
-  }
-  return generatePalette(brandColor.value);
-});
+const logoLoading = ref(false);
+const logoFile = ref<File | null>(null);
 
 function formatFullDate(date: string | null | undefined): string {
   if (!date) return "-";
@@ -73,9 +77,10 @@ onMounted(async () => {
   await Promise.all([appStore.fetchConfig(), countryStore.fetchCountries()]);
   state.appName = config.value?.appName ?? "";
   state.supportEmail = config.value?.supportEmail ?? "";
-  defaultCurrency.value = config.value?.defaultCurrency ?? "";
+  defaultCurrency.value = resolveCurrencyIdentifier(
+    config.value?.defaultCurrency ?? "",
+  );
   defaultLanguage.value = config.value?.defaultLanguage ?? "en";
-  brandColor.value = config.value?.brandColor ?? "#6D28D9";
 });
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
@@ -110,16 +115,52 @@ async function saveLocale() {
   }
 }
 
-async function saveBrandColor() {
-  brandColorLoading.value = true;
+async function saveLogo() {
+  if (!logoFile.value) {
+    toast.add({ title: "Please select a logo image", color: "warning" });
+    return;
+  }
+  if (logoFile.value.size > UPLOAD_LIMIT_SIZE) {
+    toast.add({
+      title: "Logo file is too large",
+      description: "Maximum size is 25 MB.",
+      color: "error",
+    });
+    return;
+  }
+  logoLoading.value = true;
   try {
-    await appStore.updateConfig({ brandColor: brandColor.value });
-    applyBrandColor(brandColor.value);
-    toast.add({ title: "Brand color saved", color: "success" });
+    const created = await uploadStore.createUpload({
+      file: logoFile.value,
+      name: logoFile.value.name,
+    });
+    if (!created || typeof created !== "object" || !("url" in created)) {
+      throw new Error("Upload failed");
+    }
+    await appStore.updateConfig({ logoUrl: created.url as string });
+    logoFile.value = null;
+    toast.add({ title: "Logo saved", color: "success" });
   } catch {
-    toast.add({ title: "Failed to save brand color", color: "error" });
+    toast.add({
+      title: "Failed to save logo",
+      description: "Please try again.",
+      color: "error",
+    });
   } finally {
-    brandColorLoading.value = false;
+    logoLoading.value = false;
+  }
+}
+
+async function removeLogo() {
+  logoLoading.value = true;
+  try {
+    await appStore.updateConfig({ logoUrl: null });
+    logoFile.value = null;
+    toast.add({ title: "Logo removed", color: "success" });
+  } catch {
+    toast.add({ title: "Failed to remove logo", color: "error" });
+  } finally {
+    logoLoading.value = false;
   }
 }
 
@@ -144,7 +185,7 @@ async function toggleMaintenance() {
   <div class="space-y-4">
     <!-- General -->
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">General</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
@@ -184,78 +225,58 @@ async function toggleMaintenance() {
       </UForm>
     </div>
 
-    <!-- Brand Color -->
+    <!-- Logo -->
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
-      <p class="font-semibold text-gray-900 dark:text-white mb-1">
-        Brand color
-      </p>
+      <p class="font-semibold text-gray-900 dark:text-white mb-1">Logo</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
-        Set your brand color to theme the entire application.
+        Upload a logo for your application. It will be used across the app.
       </p>
 
       <div class="space-y-4">
-        <div class="flex items-center gap-4">
-          <label class="relative cursor-pointer">
-            <input
-              v-model="brandColor"
-              type="color"
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            <div
-              class="w-14 h-14 rounded-xl border-2 border-gray-200 dark:border-white/10 shadow-sm transition-transform hover:scale-105"
-              :style="{ backgroundColor: brandColor }"
-            />
-          </label>
-          <div class="flex-1">
-            <AppInput
-              v-model="brandColor"
-              label="Hex color"
-              name="brandColor"
-              placeholder="#6D28D9"
-            />
-          </div>
-        </div>
-
-        <div v-if="Object.keys(brandPalette).length" class="space-y-2">
-          <p
-            class="text-xs font-medium text-gray-500 dark:text-white/40 uppercase tracking-wider"
+        <div class="flex items-start gap-4">
+          <div
+            class="w-20 h-20 rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden flex items-center justify-center bg-gray-50 dark:bg-white/5 shrink-0"
           >
-            Preview
-          </p>
-          <div class="flex gap-1 rounded-xl overflow-hidden">
-            <div
-              v-for="(color, shade) in brandPalette"
-              :key="shade"
-              class="flex-1 h-10 first:rounded-l-xl last:rounded-r-xl"
-              :style="{ backgroundColor: color }"
-              :title="`shade-${shade}: ${color}`"
+            <img
+              v-if="config?.logoUrl"
+              :src="config.logoUrl"
+              :alt="config?.appName || 'App logo'"
+              class="w-full h-full object-cover"
+            />
+            <UIcon
+              v-else
+              name="heroicons:photo"
+              class="size-7 text-gray-300 dark:text-white/20"
             />
           </div>
-          <div class="flex gap-1 text-[9px] text-gray-400 dark:text-white/25">
-            <span class="flex-1 text-center">50</span>
-            <span class="flex-1 text-center">100</span>
-            <span class="flex-1 text-center">200</span>
-            <span class="flex-1 text-center">300</span>
-            <span class="flex-1 text-center">400</span>
-            <span class="flex-1 text-center">500</span>
-            <span class="flex-1 text-center">600</span>
-            <span class="flex-1 text-center">700</span>
-            <span class="flex-1 text-center">800</span>
-            <span class="flex-1 text-center">900</span>
-            <span class="flex-1 text-center">950</span>
+          <div class="flex-1 min-w-0">
+            <UFileUpload v-model="logoFile" accept="image/*" class="w-full" />
+            <p class="text-xs text-gray-400 dark:text-white/30 mt-2">
+              PNG, JPG or SVG up to 25 MB.
+            </p>
           </div>
         </div>
 
-        <div class="pt-1">
+        <div class="flex items-center gap-2 pt-1">
           <AppButton
             size="lg"
-            :loading="brandColorLoading"
-            :disabled="brandColorLoading"
-            @click="saveBrandColor"
+            :loading="logoLoading"
+            :disabled="logoLoading || !logoFile"
+            @click="saveLogo"
           >
-            Save brand color
+            Save logo
+          </AppButton>
+          <AppButton
+            v-if="config?.logoUrl"
+            size="lg"
+            color="error"
+            :loading="logoLoading"
+            :disabled="logoLoading"
+            @click="removeLogo"
+          >
+            Remove logo
           </AppButton>
         </div>
       </div>
@@ -263,7 +284,7 @@ async function toggleMaintenance() {
 
     <!-- Locale Defaults -->
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">
         Locale defaults
@@ -304,7 +325,7 @@ async function toggleMaintenance() {
 
     <!-- Maintenance -->
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">
         Maintenance
@@ -357,7 +378,7 @@ async function toggleMaintenance() {
 
     <!-- Info -->
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">App info</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">

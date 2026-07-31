@@ -18,7 +18,7 @@ const emit = defineEmits<{
 <template>
   <div class="flex h-[60vh] flex-col items-center justify-center text-center">
     <div
-      class="flex size-12 items-center justify-center rounded-2xl bg-primary-50 p-0.5 dark:bg-white/5"
+      class="flex size-12 items-center justify-center rounded-2xl bg-primary-50/50 p-0.5 dark:bg-white/5"
     >
       <UIcon :name="icon" class="size-8 text-gray-3 dark:text-white/20" />
     </div>

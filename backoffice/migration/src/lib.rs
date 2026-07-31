@@ -36,6 +36,7 @@ mod m20260724_010000_add_profile_fields_to_users;
 mod m20260724_020000_change_app_config_id_to_ulid;
 mod m20260724_030000_add_brand_color_to_app_config;
 mod m20260724_040000_add_logo_url_to_app_config;
+mod m20260724_050000_drop_brand_color_from_app_config;
 
 pub use sea_orm_migration::prelude::*;
 
@@ -86,6 +87,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260724_020000_change_app_config_id_to_ulid::Migration),
             Box::new(m20260724_030000_add_brand_color_to_app_config::Migration),
             Box::new(m20260724_040000_add_logo_url_to_app_config::Migration),
+            Box::new(m20260724_050000_drop_brand_color_from_app_config::Migration),
         ]
     }
 }

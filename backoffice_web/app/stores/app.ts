@@ -25,7 +25,7 @@ export const useAppStore = defineStore("app", {
       defaultCurrency?: string | null;
       defaultLanguage?: string | null;
       maintenanceMode?: boolean;
-      brandColor?: string | null;
+      logoUrl?: string | null;
     }) {
       try {
         const res = await api.put("/config", payload);

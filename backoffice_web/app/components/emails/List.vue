@@ -40,7 +40,7 @@ defineEmits<{
           class="flex-1 py-1.5 text-xs font-medium rounded-lg capitalize transition-colors cursor-pointer"
           :class="
             activeTab === tab
-              ? 'bg-brand-50 dark:bg-brand/10 text-brand dark:text-brand-300'
+              ? 'text-brand dark:text-brand-300'
               : 'text-gray-400 dark:text-white/30 hover:text-gray-700 dark:hover:text-white/60'
           "
           @click="$emit('update:activeTab', tab)"
@@ -48,7 +48,7 @@ defineEmits<{
           {{ tab }}
           <span
             v-if="tab === 'unread' && unreadCount > 0"
-            class="ml-1 bg-brand text-white text-[10px] rounded-full px-1.5 py-0.5"
+            class="ml-1  text-white text-[10px] rounded-full px-1.5 py-0.5"
           >
             {{ unreadCount }}
           </span>

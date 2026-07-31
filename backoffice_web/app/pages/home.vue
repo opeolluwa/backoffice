@@ -108,8 +108,8 @@ function barHeight(val: number) {
                 class="w-full rounded-md transition-all"
                 :class="
                   i === chartValues.length - 1
-                    ? 'bg-brand'
-                    : 'bg-brand-100 dark:bg-brand/20'
+                    ? 'bg-gray-900 dark:bg-gray-100'
+                    : 'bg-gray-100 dark:bg-white/20'
                 "
                 :style="{ height: `${barHeight(val)}%` }"
               />

@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { useNuxtApp } from "#app";
-import { useBrandColor } from "~/composables/useBrandColor";
 
 const { $viewport } = useNuxtApp();
-const { initBrandColor } = useBrandColor();
-
-onMounted(() => {
-  initBrandColor();
-});
 
 watch($viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
   console.log("Breakpoint updated:", oldBreakpoint, "->", newBreakpoint);

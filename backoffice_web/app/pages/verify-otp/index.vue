@@ -47,7 +47,7 @@ async function onSubmit() {
       size="xl"
       type="number"
       class="mt-6"
-      :ui="{ base: 'bg-brand-50 p-7 dark:bg-brand-50/5' }"
+      :ui="{ base: 'bg-gray-50 p-7 dark:bg-gray-50/5' }"
       @complete="onSubmit"
     />
 

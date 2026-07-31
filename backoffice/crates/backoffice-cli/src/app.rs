@@ -101,7 +101,7 @@ async fn init(app: &Application) -> Result<(), CliError> {
 
     app.repositories
         .app_config
-        .create_app_config(&config_ulid, Some(app_name), Some(email), None, None, None, None)
+        .create_app_config(&config_ulid, Some(app_name), Some(email), None, None, None)
         .await
         .map_err(|e| CliError::DatabaseError(e.to_string()))?;
 
