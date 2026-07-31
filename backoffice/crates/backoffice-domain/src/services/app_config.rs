@@ -26,7 +26,6 @@ pub trait AppConfigServiceExt {
         default_currency: Option<String>,
         default_language: Option<String>,
         maintenance_mode: Option<bool>,
-        brand_color: Option<String>,
         logo_url: Option<String>,
     ) -> Result<app_config::Model, ServiceError>;
 }
@@ -43,7 +42,6 @@ impl<R: AppConfigRepositoryExt + Send + Sync> AppConfigServiceExt for AppConfigS
         default_currency: Option<String>,
         default_language: Option<String>,
         maintenance_mode: Option<bool>,
-        brand_color: Option<String>,
         logo_url: Option<String>,
     ) -> Result<app_config::Model, ServiceError> {
         let existing = self.repo.find_app_config().await?;
@@ -57,7 +55,6 @@ impl<R: AppConfigRepositoryExt + Send + Sync> AppConfigServiceExt for AppConfigS
                     default_currency,
                     default_language,
                     maintenance_mode,
-                    brand_color,
                     logo_url,
                 )
                 .await?),
@@ -71,7 +68,6 @@ impl<R: AppConfigRepositoryExt + Send + Sync> AppConfigServiceExt for AppConfigS
                         support_email,
                         default_currency,
                         default_language,
-                        brand_color,
                         logo_url,
                     )
                     .await?)

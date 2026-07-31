@@ -1,4 +1,4 @@
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
 
 use backoffice_domain::{
     errors::database_error::DatabaseError,
@@ -34,7 +34,6 @@ impl AppConfigRepositoryExt for AppConfigRepository {
         support_email: Option<String>,
         default_currency: Option<String>,
         default_language: Option<String>,
-        brand_color: Option<String>,
         logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError> {
         let model = app_config::ActiveModel {
@@ -44,7 +43,6 @@ impl AppConfigRepositoryExt for AppConfigRepository {
             support_email: Set(support_email),
             default_currency: Set(default_currency),
             default_language: Set(default_language),
-            brand_color: Set(brand_color),
             logo_url: Set(logo_url),
             ..Default::default()
         };
@@ -61,7 +59,6 @@ impl AppConfigRepositoryExt for AppConfigRepository {
         default_currency: Option<String>,
         default_language: Option<String>,
         maintenance_mode: Option<bool>,
-        brand_color: Option<String>,
         logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError> {
         let config = AppConfigEntity::find()
@@ -80,7 +77,6 @@ impl AppConfigRepositoryExt for AppConfigRepository {
         if let Some(mode) = maintenance_mode {
             active.maintenance_mode = Set(mode);
         }
-        active.brand_color = Set(brand_color);
         active.logo_url = Set(logo_url);
 
         active

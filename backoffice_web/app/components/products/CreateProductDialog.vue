@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCountryStore } from "~/stores/country";
 import { useUploadStore } from "~/stores/uploads";
+import { useCurrency } from "~/composables/useCurrency";
 import { z } from "zod";
 
 const open = defineModel<boolean>("open", { default: false });
@@ -23,6 +24,7 @@ const emit = defineEmits<{
 
 const countryStore = useCountryStore();
 const uploadStore = useUploadStore();
+const { defaultCountry, ensureLoaded } = useCurrency();
 
 type ImageSource = "upload" | "library";
 const imageSource = ref<ImageSource>("upload");
@@ -68,11 +70,23 @@ function reset() {
   state.name = "";
   state.description = "";
   state.price = 0;
-  state.currencyIdentifier = "";
+  state.currencyIdentifier = defaultCountry.value?.identifier ?? "";
   newFile.value = null;
   selectedUploadId.value = null;
   imageSource.value = "upload";
 }
+
+watch(
+  open,
+  (isOpen) => {
+    if (isOpen) {
+      ensureLoaded().then(() => {
+        state.currencyIdentifier = defaultCountry.value?.identifier ?? "";
+      });
+    }
+  },
+  { immediate: true },
+);
 
 function pickFromLibrary() {
   openLibrary.value = true;

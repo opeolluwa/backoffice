@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { useCurrency } from "~/composables/useCurrency";
+
 defineProps<{
   months: string[];
   values: number[];
   range: string;
 }>();
+
+const { formatMoney } = useCurrency();
 
 function barHeight(val: number, max: number) {
   return Math.max(Math.round((val / max) * 100), 4);
@@ -12,7 +16,7 @@ function barHeight(val: number, max: number) {
 
 <template>
   <div
-    class="xl:col-span-2 bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+    class="xl:col-span-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
   >
     <div class="flex items-center justify-between mb-6">
       <div>
@@ -32,8 +36,8 @@ function barHeight(val: number, max: number) {
             class="w-full rounded-md transition-all"
             :class="
               i === values.length - 1
-                ? 'bg-brand'
-                : 'bg-brand-100 dark:bg-brand/20'
+                ? 'bg-gray-900 dark:bg-gray-100'
+                : 'bg-gray-100 dark:bg-white/20'
             "
             :style="{ height: `${barHeight(val, Math.max(...values, 1))}%` }"
           />
@@ -49,7 +53,7 @@ function barHeight(val: number, max: number) {
     >
       <div>
         <p class="text-lg font-bold text-gray-900 dark:text-white">
-          ₦{{ values[values.length - 1]?.toLocaleString() ?? 0 }}
+          {{ formatMoney(values[values.length - 1] ?? 0) }}
         </p>
         <p class="text-xs text-gray-400 dark:text-white/30">this month</p>
       </div>

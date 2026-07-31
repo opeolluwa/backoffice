@@ -21,8 +21,6 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable)]
     pub default_language: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
-    pub brand_color: Option<String>,
-    #[sea_orm(column_type = "Text", nullable)]
     pub logo_url: Option<String>,
 }
 

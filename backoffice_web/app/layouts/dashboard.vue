@@ -110,7 +110,6 @@ const logout = async () => useLogout();
   <UDashboardGroup>
     <UDashboardSidebar
       collapsible
-
       class="border-r-0"
       :ui="{
         root: 'bg-primary border-r-0',
@@ -120,24 +119,7 @@ const logout = async () => useLogout();
       }"
     >
       <template #header="{ collapsed }">
-        <div class="flex items-center overflow-hidden">
-          <div
-            class="size-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0"
-          >
-            <UIcon
-              name="heroicons:building-office-2"
-              class="size-4.5 text-white"
-            />
-          </div>
-          <Transition name="fade" mode="out-in">
-            <span
-              v-if="!collapsed"
-              class="text-sm font-semibold text-white whitespace-nowrap"
-            >
-              backoffice
-            </span>
-          </Transition>
-        </div>
+        <AppLogo :collapsed="collapsed" variant="light" />
       </template>
 
       <template #default="{ collapsed }">

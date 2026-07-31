@@ -12,7 +12,6 @@ pub trait AppConfigRepositoryExt {
         default_currency: Option<String>,
         default_language: Option<String>,
         maintenance_mode: Option<bool>,
-        brand_color: Option<String>,
         logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError>;
 
@@ -23,7 +22,6 @@ pub trait AppConfigRepositoryExt {
         support_email: Option<String>,
         default_currency: Option<String>,
         default_language: Option<String>,
-        brand_color: Option<String>,
         logo_url: Option<String>,
     ) -> Result<app_config::Model, DatabaseError>;
 }

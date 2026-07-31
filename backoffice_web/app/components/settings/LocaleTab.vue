@@ -52,7 +52,7 @@ function save() {
   <div class="space-y-4">
     <!-- Theme -->
     <div
-      class="hidden bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="hidden bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">Appearance</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
@@ -66,7 +66,7 @@ function save() {
           class="flex flex-col items-center gap-2 p-4 rounded-xl border transition-all cursor-pointer"
           :class="
             selectedTheme === theme.value
-              ? 'border-brand bg-brand-50 dark:bg-brand/10 text-brand'
+              ? 'border-brand bg-gray-50 dark:bg-white/10 text-brand'
               : 'border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 text-gray-500 dark:text-white/40'
           "
           @click="setTheme(theme.value)"
@@ -79,7 +79,7 @@ function save() {
 
     <!-- Language -->
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">Language</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
@@ -96,7 +96,7 @@ function save() {
 
     <!-- Timezone -->
     <div
-      class="bg-white dark:bg-brand-dark-600 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">Timezone</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">

@@ -20,7 +20,6 @@ pub struct UpdateAppConfigRequest {
     pub default_currency: Option<String>,
     pub default_language: Option<String>,
     pub maintenance_mode: Option<bool>,
-    pub brand_color: Option<String>,
     pub logo_url: Option<String>,
 }
 
@@ -47,7 +46,6 @@ pub async fn update_app_config(
             data.default_currency,
             data.default_language,
             data.maintenance_mode,
-            data.brand_color,
             data.logo_url,
         )
         .await?;

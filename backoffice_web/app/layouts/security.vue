@@ -2,7 +2,7 @@
 
 <template>
   <main
-    class="h-screen w-full flex items-center justify-center overflow-hidden relative bg-linear-to-br from-brand-50 via-white to-brand-50 dark:bg-brand-dark-700"
+    class="h-screen w-full flex items-center justify-center overflow-hidden relative bg-linear-to-br from-brand-50 via-white to-brand-50 dark:bg-gray-900"
   >
     <!-- Background image (dark only) -->
     <!-- <img
@@ -13,7 +13,7 @@
     /> -->
 
     <!-- Dark overlay (dark only) -->
-    <div class="absolute inset-0 bg-brand-dark-700/75 hidden dark:block" />
+    <div class="absolute inset-0 bg-gray-900/75 hidden dark:block" />
 
     <!-- Subtle grid texture (dark only) -->
     <div
@@ -41,16 +41,16 @@
 
     <!-- Glowing accent blobs -->
     <div
-      class="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-brand/10 blur-[120px] pointer-events-none dark:bg-brand/20"
+      class="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-gray-900/10 blur-[120px] pointer-events-none dark:bg-white/20"
     />
     <div
-      class="absolute bottom-0 right-0 w-[320px] h-80 rounded-full blur-[100px] pointer-events-none dark:bg-brand/10"
+      class="absolute bottom-0 right-0 w-[320px] h-80 rounded-full blur-[100px] pointer-events-none dark:bg-white/10"
     />
 
     <!-- Card -->
     <div class="relative z-10 w-1/3 min-w-80 mx-auto px-4">
       <div
-        class="rounded-2xl px-8 py-10 shadow-lg dark:bg-brand-dark-600/80 dark:backdrop-blur-md dark:border-white/8 dark:shadow-2xl"
+        class="rounded-2xl px-8 py-10 shadow-lg dark:bg-gray-800/80 dark:backdrop-blur-md dark:border-white/8 dark:shadow-2xl"
       >
         <!-- Brand mark -->
         <div class="flex items-center justify-center gap-2.5 mb-8">
