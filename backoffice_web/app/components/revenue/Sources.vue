@@ -12,7 +12,7 @@ defineProps<{
 
 <template>
   <div
-    class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+    class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
   >
     <p class="text-sm font-semibold text-gray-700 dark:text-white/80 mb-1">
       By source

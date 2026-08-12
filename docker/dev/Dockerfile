@@ -21,6 +21,7 @@ RUN cargo install cargo-watch
 
 WORKDIR /app
 
+COPY backoffice_macros/ ./backoffice_macros/
 COPY backoffice/ ./backoffice/
 
 WORKDIR /app/backoffice
@@ -40,15 +41,8 @@ CMD ["cargo", "watch", \
      "--ignore", ".git/", \
      "--ignore", "target/", \
      "-w", "src", \
-     "-w", "Cargo.toml", \
      "-w", "migration", \
-     "-w", "crates", \
-     "-w", "crates/backoffice-api", \
-     "-w", "crates/backoffice-cli", \
-     "-w", "crates/backoffice-config", \
-     "-w", "crates/backoffice-domain", \
-     "-w", "crates/backoffice-infra", \
-     "-w", "crates/backoffice-macros", \
-     "-w", "crates/backoffice-payment-provider", \
+     "-w", "templates", \
+     "-w", "../backoffice_macros", \
      "-x", "check", \
      "-x", "run"]

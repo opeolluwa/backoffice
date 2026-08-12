@@ -1,4 +1,4 @@
-use backoffice_cli::app;
+use backoffice_lib::cli::app;
 
 #[tokio::main]
 async fn main() {

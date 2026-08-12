@@ -7,12 +7,11 @@ alias run-fe := run-frontend
 alias r := restart
 alias cfg := copy-env
 alias start := watch
-alias dev := watch
 
 set dotenv-required := false
-set dotenv-load := true
+set dotenv-load
 set dotenv-path := "./backoffice/.env"
-set export := true
+set export
 
 FRONTEND_DIR := 'backoffice_web'
 DOCKER_CMD := "docker compose -f docker-compose.yaml"
@@ -49,6 +48,15 @@ DEV_DB_URL := "postgres://backoffice:backoffice@localhost:6543/backoffice"
 # ──────────────────────────────────────────────
 # Development
 # ──────────────────────────────────────────────
+
+[doc('Run backoffice web server and Nuxt frontend concurrently')]
+dev:
+    npm exec concurrently --names backoffice,web --prefix-colors blue,red "just run-backoffice" "just run-frontend"
+
+[doc('Run backoffice web server')]
+[working-directory('backoffice')]
+run-backoffice:
+    just watch
 
 [doc('Start dev environment and follow logs')]
 @watch:
@@ -149,12 +157,12 @@ prod-logs:
 # ──────────────────────────────────────────────
 
 [doc('Run frontend dev server')]
-[working-directory: 'backoffice_web']
+[working-directory('backoffice_web')]
 @run-frontend:
     npm run dev
 
 [doc('Build frontend and copy assets to backend')]
-[working-directory: 'backoffice_web']
+[working-directory('backoffice_web')]
 @build-frontend:
     npm run generate
     {{ if os_family() == "windows" { "Remove-Item -Recurse -Force ../assets" } else { "rm -rf ../assets" } }}
@@ -170,19 +178,19 @@ db:
     cargo sqlx prepare -- --bin cli
 
 [doc('Add a new SeaORM migration')]
-[working-directory: 'backoffice']
+[working-directory('backoffice')]
 migrate-add target:
-    sea-orm-cli migrate generate {{target}}
+    sea-orm-cli migrate generate {{ target }}
 
 [doc('Run SeaORM migrations against dev DB')]
-[working-directory: 'backoffice']
+[working-directory('backoffice')]
 @run-migrations:
-    sea-orm-cli migrate up --database-url {{DEV_DB_URL}}
+    sea-orm-cli migrate up --database-url {{ DEV_DB_URL }}
 
 [doc('Regenerate SeaORM entities from dev DB')]
 @generate-entities:
     RUST_BACKTRACE=full sea-orm-cli generate entity \
-        --database-url {{DEV_DB_URL}} \
+        --database-url {{ DEV_DB_URL }} \
         --with-serde both \
         --enum-extra-derives 'ts_rs::TS' \
         --model-extra-attributes 'serde(rename_all="camelCase")' \
@@ -199,7 +207,7 @@ db-pull:
     node scripts/ts-export.js
 
 [doc('Export TypeScript bindings from Rust tests')]
-[working-directory: 'backoffice']
+[working-directory('backoffice')]
 export-bindings:
     cargo test --workspace
 
@@ -208,12 +216,12 @@ export-bindings:
 # ──────────────────────────────────────────────
 
 [doc('Create a new admin user via CLI')]
-[working-directory: 'backoffice']
+[working-directory('backoffice')]
 run-cli:
-    DATABASE_URL={{DEV_DB_URL}} cargo run --bin cli create-user
+    DATABASE_URL={{ DEV_DB_URL }} cargo run --bin cli create-user
 
 [doc('Initialize the application via CLI')]
-[working-directory: 'backoffice']
+[working-directory('backoffice')]
 run-init:
     cargo run --bin cli init
 

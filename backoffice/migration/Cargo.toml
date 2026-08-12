@@ -1,15 +1,14 @@
 [package]
-edition.workspace = true
 name = "migration"
+version = "0.1.0"
+edition = "2024"
 publish = false
-version.workspace = true
 
 [lib]
 name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
-sea-orm = { workspace = true, features = ["rbac"] }
-sea-orm-migration.workspace = true
-tokio.workspace = true
-
+sea-orm = { version = "=2.0.0-rc.37", features = ["rbac"] }
+sea-orm-migration = { version = "=2.0.0-rc.37", features = ["runtime-tokio-rustls", "sqlx-postgres"] }
+tokio = { version = "1.44.2", features = ["full", "macros"] }

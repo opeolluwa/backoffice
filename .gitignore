@@ -33,3 +33,4 @@ logs/
 tmp/
 
 docs.sh
+email.sh

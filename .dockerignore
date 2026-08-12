@@ -1,6 +1,8 @@
 **
 !backoffice/
 !backoffice/**
+!backoffice_macros/
+!backoffice_macros/**
 !backoffice_web/
 !backoffice_web/**
 
