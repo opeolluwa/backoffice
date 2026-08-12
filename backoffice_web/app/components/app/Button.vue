@@ -5,7 +5,7 @@
     :loading="loading"
     :size="size"
     :disabled="disabled || loading"
-    class="dark:text-gray-200 dark:bg-primary-300 bg-primary-400"
+    class="dark:text-gray-200 dark:bg-primary-300 bg-primary-400 disabled:bg-primary-200"
   >
     <slot />
   </UButton>
@@ -14,7 +14,7 @@
 <script setup lang="ts">
 defineProps({
   type: {
-    type: String as PropType<"button" | "submit" | "reset">,
+    type: String as PropType<"button" | "submit" | "reset" | "link">,
     default: "button",
   },
   color: {

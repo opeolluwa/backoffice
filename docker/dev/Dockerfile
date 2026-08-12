@@ -28,7 +28,7 @@ WORKDIR /app/backoffice
 
 RUN cargo build
 
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app /cargo-target /usr/local/cargo/registry
 
 USER appuser
 
