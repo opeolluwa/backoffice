@@ -68,9 +68,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
 
 <template>
   <div class="space-y-4">
-    <div
-      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
-    >
+    <div class="border border-gray-100 dark:border-white/5 rounded-2xl p-5">
       <UChip size="sm" position="bottom-right" class="bg-none">
         <template #content>
           <UButton
@@ -92,9 +90,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       </UChip>
     </div>
 
-    <div
-      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
-    >
+    <div class="border border-gray-100 dark:border-white/5 rounded-2xl p-5">
       <p class="font-semibold text-gray-900 dark:text-white mb-1">
         Personal information
       </p>
@@ -162,12 +158,11 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       <template #footer>
         <div class="flex justify-end gap-2">
           <UButton
-            color="neutral"
-            variant="outline"
+            color="error"
             label="Cancel"
             @click="open = false"
           />
-          <UButton
+          <AppButton
             label="Upload"
             :loading="uploading"
             :disabled="!file"
