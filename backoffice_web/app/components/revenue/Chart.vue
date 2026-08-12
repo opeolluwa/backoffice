@@ -16,7 +16,7 @@ function barHeight(val: number, max: number) {
 
 <template>
   <div
-    class="xl:col-span-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+    class="xl:col-span-2  border border-gray-100 dark:border-white/5 rounded-2xl p-5"
   >
     <div class="flex items-center justify-between mb-6">
       <div>

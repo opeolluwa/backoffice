@@ -3,12 +3,14 @@ use std::net::{Ipv4Addr, SocketAddrV4};
 use axum::{Router, extract::DefaultBodyLimit, http::StatusCode};
 use tower_http::{limit::RequestBodyLimitLayer, timeout::TimeoutLayer};
 
-use backoffice_api::{load_graphql_router, load_http_routes, state::AppState};
-use backoffice_config::{
+use crate::config::db::init_db_pool;
+use crate::config::{
     cors::init_cors, env::load_config, logger::init_tracing, shutdown::shutdown_signal,
 };
-use backoffice_domain::errors::app_error::AppError;
-use backoffice_infra::database::connection::init_db_pool;
+use crate::errors::app_error::AppError;
+use crate::graphql::build_router as load_graphql_router;
+use crate::http::routes::router::load_routes as load_http_routes;
+use crate::state::AppState;
 
 pub async fn run() -> Result<(), AppError> {
     let app_config = load_config()?;

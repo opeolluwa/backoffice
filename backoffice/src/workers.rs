@@ -1,4 +1,4 @@
-use backoffice_config::env::AppConfig;
+use crate::config::env::AppConfig;
 use bullmq::redis_connection::RedisConnection;
 use bullmq::worker::{CancellationToken, ProcessorFn};
 use bullmq::{Job, Queue, QueueOptions, Worker, WorkerOptions};

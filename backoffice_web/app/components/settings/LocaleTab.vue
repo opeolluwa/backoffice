@@ -52,7 +52,7 @@ function save() {
   <div class="space-y-4">
     <!-- Theme -->
     <div
-      class="hidden bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class="hidden  border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">Appearance</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
@@ -79,7 +79,7 @@ function save() {
 
     <!-- Language -->
     <div
-      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">Language</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
@@ -96,7 +96,7 @@ function save() {
 
     <!-- Timezone -->
     <div
-      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">Timezone</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">

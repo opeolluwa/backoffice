@@ -27,8 +27,8 @@ function handleCta() {
       <h2 class="text-lg font-semibold">{{ title }}</h2>
       <p class="text-sm text-muted mt-1">{{ subtitle }}</p>
     </div>
-    <UButton class="px-4 py-2 shrink-0" @click="handleCta()">
+    <AppButton class="px-4 py-2 shrink-0" @click="handleCta()">
       {{ ctaText }}
-    </UButton>
+    </AppButton>
   </div>
 </template>

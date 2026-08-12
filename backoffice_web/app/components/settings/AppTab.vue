@@ -185,7 +185,7 @@ async function toggleMaintenance() {
   <div class="space-y-4">
     <!-- General -->
     <div
-      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">General</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
@@ -227,7 +227,7 @@ async function toggleMaintenance() {
 
     <!-- Logo -->
     <div
-      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">Logo</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">
@@ -284,7 +284,7 @@ async function toggleMaintenance() {
 
     <!-- Locale Defaults -->
     <div
-      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">
         Locale defaults
@@ -325,7 +325,7 @@ async function toggleMaintenance() {
 
     <!-- Maintenance -->
     <div
-      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">
         Maintenance
@@ -378,7 +378,7 @@ async function toggleMaintenance() {
 
     <!-- Info -->
     <div
-      class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-5"
+      class=" border border-gray-100 dark:border-white/5 rounded-2xl p-5"
     >
       <p class="font-semibold text-gray-900 dark:text-white mb-1">App info</p>
       <p class="text-xs text-gray-400 dark:text-white/30 mb-5">

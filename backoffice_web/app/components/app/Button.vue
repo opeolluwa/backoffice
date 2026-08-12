@@ -5,6 +5,7 @@
     :loading="loading"
     :size="size"
     :disabled="disabled || loading"
+    class="dark:text-gray-200 dark:bg-primary-300 bg-primary-400"
   >
     <slot />
   </UButton>

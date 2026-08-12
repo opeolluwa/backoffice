@@ -1,55 +1,38 @@
 [package]
-default-run = "backoffice"
-edition.workspace = true
 name = "backoffice"
 version = "0.1.0"
-
-[workspace]
-members = [
-    "crates/backoffice-api",
-    "crates/backoffice-cli",
-    "crates/backoffice-config",
-    "crates/backoffice-domain",
-    "crates/backoffice-infra",
-    "crates/backoffice-macros",
-    "crates/backoffice-payment-provider",
-    "migration",
-]
-resolver = "2"
-
-[workspace.package]
 authors = ["Adefemi Adeoye"]
 description = "Content management system and administrative platform for web applications"
-version = "0.1.0"
 edition = "2024"
+default-run = "backoffice"
 
-[workspace.dependencies]
+[lib]
+name = "backoffice_lib"
+path = "src/lib.rs"
+
+[dependencies]
 askama = "0.15.6"
 async-graphql = "7.0"
 async-graphql-axum = "7.0"
-axum = "0.8.3"
+axum = { version = "0.8.3", features = ["macros"] }
 axum-extra = { version = "0.12.1", features = ["typed-header"] }
-axum-test = "18.2.1"
 axum_typed_multipart = { version = "0.16.3", features = ["tempfile_3"] }
-backoffice-api = { path = "crates/backoffice-api" }
-backoffice-cli = { path = "crates/backoffice-cli" }
-backoffice-config = { path = "crates/backoffice-config" }
-backoffice-domain = { path = "crates/backoffice-domain" }
-backoffice-infra = { path = "crates/backoffice-infra" }
-backoffice-payment-provider = { path = "crates/backoffice-payment-provider" }
+backoffice_macros = { version = "0.1.0", path = "../backoffice_macros" }
 base64 = "0.22"
 bcrypt = "0.17.0"
+bullmq-official = "1.1.0"
 chrono = { version = "0.4.41", features = ["serde"] }
 clap = { version = "4.5.51", features = ["derive"] }
 console = "0.16.1"
 dialoguer = "0.12.0"
-dotenv = "0.15.0"
-fs_extra = "1.3.0"
 jsonwebtoken = { version = "10.1.0", features = ["rust_crypto"] }
+lettre = { version = "0.11.22", features = ["ring", "rustls", "rustls-native-certs"] }
+log = "0.4.27"
 migration = { version = "0.1.0", path = "migration" }
-mockall = "0.13"
+redis = "1.4.1"
 reqwest = { version = "0.12", features = ["json", "multipart"] }
 rust_decimal = { version = "1.39.0", features = ["macros", "serde"] }
+sanitizer = { version = "1.0.0", features = ["derive"] }
 sea-orm = { version = "=2.0.0-rc.37", features = [
     "runtime-tokio-rustls",
     "sqlx-postgres",
@@ -69,11 +52,14 @@ seaography = { version = "=2.0.0-rc.8", features = [
     "with-chrono",
     "with-uuid",
     "with-postgres-array",
+    "field-camel-case",
+    "serde",
 ] }
 secrecy = { version = "0.10.3", features = ["serde"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = { version = "1.0.140", features = ["raw_value"] }
 serde_with = "3.16.0"
+tempfile = "3.23.0"
 thiserror = "2.0.12"
 tokio = { version = "1.44.2", features = ["full", "macros"] }
 tower = { version = "0.5.2", features = ["limit", "timeout"] }
@@ -89,40 +75,16 @@ ts-rs = { version = "11.1.0", features = [
 ] }
 ulid = { version = "1.2.1", features = ["serde"] }
 url = "2.5"
+uuid = { version = "1.24.0", features = ["v4"] }
 validator = { version = "0.20.0", features = ["derive"] }
-redis = "1.4.1"
-
-[lib]
-name = "backoffice_lib"
-path = "src/lib.rs"
-
-[dependencies]
-axum.workspace = true
-backoffice-api = { workspace = true }
-backoffice-cli = { workspace = true }
-backoffice-config = { workspace = true }
-backoffice-domain.workspace = true
-backoffice-infra = { workspace = true }
-backoffice-payment-provider.workspace = true
-bullmq-official = "1.1.0"
-migration.workspace = true
-redis.workspace = true
-secrecy.workspace = true
-serde_json.workspace = true
-tokio.workspace = true
-tower-http.workspace = true
-tracing.workspace = true
-ulid.workspace = true
-
-[build-dependencies]
-fs_extra.workspace = true
 
 [dev-dependencies]
-axum = { workspace = true, features = ["macros"] } 
-axum-test.workspace = true
-sea-orm = { workspace = true, features = ["sqlx-sqlite"] }
-secrecy.workspace = true
-serde_json.workspace = true
+axum-test = "18.2.1"
+mockall = "0.13"
+sea-orm = { version = "=2.0.0-rc.37", features = ["sqlx-sqlite"] }
+secrecy = { version = "0.10.3", features = ["serde"] }
+serde_json = "1.0.140"
+tokio = { version = "1.44.2", features = ["full", "macros"] }
 
 [profile.release]
 codegen-units = 1

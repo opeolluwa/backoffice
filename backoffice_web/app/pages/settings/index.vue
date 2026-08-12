@@ -47,7 +47,7 @@ const tabs: { key: TabKey; label: string; icon: string; desc: string }[] = [
   <div class="flex gap-6 items-start">
     <aside class="w-52 shrink-0">
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 rounded-2xl p-2 sticky top-0"
+        class=" border border-gray-100 dark:border-white/5 rounded-2xl p-2 sticky top-0"
       >
         <p
           class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-white/25 px-3 py-2"
